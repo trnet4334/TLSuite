@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FMSYS Trading Suite Pro — Design Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --primary: #13ec80;
+    --primary-dim: rgba(19, 236, 128, 0.12);
+    --bg: #0e1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2129;
+    --border: rgba(255,255,255,0.06);
+    --border-active: rgba(19, 236, 128, 0.3);
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-muted: #484f58;
+    --mac-red: #ff5f57;
+    --mac-yellow: #ffbd2e;
+    --mac-green: #28c840;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --radius: 12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Manrope', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 80px 40px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(19,236,128,0.08) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--primary-dim); color: var(--primary);
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 42px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero p { color: var(--text-dim); font-size: 16px; max-width: 560px; margin: 0 auto; }
+  .hero-meta {
+    margin-top: 32px; display: flex; justify-content: center; gap: 32px;
+    font-size: 12px; color: var(--text-muted); font-weight: 600;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── Container ── */
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── Navigation ── */
+  .doc-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(14,17,23,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+  }
+  .doc-nav-inner {
+    max-width: 1120px; margin: 0 auto;
+    display: flex; gap: 4px; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .doc-nav-inner::-webkit-scrollbar { display: none; }
+  .nav-item {
+    padding: 14px 16px; font-size: 12px; font-weight: 700; color: var(--text-muted);
+    text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-item:hover { color: var(--text-dim); }
+  .nav-item.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ── Sections ── */
+  .section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--primary); margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px;
+  }
+  .section-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 40px; max-width: 640px; }
+
+  /* ── Cards ── */
+  .card-grid { display: grid; gap: 16px; }
+  .card-grid-2 { grid-template-columns: 1fr 1fr; }
+  .card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .card-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; transition: all 0.25s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.1); background: var(--bg-card-hover); }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; font-size: 22px;
+  }
+  .card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ── Flow / Sitemap ── */
+  .flow-container {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 40px; overflow-x: auto;
+  }
+  .flow-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .flow-row:last-child { margin-bottom: 0; }
+  .flow-node {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: 12px; font-weight: 700; white-space: nowrap;
+    border: 1px solid var(--border);
+  }
+  .flow-node.auth { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.25); color: var(--blue); }
+  .flow-node.main { background: var(--primary-dim); border-color: var(--border-active); color: var(--primary); }
+  .flow-node.sub { background: rgba(255,255,255,0.03); color: var(--text-dim); }
+  .flow-node.settings { background: rgba(240,136,62,0.1); border-color: rgba(240,136,62,0.2); color: var(--orange); }
+  .flow-arrow { color: var(--text-muted); font-size: 18px; }
+  .flow-branch { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .flow-vline {
+    width: 1px; height: 28px; background: var(--text-muted); margin: 0 auto;
+    opacity: 0.3;
+  }
+
+  /* ── Color Palette ── */
+  .palette-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .palette-chip {
+    width: 80px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .palette-color {
+    width: 80px; height: 56px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .palette-name { font-size: 11px; font-weight: 700; }
+  .palette-hex { font-size: 10px; color: var(--text-muted); font-family: 'SF Mono', monospace; }
+
+  /* ── Component Spec ── */
+  .spec-table { width: 100%; border-collapse: collapse; }
+  .spec-table th {
+    text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--text-muted); padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .spec-table td {
+    font-size: 13px; padding: 12px 16px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table code {
+    font-family: 'SF Mono', 'Monaco', monospace;
+    font-size: 11px; background: rgba(255,255,255,0.06); padding: 2px 6px;
+    border-radius: 4px; color: var(--primary);
+  }
+
+  /* ── Tag / Pill ── */
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 100px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .tag-green { background: rgba(19,236,128,0.12); color: #13ec80; }
+  .tag-blue { background: rgba(88,166,255,0.12); color: #58a6ff; }
+  .tag-purple { background: rgba(188,140,255,0.12); color: #bc8cff; }
+  .tag-orange { background: rgba(240,136,62,0.12); color: #f0883e; }
+  .tag-red { background: rgba(255,95,87,0.12); color: #ff5f57; }
+
+  /* ── macOS Chrome Preview ── */
+  .mac-preview {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .mac-preview-bar {
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);
+  }
+  .mac-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mac-preview-content { padding: 24px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .card-grid-2, .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .section { padding: 40px 0; }
+  }
+
+  /* ── Schema / ER ── */
+  .schema-entity {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .schema-entity-header {
+    padding: 10px 16px; font-size: 13px; font-weight: 800;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .schema-entity-body { padding: 0; }
+  .schema-field {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .schema-field:last-child { border-bottom: none; }
+  .schema-field-name { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .schema-field-type { font-family: 'SF Mono', monospace; font-size: 10px; color: var(--primary); background: var(--primary-dim); padding: 2px 8px; border-radius: 4px; }
+  .schema-field-key { font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px; }
+  .schema-field-pk { background: rgba(255,189,46,0.15); color: var(--mac-yellow); }
+  .schema-field-fk { background: rgba(88,166,255,0.15); color: var(--blue); }
+  .schema-field-req { color: var(--mac-red); margin-left: 2px; font-size: 10px; }
+
+  /* ── State Cards ── */
+  .state-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .state-card-header {
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .state-card-body { padding: 16px; }
+  .state-preview {
+    background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 24px; text-align: center;
+    margin-bottom: 12px; min-height: 100px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* ── Breakpoint Bar ── */
+  .bp-bar {
+    display: flex; height: 32px; border-radius: 6px; overflow: hidden;
+    border: 1px solid var(--border); margin-bottom: 8px;
+  }
+  .bp-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ── Permission Matrix ── */
+  .perm-matrix { width: 100%; border-collapse: collapse; }
+  .perm-matrix th, .perm-matrix td {
+    padding: 10px 12px; font-size: 12px; text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .perm-matrix th {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text-muted);
+  }
+  .perm-matrix td:first-child { text-align: left; font-weight: 600; }
+  .perm-check { color: var(--primary); font-size: 16px; }
+  .perm-deny { color: var(--mac-red); font-size: 14px; font-weight: 700; }
+  .perm-limited { color: var(--mac-yellow); font-size: 11px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="material-symbols-outlined" style="font-size:14px">architecture</span>
+    Design Architecture v1.2
+  </div>
+  <h1>FMSYS Trading Suite Pro</h1>
+  <p>交易紀錄平台設計架構文件 — macOS 原生風格桌面應用，涵蓋認證流程、核心交易模組、資料模型、互動規格、權限系統與技術架構</p>
+  <div class="hero-meta">
+    <span><span class="material-symbols-outlined" style="font-size:14px">devices</span>Platform: macOS (SwiftUI)</span>
+    <span><span class="material-symbols-outlined" style="font-size:14px">palette</span>Design System: FMSYS v4.2</span>
+    <span><span class="material-symbols-outlined" style="font-size:14px">layers</span>17 Sections</span>
+  </div>
+</div>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="doc-nav">
+  <div class="doc-nav-inner">
+    <a class="nav-item active" href="#overview">總覽</a>
+    <a class="nav-item" href="#sitemap">頁面架構</a>
+    <a class="nav-item" href="#design-system">設計系統</a>
+    <a class="nav-item" href="#auth-flow">認證流程</a>
+    <a class="nav-item" href="#dashboard">Dashboard</a>
+    <a class="nav-item" href="#journal">Trading Journal</a>
+    <a class="nav-item" href="#backtesting">Backtesting</a>
+    <a class="nav-item" href="#strategy">Strategy Lab</a>
+    <a class="nav-item" href="#portfolio">Portfolio</a>
+    <a class="nav-item" href="#settings">Settings</a>
+    <a class="nav-item" href="#components">元件規格</a>
+    <a class="nav-item" href="#data-model">資料模型</a>
+    <a class="nav-item" href="#interactions">互動規格</a>
+    <a class="nav-item" href="#responsive">響應式</a>
+    <a class="nav-item" href="#ux-states">UX 狀態</a>
+    <a class="nav-item" href="#permissions">權限系統</a>
+    <a class="nav-item" href="#tech-arch">技術架構</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════ 1. OVERVIEW ═══════════ -->
+<section class="section" id="overview">
+  <div class="section-label">01 — Overview</div>
+  <h2 class="section-title">平台總覽</h2>
+  <p class="section-desc">FMSYS Trading Suite Pro 是一款以 macOS 原生設計語言為基礎的桌面交易紀錄平台，專為專業交易者打造，整合交易日誌、回測分析、策略實驗室與投資組合管理四大核心模組。</p>
+
+  <div class="card-grid card-grid-4">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(88,166,255,0.12); color:var(--blue);">
+        <span class="material-symbols-outlined">shield_lock</span>
+      </div>
+      <h4>安全認證</h4>
+      <p>OAuth / Passkey 登入搭配 MFA 多因子驗證，確保帳戶安全</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--primary-dim); color:var(--primary);">
+        <span class="material-symbols-outlined">book_5</span>
+      </div>
+      <h4>交易日誌</h4>
+      <p>記錄每筆交易的進出場邏輯、情緒標籤與績效追蹤</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(188,140,255,0.12); color:var(--purple);">
+        <span class="material-symbols-outlined">analytics</span>
+      </div>
+      <h4>回測分析</h4>
+      <p>策略回測引擎，含權益曲線、勝率、Profit Factor 等指標</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(240,136,62,0.12); color:var(--orange);">
+        <span class="material-symbols-outlined">science</span>
+      </div>
+      <h4>策略實驗室</h4>
+      <p>開發、測試與優化演算法模型，含即時代碼編輯與參數調整</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2. SITEMAP ═══════════ -->
+<section class="section" id="sitemap">
+  <div class="section-label">02 — Information Architecture</div>
+  <h2 class="section-title">頁面架構 / Sitemap</h2>
+  <p class="section-desc">完整的應用頁面流程圖，展示使用者從登入到各模組的導航路徑。</p>
+
+  <div class="flow-container">
+    <!-- Auth Layer -->
+    <div class="flow-row">
+      <div class="flow-node auth">
+        <span class="material-symbols-outlined" style="font-size:16px">login</span>
+        Login Page
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node auth">
+        <span class="material-symbols-outlined" style="font-size:16px">shield_lock</span>
+        MFA Verification
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node main" style="font-size:14px">
+        <span class="material-symbols-outlined" style="font-size:18px">grid_view</span>
+        Dashboard (主畫面)
+      </div>
+    </div>
+
+    <div class="flow-vline"></div>
+
+    <!-- Main Modules -->
+    <div class="flow-row">
+      <div class="flow-branch">
+        <div class="flow-node sub">
+          <span class="material-symbols-outlined" style="font-size:14px;color:var(--primary)">book_5</span>
+          Trading Journal
+        </div>
+        <div class="flow-node sub">
+          <span class="material-symbols-outlined" style="font-size:14px;color:var(--purple)">analytics</span>
+          Backtesting
+        </div>
+        <div class="flow-node sub">
+          <span class="material-symbols-outlined" style="font-size:14px;color:var(--orange)">science</span>
+          Strategy Lab
+        </div>
+        <div class="flow-node sub">
+          <span class="material-symbols-outlined" style="font-size:14px;color:#13ec80">account_balance_wallet</span>
+          Portfolio
+        </div>
+        <div class="flow-node settings">
+          <span class="material-symbols-outlined" style="font-size:14px">settings</span>
+          Settings
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-vline"></div>
+
+    <!-- Sub pages -->
+    <div class="flow-row" style="gap:24px">
+      <div style="text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Journal 子頁</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Journal List</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Journal Detail</div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Journal 分類</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Stocks</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">ETFs</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Forex</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Crypto</div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Settings 分頁</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">General</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Accounts</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">API Keys</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Alerts</div>
+          <div class="flow-node sub" style="font-size:11px;padding:6px 12px">Style</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 3. DESIGN SYSTEM ═══════════ -->
+<section class="section" id="design-system">
+  <div class="section-label">03 — Design System</div>
+  <h2 class="section-title">設計系統</h2>
+  <p class="section-desc">統一的視覺語言、色彩體系、字體規格與 macOS 原生元件風格定義。</p>
+
+  <!-- macOS Chrome -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">macOS Window Chrome</h3>
+  <div class="mac-preview" style="margin-bottom:32px; max-width:480px">
+    <div class="mac-preview-bar">
+      <div class="mac-dot" style="background:var(--mac-red)"></div>
+      <div class="mac-dot" style="background:var(--mac-yellow)"></div>
+      <div class="mac-dot" style="background:var(--mac-green)"></div>
+      <div style="flex:1;text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);padding:4px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.05)">
+          <span class="material-symbols-outlined" style="font-size:13px;opacity:0.4">search</span>
+          <span style="font-size:11px;opacity:0.4;font-weight:500">Search...</span>
+        </div>
+      </div>
+    </div>
+    <div class="mac-preview-content" style="display:flex;gap:12px;align-items:center;justify-content:center;padding:16px">
+      <span style="font-size:11px;color:var(--text-dim)">Title Bar · Traffic Lights · Search Bar · Toolbar Icons · Status Bar</span>
+    </div>
+  </div>
+
+  <!-- Colors -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">色彩系統 / Color Palette</h3>
+  <div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">品牌色 / Brand</div>
+    <div class="palette-row">
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#13ec80"></div>
+        <div class="palette-name">Primary</div>
+        <div class="palette-hex">#13ec80</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:rgba(19,236,128,0.12);border:1px solid rgba(19,236,128,0.3)"></div>
+        <div class="palette-name">Primary/10</div>
+        <div class="palette-hex">12% opacity</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:12px;margin-top:20px;text-transform:uppercase;letter-spacing:1px">功能色 / Semantic</div>
+    <div class="palette-row">
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#28c840"></div>
+        <div class="palette-name">Success</div>
+        <div class="palette-hex">#28c840</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#ff5f57"></div>
+        <div class="palette-name">Loss / Error</div>
+        <div class="palette-hex">#ff5f57</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#ffbd2e"></div>
+        <div class="palette-name">Warning</div>
+        <div class="palette-hex">#ffbd2e</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#58a6ff"></div>
+        <div class="palette-name">Info / Link</div>
+        <div class="palette-hex">#58a6ff</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#bc8cff"></div>
+        <div class="palette-name">Analytics</div>
+        <div class="palette-hex">#bc8cff</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#f0883e"></div>
+        <div class="palette-name">Strategy</div>
+        <div class="palette-hex">#f0883e</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:12px;margin-top:20px;text-transform:uppercase;letter-spacing:1px">表面 / Surface (Light Mode)</div>
+    <div class="palette-row">
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#ffffff;border:1px solid rgba(0,0,0,0.1)"></div>
+        <div class="palette-name">Card</div>
+        <div class="palette-hex">#FFFFFF</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#f6f6f7;border:1px solid rgba(0,0,0,0.05)"></div>
+        <div class="palette-name">Background</div>
+        <div class="palette-hex">#F6F6F7</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#f1f1f2;border:1px solid rgba(0,0,0,0.05)"></div>
+        <div class="palette-name">Toolbar</div>
+        <div class="palette-hex">#F1F1F2</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:rgba(245,245,247,0.7);border:1px solid rgba(0,0,0,0.05)"></div>
+        <div class="palette-name">Sidebar Glass</div>
+        <div class="palette-hex">F5F5F7 / 70%</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:12px;margin-top:20px;text-transform:uppercase;letter-spacing:1px">表面 / Surface (Dark Mode)</div>
+    <div class="palette-row">
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#1c1c1e"></div>
+        <div class="palette-name">Base</div>
+        <div class="palette-hex">#1C1C1E</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:#2c2c2e"></div>
+        <div class="palette-name">Card / Toolbar</div>
+        <div class="palette-hex">#2C2C2E</div>
+      </div>
+      <div class="palette-chip">
+        <div class="palette-color" style="background:rgba(28,28,30,0.8)"></div>
+        <div class="palette-name">Sidebar Glass</div>
+        <div class="palette-hex">1C1C1E / 80%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typography -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">字體系統 / Typography</h3>
+  <div class="card" style="margin-bottom:32px">
+    <table class="spec-table">
+      <thead>
+        <tr><th>用途</th><th>字體</th><th>大小</th><th>字重</th><th>範例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>主字體</td><td><code>Manrope</code></td><td>—</td><td>300–800</td><td style="font-family:Manrope">The quick brown fox</td></tr>
+        <tr><td>Page Title</td><td><code>Manrope</code></td><td>20–21px</td><td>800 (ExtraBold)</td><td><span style="font-size:20px;font-weight:800">Strategy Lab</span></td></tr>
+        <tr><td>Section Title</td><td><code>Manrope</code></td><td>14–15px</td><td>700 (Bold)</td><td><span style="font-size:14px;font-weight:700">Equity Curve</span></td></tr>
+        <tr><td>Nav / Button</td><td><code>Manrope</code></td><td>13px</td><td>600–700</td><td><span style="font-size:13px;font-weight:600">Backtesting</span></td></tr>
+        <tr><td>Body Text</td><td><code>Manrope</code></td><td>12–13px</td><td>500</td><td><span style="font-size:12px;font-weight:500">Cumulative net profit</span></td></tr>
+        <tr><td>Label / Caption</td><td><code>Manrope</code></td><td>10–11px</td><td>700</td><td><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">WIN RATE</span></td></tr>
+        <tr><td>Code / Mono</td><td><code>SF Mono, Monaco</code></td><td>11px</td><td>400</td><td><span style="font-family:monospace;font-size:11px">enterLong("L1")</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Layout -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">佈局結構 / Layout</h3>
+  <div class="card-grid card-grid-2" style="margin-bottom:32px">
+    <div class="card">
+      <h4>App Shell (Dashboard 頁面)</h4>
+      <p style="margin-bottom:12px">macOS 三欄式佈局，含 Title Bar、Sidebar、Main Content 與可選的 Inspector Panel</p>
+      <div style="display:flex;gap:2px;height:120px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+        <div style="width:100%;height:12px;background:rgba(255,255,255,0.06);position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:0 8px;gap:4px">
+        </div>
+        <div style="width:20%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);font-weight:700">SIDEBAR<br>W: 256px</div>
+        <div style="flex:1;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);font-weight:700">MAIN CONTENT<br>flex: 1</div>
+        <div style="width:25%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);font-weight:700">INSPECTOR<br>W: 320px</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>Auth Shell (登入 / MFA 頁面)</h4>
+      <p style="margin-bottom:12px">居中卡片式佈局，毛玻璃效果容器，最大寬度 400px</p>
+      <div style="height:120px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(135deg,rgba(19,236,128,0.05),rgba(88,166,255,0.05));display:flex;align-items:center;justify-content:center">
+        <div style="width:50%;height:80%;background:rgba(255,255,255,0.06);border-radius:12px;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);font-weight:700;backdrop-filter:blur(20px)">
+          GLASS CARD<br>max-w: 400px
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacing & Radius -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">間距與圓角 / Spacing & Radius</h3>
+  <div class="card">
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Value</th><th>使用場景</th></tr></thead>
+      <tbody>
+        <tr><td><code>border-radius</code></td><td><code>0.25rem (4px)</code></td><td>Badge、小按鈕</td></tr>
+        <tr><td><code>border-radius-lg</code></td><td><code>0.5rem (8px)</code></td><td>輸入框、下拉選單</td></tr>
+        <tr><td><code>border-radius-xl</code></td><td><code>0.75rem (12px)</code></td><td>卡片、面板</td></tr>
+        <tr><td><code>border-radius-2xl</code></td><td><code>1rem (16px)</code></td><td>macOS 主視窗</td></tr>
+        <tr><td><code>padding-card</code></td><td><code>20–24px</code></td><td>卡片內距</td></tr>
+        <tr><td><code>padding-section</code></td><td><code>24px</code></td><td>頁面區塊間距</td></tr>
+        <tr><td><code>gap-grid</code></td><td><code>16–24px</code></td><td>Grid 欄間距</td></tr>
+        <tr><td><code>window-shadow</code></td><td><code>0 30px 60px rgba(0,0,0,0.12)</code></td><td>macOS 視窗陰影</td></tr>
+        <tr><td><code>sidebar-blur</code></td><td><code>backdrop-filter: blur(40px)</code></td><td>Sidebar 毛玻璃效果</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 4. AUTH FLOW ═══════════ -->
+<section class="section" id="auth-flow">
+  <div class="section-label">04 — Authentication</div>
+  <h2 class="section-title">認證流程</h2>
+  <p class="section-desc">安全登入與多因子驗證的兩階段認證架構。</p>
+
+  <div class="card-grid card-grid-2">
+    <!-- Login -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-icon" style="background:rgba(88,166,255,0.12);color:var(--blue);margin:0;width:36px;height:36px">
+          <span class="material-symbols-outlined" style="font-size:20px">login</span>
+        </div>
+        <div>
+          <h4 style="margin:0">Login Page</h4>
+          <span class="tag tag-blue" style="margin-top:2px">screen.png</span>
+        </div>
+      </div>
+      <p style="margin-bottom:16px">居中卡片佈局，帶有漸層背景（淺綠色霧面）</p>
+      <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px">頁面元件：</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-dim)">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Brand Header — "TRADING SUITE PRO" + "FMSYS"</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> OAuth 按鈕 — Continue with Google / Apple Passkey</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Divider — "OR" 分隔線</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> 表單 — Username/Email + Password 輸入框</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> CTA — "SIGN IN" 主按鈕（Primary Green）</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Footer — Create account / Forgot? / 法律連結</div>
+      </div>
+    </div>
+
+    <!-- MFA -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-icon" style="background:rgba(88,166,255,0.12);color:var(--blue);margin:0;width:36px;height:36px">
+          <span class="material-symbols-outlined" style="font-size:20px">shield_lock</span>
+        </div>
+        <div>
+          <h4 style="margin:0">MFA Verification</h4>
+          <span class="tag tag-blue" style="margin-top:2px">code拷貝6.html</span>
+        </div>
+      </div>
+      <p style="margin-bottom:16px">macOS 風格毛玻璃卡片，含 Traffic Light 按鈕</p>
+      <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px">頁面元件：</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-dim)">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> macOS Title Bar — Traffic lights + "FMSYS"</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Shield Icon — 20×20 圓角方形，Primary 底色</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> 6-digit OTP 輸入 — 獨立輸入框（44×56px）</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> CTA — "Verify Identity" 主按鈕</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Resend Link — Primary 色</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--primary)">●</span> Method Pill — 裝置圖示 + "Google Authenticator"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 5. DASHBOARD ═══════════ -->
+<section class="section" id="dashboard">
+  <div class="section-label">05 — Core Module</div>
+  <h2 class="section-title">Dashboard 主畫面</h2>
+  <p class="section-desc">登入後的主要入口頁面，提供總覽式的交易數據摘要與即時市場概況。</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span class="tag tag-green">code拷貝4.html</span>
+      <span style="font-size:11px;color:var(--text-muted)">The Trading Suite Pro - macOS View</span>
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">佈局結構</div>
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;font-size:12px;color:var(--text-dim)">
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Sidebar (256px)</div>
+        <div>• Navigation Menu（含展開子選單）</div>
+        <div>• Trading Journal 子分類：Stocks / ETFs / Forex / Crypto</div>
+        <div>• Bottom Card — Total Equity 摘要</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Main Content</div>
+        <div>• Equity Curve — SVG 面積圖，含時間範圍切換（1W/1M/3M/YTD）</div>
+        <div>• 2-column Grid：</div>
+        <div style="padding-left:12px">
+          — Market Overview（BTC / ETH / SOL / SPY 即時行情卡片）<br>
+          — Quick Stats（Win Rate、Avg. RR、Sharpe Ratio、Total Trades）
+        </div>
+        <div>• Recent Trades Table — 含 Asset、Type、Entry/Exit、P/L、Date</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 6. TRADING JOURNAL ═══════════ -->
+<section class="section" id="journal">
+  <div class="section-label">06 — Trading Journal</div>
+  <h2 class="section-title">交易日誌</h2>
+  <p class="section-desc">完整的交易記錄與分析模組，包含列表檢視與詳細資料頁。</p>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span class="tag tag-green">code拷貝5.html</span>
+        <span style="font-size:11px;color:var(--text-muted)">Journal Details</span>
+      </div>
+      <h4>Journal Detail View</h4>
+      <p style="margin-bottom:12px">三欄式佈局：左側交易列表 + 中央詳情 + 右側屬性面板</p>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:4px">
+        <div>• Trade List Panel — 含搜尋、篩選、交易卡片列表</div>
+        <div>• Detail Panel — Entry/Exit Chart、交易備註、情緒標籤</div>
+        <div>• Properties Panel — Metadata（Asset / Type / Date / P&L）</div>
+        <div>• Input Fields — 自訂欄位：Strategy、Emotion Tag、Notes</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>資料欄位定義</h4>
+      <p style="margin-bottom:12px">每筆交易紀錄包含以下核心資料</p>
+      <table class="spec-table">
+        <tbody>
+          <tr><td style="font-weight:700;width:120px">Asset</td><td>交易標的 (BTC/USDT, AAPL, EUR/USD)</td></tr>
+          <tr><td style="font-weight:700">Direction</td><td>Long / Short</td></tr>
+          <tr><td style="font-weight:700">Entry / Exit</td><td>進出場價格與時間</td></tr>
+          <tr><td style="font-weight:700">Size</td><td>部位大小</td></tr>
+          <tr><td style="font-weight:700">P&L</td><td>損益金額與百分比</td></tr>
+          <tr><td style="font-weight:700">Strategy</td><td>使用策略名稱</td></tr>
+          <tr><td style="font-weight:700">Emotion Tag</td><td>交易情緒標記</td></tr>
+          <tr><td style="font-weight:700">Notes</td><td>交易備註文字</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 7. BACKTESTING ═══════════ -->
+<section class="section" id="backtesting">
+  <div class="section-label">07 — Backtesting</div>
+  <h2 class="section-title">回測分析</h2>
+  <p class="section-desc">策略回測引擎，提供歷史數據驗證與績效指標分析。</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span class="tag tag-purple">code拷貝.html</span>
+      <span style="font-size:11px;color:var(--text-muted)">Backtesting Analysis</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:12px;color:var(--text-dim)">
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">主要區塊</div>
+        <div>• Header — Strategy Name + Asset Pair + Timeframe</div>
+        <div>• Equity Curve — SVG 折線圖（含 Gradient Fill），支援 Daily / Trade-by-Trade 切換</div>
+        <div>• Hover Tooltip — 顯示 Trade #、Profit、Cumulative Total</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">績效指標卡片 (3-col Grid)</div>
+        <div>• Win Rate — 64.2%（含目標對比）</div>
+        <div>• Profit Factor — 2.84</div>
+        <div>• Max Drawdown — -8.2%</div>
+        <div>• Sharpe Ratio</div>
+        <div>• Total Trades — 250</div>
+        <div>• Average RR Ratio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-bottom:12px">Trade Distribution 視覺化</h4>
+    <p>回測結果頁面包含 Win/Loss 分佈圖、交易時間分佈熱力圖，以及最大連續獲利/虧損統計。所有圖表使用 SVG 繪製，配合 Primary Green (#13ec80) 與 Loss Red (#ff5f57) 的雙色系統。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 8. STRATEGY LAB ═══════════ -->
+<section class="section" id="strategy">
+  <div class="section-label">08 — Strategy Lab</div>
+  <h2 class="section-title">策略實驗室</h2>
+  <p class="section-desc">開發、測試與優化演算法交易模型的核心模組。</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span class="tag tag-orange">code拷貝3.html</span>
+      <span style="font-size:11px;color:var(--text-muted)">Strategy Lab</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:12px;color:var(--text-dim)">
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Main Content — Strategy Cards (2-col Grid)</div>
+        <div>每張策略卡片包含：</div>
+        <div style="padding-left:12px">
+          — Strategy Name + Indicator Tag<br>
+          — Status Badge: <span class="tag tag-green" style="font-size:9px">Active</span> <span class="tag tag-blue" style="font-size:9px">Paused</span> <span class="tag tag-orange" style="font-size:9px">Drafting</span><br>
+          — Mini SVG Equity Preview<br>
+          — Win Rate + Profit Factor / RR Ratio
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Inspector Panel (右側 320px)</div>
+        <div>• Strategy Logic — Dark theme code block（SF Mono 字體）</div>
+        <div>• Parameters — Slider 控制項（EMA Fast/Slow Period）</div>
+        <div>• Toggle Switches — Risk Management / Trailing Stop</div>
+        <div>• CTA — "Run Backtest" 按鈕</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-bottom:8px">Sidebar 狀態卡</h4>
+    <p>Sidebar 底部顯示 Active Labs 數量（4 Running）及系統資源使用狀態（82% CPU Usage），搭配 Memory icon 與脈衝動畫指示。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 9. PORTFOLIO ═══════════ -->
+<section class="section" id="portfolio">
+  <div class="section-label">09 — Portfolio</div>
+  <h2 class="section-title">投資組合</h2>
+  <p class="section-desc">帳戶資產總覽、績效追蹤與持倉管理。</p>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span class="tag tag-green">code.html</span>
+      <span style="font-size:11px;color:var(--text-muted)">Portfolio - The Trading Suite Pro</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:12px;color:var(--text-dim)">
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Summary Cards (3-col Top Row)</div>
+        <div>• Total Net Liquidity — $142,500.42</div>
+        <div>• Daily P/L — +$1,842.20 (+1.31%)</div>
+        <div>• Buying Power — $58,210.15</div>
+        <div style="margin-top:12px;font-weight:700;color:var(--text);margin-bottom:8px">Portfolio Performance Chart</div>
+        <div>• SVG 面積圖 + 漸層填充</div>
+        <div>• 時間篩選：1M / 3M / YTD / ALL</div>
+        <div>• X 軸標籤：月份標記</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Current Positions Table</div>
+        <div>表格欄位：</div>
+        <div style="padding-left:12px">
+          — Asset（含圖示與名稱）<br>
+          — Qty / Avg. Cost<br>
+          — Market Price<br>
+          — P&L（顏色編碼）<br>
+          — % Change<br>
+          — Action Button
+        </div>
+        <div style="margin-top:12px">
+          • Donut Chart — 資產配置比例（右側面板）
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 10. SETTINGS ═══════════ -->
+<section class="section" id="settings">
+  <div class="section-label">10 — Settings</div>
+  <h2 class="section-title">設定頁面</h2>
+  <p class="section-desc">應用程式偏好設定，採用 macOS 風格的 Popover Modal 設計。</p>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span class="tag tag-orange">code拷貝2.html</span>
+      <span style="font-size:11px;color:var(--text-muted)">Trading App Settings</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:12px;color:var(--text-dim)">
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">佈局</div>
+        <div>• Popover Modal — max-width: 400px，居中顯示</div>
+        <div>• Header — Close + "Settings" + Done 按鈕</div>
+        <div>• Tab Bar — General / Accounts / API Keys / Alerts / Style</div>
+        <div>• Content — 分組式表單</div>
+        <div>• Footer — Save Changes CTA + 版本號</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">General Tab 元件</div>
+        <div>• Toggle Group — Auto-save Journal / Show Emotion Heatmap / Real-time Updates</div>
+        <div>• Select Menu — Default Asset Category（Crypto / Stock Options / Forex / Commodities）</div>
+        <div>• Range Slider — Chart Refresh Rate（Real-time ↔ 5s delay）</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 11. COMPONENTS ═══════════ -->
+<section class="section" id="components">
+  <div class="section-label">11 — Component Library</div>
+  <h2 class="section-title">元件規格總覽</h2>
+  <p class="section-desc">跨頁面共用的 UI 元件清單與設計規格。</p>
+
+  <div class="card" style="overflow-x:auto">
+    <table class="spec-table">
+      <thead>
+        <tr><th>元件</th><th>規格</th><th>使用頁面</th><th>狀態</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700">macOS Title Bar</td>
+          <td>H: 48px · Traffic lights (12px dots) · Search bar (W: 320px) · Toolbar icons (32×32)</td>
+          <td>所有 Dashboard 頁面</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Glass Sidebar</td>
+          <td>W: 256px · backdrop-filter: blur(40px) · Nav items (13px, 600wt) · Bottom equity card</td>
+          <td>所有 Dashboard 頁面</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Status Bar</td>
+          <td>H: 28px · Engine status (green dot) · Latency · Version · OS info</td>
+          <td>Strategy Lab, Backtesting</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Equity Curve Chart</td>
+          <td>SVG path + linearGradient fill · 圓角線端 (stroke-linecap: round)</td>
+          <td>Dashboard, Backtesting, Portfolio</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Strategy Card</td>
+          <td>Border highlight (active) · Status badge · Mini SVG preview · 2-col stats grid</td>
+          <td>Strategy Lab</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">KPI Stat Card</td>
+          <td>Icon + Label (10px uppercase) + Value (24px extrabold) + Sub-label</td>
+          <td>Portfolio, Backtesting, Dashboard</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Toggle Switch</td>
+          <td>W: 44px, H: 24px · CSS-only (has-[:checked]) · Primary color active</td>
+          <td>Settings, Strategy Lab</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Range Slider</td>
+          <td>accent-color: primary · H: 4–6px track · With label + value display</td>
+          <td>Settings, Strategy Lab</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">OTP Input</td>
+          <td>6 × individual inputs · W: 44px, H: 56px · Focus: primary ring · Monospace digits</td>
+          <td>MFA Page</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Primary Button</td>
+          <td>bg: primary · text: dark · font: 13px 700wt · rounded-xl · shadow-lg primary/20</td>
+          <td>所有頁面</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Data Table</td>
+          <td>Striped rows · Hover highlight · Font: 12–13px · P&L color coding</td>
+          <td>Portfolio, Dashboard, Backtesting</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Code Block</td>
+          <td>bg: #1e1e1e · SF Mono 11px · Syntax highlight (purple/blue/orange/primary)</td>
+          <td>Strategy Lab</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Market Ticker Card</td>
+          <td>Asset icon (32×32 rounded) + Name/Price + Mini SVG sparkline + % Change</td>
+          <td>Dashboard</td>
+          <td><span class="tag tag-green">完成</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- NEW SECTIONS: Data Model, Interactions, Responsive, UX States, Permissions -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="container">
+
+<!-- ═══════════ 12. DATA MODEL ═══════════ -->
+<section class="section" id="data-model">
+  <div class="section-label">12 — Data Model</div>
+  <h2 class="section-title">資料模型 / Data Schema</h2>
+  <p class="section-desc">平台核心資料實體的欄位定義、型別與關聯關係。所有 ID 使用 UUID v4，時間戳記統一 ISO 8601 UTC 格式。</p>
+
+  <!-- ER Overview -->
+  <div class="card" style="margin-bottom:24px;padding:20px">
+    <h4 style="margin-bottom:12px">Entity Relationship 總覽</h4>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:16px 0">
+      <div class="flow-node auth" style="font-size:11px">User</div>
+      <span class="flow-arrow">1:N</span>
+      <div class="flow-node main" style="font-size:11px">Trade</div>
+      <span class="flow-arrow">N:1</span>
+      <div class="flow-node settings" style="font-size:11px">Strategy</div>
+      <span style="color:var(--text-muted);margin:0 4px">|</span>
+      <div class="flow-node auth" style="font-size:11px">User</div>
+      <span class="flow-arrow">1:N</span>
+      <div class="flow-node sub" style="font-size:11px">Backtest</div>
+      <span class="flow-arrow">N:1</span>
+      <div class="flow-node settings" style="font-size:11px">Strategy</div>
+      <span style="color:var(--text-muted);margin:0 4px">|</span>
+      <div class="flow-node auth" style="font-size:11px">User</div>
+      <span class="flow-arrow">1:N</span>
+      <div class="flow-node sub" style="font-size:11px">Portfolio</div>
+      <span class="flow-arrow">1:N</span>
+      <div class="flow-node sub" style="font-size:11px">Position</div>
+    </div>
+  </div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:24px">
+    <!-- User -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:rgba(88,166,255,0.06)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue)">person</span>
+        User
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name">email<span class="schema-field-req">*</span></div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">display_name</div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">avatar_url</div><div class="schema-field-type">string?</div></div>
+        <div class="schema-field"><div class="schema-field-name">role<span class="schema-field-req">*</span></div><div class="schema-field-type">enum</div></div>
+        <div class="schema-field"><div class="schema-field-name">mfa_enabled</div><div class="schema-field-type">boolean</div></div>
+        <div class="schema-field"><div class="schema-field-name">mfa_method</div><div class="schema-field-type">enum?</div></div>
+        <div class="schema-field"><div class="schema-field-name">oauth_provider</div><div class="schema-field-type">enum?</div></div>
+        <div class="schema-field"><div class="schema-field-name">preferences</div><div class="schema-field-type">json</div></div>
+        <div class="schema-field"><div class="schema-field-name">created_at</div><div class="schema-field-type">timestamp</div></div>
+        <div class="schema-field"><div class="schema-field-name">last_login_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+
+    <!-- Trade -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:var(--primary-dim)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--primary)">swap_vert</span>
+        Trade
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> user_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> strategy_id</div><div class="schema-field-type">uuid?</div></div>
+        <div class="schema-field"><div class="schema-field-name">asset<span class="schema-field-req">*</span></div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">asset_category<span class="schema-field-req">*</span></div><div class="schema-field-type">enum</div></div>
+        <div class="schema-field"><div class="schema-field-name">direction<span class="schema-field-req">*</span></div><div class="schema-field-type">enum</div></div>
+        <div class="schema-field"><div class="schema-field-name">entry_price / exit_price</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">entry_at / exit_at</div><div class="schema-field-type">timestamp</div></div>
+        <div class="schema-field"><div class="schema-field-name">size</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">pnl_amount / pnl_percent</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">emotion_tag</div><div class="schema-field-type">enum?</div></div>
+        <div class="schema-field"><div class="schema-field-name">notes</div><div class="schema-field-type">text?</div></div>
+        <div class="schema-field"><div class="schema-field-name">screenshot_urls</div><div class="schema-field-type">string[]</div></div>
+        <div class="schema-field"><div class="schema-field-name">created_at / updated_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:24px">
+    <!-- Strategy -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:rgba(240,136,62,0.06)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--orange)">science</span>
+        Strategy
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> user_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name">name<span class="schema-field-req">*</span></div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">indicator_tag</div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">status<span class="schema-field-req">*</span></div><div class="schema-field-type">enum</div></div>
+        <div class="schema-field"><div class="schema-field-name">logic_code</div><div class="schema-field-type">text</div></div>
+        <div class="schema-field"><div class="schema-field-name">parameters</div><div class="schema-field-type">json</div></div>
+        <div class="schema-field"><div class="schema-field-name">win_rate / profit_factor</div><div class="schema-field-type">decimal?</div></div>
+        <div class="schema-field"><div class="schema-field-name">risk_mgmt_enabled</div><div class="schema-field-type">boolean</div></div>
+        <div class="schema-field"><div class="schema-field-name">trailing_stop_enabled</div><div class="schema-field-type">boolean</div></div>
+        <div class="schema-field"><div class="schema-field-name">created_at / updated_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+
+    <!-- BacktestResult -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:rgba(188,140,255,0.06)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--purple)">analytics</span>
+        BacktestResult
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> strategy_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> user_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name">asset_pair<span class="schema-field-req">*</span></div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">timeframe</div><div class="schema-field-type">enum</div></div>
+        <div class="schema-field"><div class="schema-field-name">start_date / end_date</div><div class="schema-field-type">date</div></div>
+        <div class="schema-field"><div class="schema-field-name">total_trades</div><div class="schema-field-type">int</div></div>
+        <div class="schema-field"><div class="schema-field-name">win_rate</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">profit_factor</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">max_drawdown</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">sharpe_ratio</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">equity_curve_data</div><div class="schema-field-type">json</div></div>
+        <div class="schema-field"><div class="schema-field-name">trade_log</div><div class="schema-field-type">json[]</div></div>
+        <div class="schema-field"><div class="schema-field-name">created_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid card-grid-2">
+    <!-- Portfolio -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:rgba(19,236,128,0.06)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:#13ec80">account_balance_wallet</span>
+        Portfolio
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> user_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name">total_equity</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">buying_power</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">daily_pnl / daily_pnl_pct</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">equity_history</div><div class="schema-field-type">json</div></div>
+        <div class="schema-field"><div class="schema-field-name">updated_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+
+    <!-- Position -->
+    <div class="schema-entity">
+      <div class="schema-entity-header" style="background:rgba(255,255,255,0.03)">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-dim)">stacked_line_chart</span>
+        Position
+      </div>
+      <div class="schema-entity-body">
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-pk">PK</span> id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name"><span class="schema-field-key schema-field-fk">FK</span> portfolio_id</div><div class="schema-field-type">uuid</div></div>
+        <div class="schema-field"><div class="schema-field-name">asset<span class="schema-field-req">*</span></div><div class="schema-field-type">string</div></div>
+        <div class="schema-field"><div class="schema-field-name">quantity</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">avg_cost</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">market_price</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">unrealized_pnl</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">weight_pct</div><div class="schema-field-type">decimal</div></div>
+        <div class="schema-field"><div class="schema-field-name">opened_at</div><div class="schema-field-type">timestamp</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enum Definitions -->
+  <div class="card" style="margin-top:24px">
+    <h4 style="margin-bottom:16px">Enum 定義</h4>
+    <table class="spec-table">
+      <thead><tr><th>Enum 名稱</th><th>可選值</th><th>使用場景</th></tr></thead>
+      <tbody>
+        <tr><td><code>UserRole</code></td><td><code>owner</code> · <code>admin</code> · <code>trader</code> · <code>viewer</code></td><td>權限控制</td></tr>
+        <tr><td><code>AssetCategory</code></td><td><code>crypto</code> · <code>stock</code> · <code>etf</code> · <code>forex</code> · <code>commodity</code></td><td>Trade / Settings</td></tr>
+        <tr><td><code>Direction</code></td><td><code>long</code> · <code>short</code></td><td>Trade</td></tr>
+        <tr><td><code>EmotionTag</code></td><td><code>confident</code> · <code>fearful</code> · <code>greedy</code> · <code>neutral</code> · <code>revenge</code> · <code>fomo</code></td><td>Trade Journal</td></tr>
+        <tr><td><code>StrategyStatus</code></td><td><code>active</code> · <code>paused</code> · <code>drafting</code> · <code>archived</code></td><td>Strategy Lab</td></tr>
+        <tr><td><code>Timeframe</code></td><td><code>1m</code> · <code>5m</code> · <code>15m</code> · <code>1h</code> · <code>4h</code> · <code>1d</code> · <code>1w</code></td><td>Backtest</td></tr>
+        <tr><td><code>MfaMethod</code></td><td><code>totp</code> · <code>sms</code> · <code>passkey</code></td><td>User Auth</td></tr>
+        <tr><td><code>OAuthProvider</code></td><td><code>google</code> · <code>apple</code></td><td>Login</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 13. INTERACTIONS ═══════════ -->
+<section class="section" id="interactions">
+  <div class="section-label">13 — Interaction Specs</div>
+  <h2 class="section-title">互動規格</h2>
+  <p class="section-desc">圖表、表格與核心元件的互動行為定義，包含滑鼠事件、鍵盤快捷鍵與動畫過渡規格。</p>
+
+  <!-- Chart Interactions -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">圖表互動行為 / Chart Interactions</h3>
+  <div class="card" style="margin-bottom:24px">
+    <table class="spec-table">
+      <thead><tr><th>行為</th><th>觸發方式</th><th>回饋</th><th>適用頁面</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700">Hover Tooltip</td>
+          <td><code>mousemove</code> on SVG path</td>
+          <td>垂直十字線 + 浮動卡片顯示：日期、價格/P&L、Trade # 等。卡片背景 <code>#1e1e1e</code>，圓角 4px，白色邊框 10% opacity</td>
+          <td>Dashboard, Backtesting, Portfolio</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Time Range Switch</td>
+          <td>點擊 Segmented Control (1W/1M/3M/YTD/ALL)</td>
+          <td>圖表數據以 300ms ease-out 過渡動畫重繪；Active button 加白色背景 + shadow-sm</td>
+          <td>Dashboard, Portfolio</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">View Mode Switch</td>
+          <td>Daily ↔ Trade-by-Trade 切換</td>
+          <td>X 軸標籤從日期切換為 Trade 序號；曲線以 crossfade 200ms 切換</td>
+          <td>Backtesting</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Data Point Highlight</td>
+          <td><code>mouseenter</code> on SVG circle</td>
+          <td>圓點放大至 r=6，顯示 Detail Tooltip；<code>cursor: pointer</code></td>
+          <td>Backtesting</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Mini Sparkline</td>
+          <td>僅展示，無互動</td>
+          <td>64×24px SVG polyline，stroke-width: 2，跟隨 P&L 正負使用 green/red</td>
+          <td>Dashboard (Market Overview), Strategy Lab</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Interactions -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">表格互動行為 / Table Interactions</h3>
+  <div class="card" style="margin-bottom:24px">
+    <table class="spec-table">
+      <thead><tr><th>行為</th><th>規格</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700">Row Hover</td>
+          <td>背景色過渡至 <code>rgba(255,255,255,0.03)</code>，transition: 150ms。游標切換為 pointer</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Column Sort</td>
+          <td>點擊表頭觸發排序，箭頭圖示 <code>expand_more</code> / <code>expand_less</code> 切換。預設按 Date 降序。支援 Asset、P&L、% Change 排序</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Pagination</td>
+          <td>每頁 20 筆，底部顯示 "Page 1 of N" + Prev/Next 按鈕。超過 100 筆時啟用虛擬滾動 (virtual scroll)</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">P&L 色碼</td>
+          <td>正值：<code>#13ec80</code> (primary green)；負值：<code>#ff5f57</code> (loss red)；零值：<code>var(--text-dim)</code></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Row Action</td>
+          <td>Hover 時右側顯示 icon button group (Edit / Delete / View)，fade-in 150ms</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Keyboard Shortcuts -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">鍵盤快捷鍵 / Keyboard Shortcuts</h3>
+  <div class="card" style="margin-bottom:24px">
+    <table class="spec-table">
+      <thead><tr><th>快捷鍵</th><th>動作</th><th>適用範圍</th></tr></thead>
+      <tbody>
+        <tr><td><code>⌘ + K</code></td><td>開啟全域搜尋 (Command Palette)</td><td>全域</td></tr>
+        <tr><td><code>⌘ + N</code></td><td>新增交易紀錄 / 新增策略 (依當前頁面)</td><td>Journal / Strategy Lab</td></tr>
+        <tr><td><code>⌘ + ,</code></td><td>開啟 Settings</td><td>全域</td></tr>
+        <tr><td><code>⌘ + 1–5</code></td><td>切換 Sidebar 主要頁面 (Dashboard / Journal / Backtesting / Strategy / Portfolio)</td><td>全域</td></tr>
+        <tr><td><code>⌘ + S</code></td><td>儲存當前編輯 (Journal Notes / Strategy Code)</td><td>Journal Detail / Strategy Lab</td></tr>
+        <tr><td><code>⌘ + ⇧ + R</code></td><td>執行回測 (Run Backtest)</td><td>Strategy Lab</td></tr>
+        <tr><td><code>Esc</code></td><td>關閉 Modal / Settings Popover</td><td>全域</td></tr>
+        <tr><td><code>↑ / ↓</code></td><td>在 Trade List 中導航</td><td>Journal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Animations -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">動畫與過渡 / Animation Tokens</h3>
+  <div class="card">
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Duration</th><th>Easing</th><th>使用場景</th></tr></thead>
+      <tbody>
+        <tr><td><code>transition-fast</code></td><td>100ms</td><td><code>ease-out</code></td><td>Button hover、Toggle switch</td></tr>
+        <tr><td><code>transition-base</code></td><td>200ms</td><td><code>ease-in-out</code></td><td>Nav highlight、Tab switch、Fade in/out</td></tr>
+        <tr><td><code>transition-smooth</code></td><td>300ms</td><td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td><td>Chart redraw、Page transition、Sidebar collapse</td></tr>
+        <tr><td><code>transition-slow</code></td><td>500ms</td><td><code>ease-in-out</code></td><td>Modal open/close、Onboarding step</td></tr>
+        <tr><td><code>scale-press</code></td><td>100ms</td><td><code>ease-out</code></td><td>Button active state → <code>scale(0.98)</code></td></tr>
+        <tr><td><code>skeleton-pulse</code></td><td>1.5s infinite</td><td><code>ease-in-out</code></td><td>Loading skeleton 脈衝動畫</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 14. RESPONSIVE ═══════════ -->
+<section class="section" id="responsive">
+  <div class="section-label">14 — Responsive & Window Behavior</div>
+  <h2 class="section-title">響應式與視窗行為</h2>
+  <p class="section-desc">macOS 視窗在不同尺寸下的佈局變化策略，包含 Sidebar 收合、Inspector 隱藏與最小視窗支援。</p>
+
+  <!-- Breakpoints -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">斷點定義 / Breakpoints</h3>
+  <div class="card" style="margin-bottom:24px">
+    <div class="bp-bar">
+      <div class="bp-segment" style="width:15%;background:rgba(255,95,87,0.15);color:var(--mac-red)">Minimum</div>
+      <div class="bp-segment" style="width:20%;background:rgba(255,189,46,0.12);color:var(--mac-yellow)">Compact</div>
+      <div class="bp-segment" style="width:30%;background:rgba(88,166,255,0.12);color:var(--blue)">Regular</div>
+      <div class="bp-segment" style="flex:1;background:var(--primary-dim);color:var(--primary)">Full</div>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>斷點</th><th>視窗寬度</th><th>Sidebar</th><th>Inspector</th><th>Grid Columns</th><th>備註</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700"><span class="tag tag-green">Full</span></td>
+          <td><code>≥ 1280px</code></td>
+          <td>展開 (256px)</td>
+          <td>展開 (320px)</td>
+          <td>依頁面 2–3 col</td>
+          <td>設計稿預設尺寸</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700"><span class="tag tag-blue">Regular</span></td>
+          <td><code>960–1279px</code></td>
+          <td>展開 (256px)</td>
+          <td>隱藏，點擊按鈕滑入 (overlay)</td>
+          <td>2 col</td>
+          <td>Inspector 以 Drawer 方式呈現</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700"><span class="tag tag-orange">Compact</span></td>
+          <td><code>720–959px</code></td>
+          <td>收合為 Icon-only (56px)</td>
+          <td>隱藏</td>
+          <td>1–2 col</td>
+          <td>Sidebar 僅顯示 icon，hover 展開 tooltip</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700"><span class="tag tag-red">Minimum</span></td>
+          <td><code>≥ 640px</code></td>
+          <td>完全隱藏，漢堡選單觸發</td>
+          <td>隱藏</td>
+          <td>1 col</td>
+          <td>最小支援寬度，低於此不保證佈局</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Window Behaviors -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">視窗行為細節 / Window Behaviors</h3>
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <h4>Sidebar Collapse 動畫</h4>
+      <p style="margin-bottom:12px">寬度從 256px → 56px 的過渡行為</p>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px">
+        <div>• 過渡動畫：<code>width 300ms cubic-bezier(0.4, 0, 0.2, 1)</code></div>
+        <div>• 收合時：文字標籤淡出 (opacity 0, 150ms)，僅保留圖示</div>
+        <div>• 底部 Equity 卡片：收合時隱藏文字，僅顯示金額數字</div>
+        <div>• 手動觸發：Sidebar 頂部 Toggle 按鈕 或 <code>⌘ + \</code></div>
+        <div>• 自動觸發：視窗寬度縮至 Compact 斷點以下</div>
+        <div>• 展開時：文字標籤淡入 (opacity 1, 200ms, delay 100ms)</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>Inspector Panel 行為</h4>
+      <p style="margin-bottom:12px">右側面板在不同斷點下的顯示策略</p>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px">
+        <div>• Full 模式：固定顯示，border-left 分隔</div>
+        <div>• Regular 模式：Overlay Drawer，從右側滑入</div>
+        <div style="padding-left:12px">— 背景遮罩：<code>rgba(0,0,0,0.3)</code></div>
+        <div style="padding-left:12px">— 動畫：<code>transform: translateX(100%) → 0</code>, 300ms</div>
+        <div style="padding-left:12px">— 關閉：點擊遮罩 或 Esc 鍵</div>
+        <div>• 觸發按鈕：Toolbar 區域 <code>info</code> 圖示</div>
+        <div>• 適用頁面：Strategy Lab (Inspector)、Journal (Properties)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h4 style="margin-bottom:12px">最小視窗與 Resize 規則</h4>
+    <table class="spec-table">
+      <thead><tr><th>屬性</th><th>值</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:700">最小視窗尺寸</td><td><code>640 × 480px</code></td><td>macOS NSWindow minSize 設定</td></tr>
+        <tr><td style="font-weight:700">建議使用尺寸</td><td><code>1280 × 800px</code></td><td>設計稿基準，涵蓋所有元件</td></tr>
+        <tr><td style="font-weight:700">Full Screen 支援</td><td>是</td><td>自動切換至 Full 斷點，移除 Traffic Lights padding</td></tr>
+        <tr><td style="font-weight:700">Split View 支援</td><td>是</td><td>最小 50% 螢幕寬度，等同 Regular 斷點</td></tr>
+        <tr><td style="font-weight:700">Resize 防抖</td><td><code>debounce 150ms</code></td><td>避免過渡動畫過度觸發</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 15. UX STATES ═══════════ -->
+<section class="section" id="ux-states">
+  <div class="section-label">15 — UX States</div>
+  <h2 class="section-title">UX 狀態設計</h2>
+  <p class="section-desc">各種非正常路徑的介面狀態定義，確保使用者在任何情境下都有清晰的回饋與引導。</p>
+
+  <!-- Loading States -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Loading / Skeleton 狀態</h3>
+  <div class="card-grid card-grid-3" style="margin-bottom:32px">
+    <div class="state-card">
+      <div class="state-card-header">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue)">hourglass_top</span>
+        <span style="font-size:13px;font-weight:700">Initial Load</span>
+      </div>
+      <div class="state-card-body">
+        <div class="state-preview">
+          <div style="width:60%;height:12px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);border-radius:6px"></div>
+          <div style="width:40%;height:12px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);border-radius:6px"></div>
+          <div style="width:80%;height:8px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);border-radius:4px"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-dim)">首次載入使用 Skeleton Screen，保留佈局結構。脈衝動畫 1.5s infinite，背景漸層 <code>rgba(255,255,255, 0.04→0.08)</code></p>
+      </div>
+    </div>
+    <div class="state-card">
+      <div class="state-card-header">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary)">sync</span>
+        <span style="font-size:13px;font-weight:700">Data Refresh</span>
+      </div>
+      <div class="state-card-body">
+        <div class="state-preview">
+          <span class="material-symbols-outlined" style="font-size:28px;color:var(--primary);opacity:0.5">sync</span>
+          <span style="font-size:11px;color:var(--text-muted)">Overlay spinner</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-dim)">資料更新時，在現有內容上方覆蓋半透明遮罩 + 旋轉圖示。不清除已有數據，避免畫面跳動</p>
+      </div>
+    </div>
+    <div class="state-card">
+      <div class="state-card-header">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--purple)">analytics</span>
+        <span style="font-size:13px;font-weight:700">Backtest Running</span>
+      </div>
+      <div class="state-card-body">
+        <div class="state-preview">
+          <div style="width:80%;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+            <div style="width:60%;height:100%;background:var(--primary);border-radius:3px"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text-muted)">Progress bar + ETA</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-dim)">長時間回測使用 Progress Bar + 預估完成時間。CTA 按鈕文字切換為 "Running..." 並禁用</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty States -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">空狀態 / Empty States</h3>
+  <div class="card-grid card-grid-2" style="margin-bottom:32px">
+    <div class="state-card">
+      <div class="state-card-header">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary)">book_5</span>
+        <span style="font-size:13px;font-weight:700">Journal — 無交易紀錄</span>
+      </div>
+      <div class="state-card-body">
+        <div class="state-preview" style="min-height:140px">
+          <span class="material-symbols-outlined" style="font-size:48px;color:var(--text-muted);opacity:0.3">edit_note</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text-dim)">Start Your Trading Journal</span>
+          <span style="font-size:11px;color:var(--text-muted);max-width:200px;text-align:center">Record your first trade to begin tracking performance and building insights.</span>
+          <div style="margin-top:8px;padding:8px 16px;background:var(--primary);color:#000;font-size:12px;font-weight:700;border-radius:8px">+ Log First Trade</div>
+        </div>
+      </div>
+    </div>
+    <div class="state-card">
+      <div class="state-card-header">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--orange)">science</span>
+        <span style="font-size:13px;font-weight:700">Strategy Lab — 無策略</span>
+      </div>
+      <div class="state-card-body">
+        <div class="state-preview" style="min-height:140px">
+          <span class="material-symbols-outlined" style="font-size:48px;color:var(--text-muted);opacity:0.3">biotech</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text-dim)">Create Your First Strategy</span>
+          <span style="font-size:11px;color:var(--text-muted);max-width:200px;text-align:center">Build algorithmic models, define entry rules, and backtest against historical data.</span>
+          <div style="margin-top:8px;padding:8px 16px;background:var(--bg-card);color:var(--text);font-size:12px;font-weight:700;border-radius:8px;border:1px solid var(--border)">+ New Strategy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error States -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">錯誤狀態 / Error States</h3>
+  <div class="card" style="margin-bottom:24px">
+    <table class="spec-table">
+      <thead><tr><th>錯誤類型</th><th>觸發場景</th><th>UI 回饋</th><th>操作選項</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700">Login Failed</td>
+          <td>密碼錯誤 / 帳號不存在</td>
+          <td>輸入框邊框變為 <code>#ff5f57</code>，下方出現紅色錯誤訊息。輸入框輕微 shake 動畫 (300ms)</td>
+          <td>重新輸入 / Forgot Password</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">MFA Expired</td>
+          <td>驗證碼超時 (30s)</td>
+          <td>OTP 輸入框清空，上方顯示 Warning Toast "Code expired"，Resend 連結脈衝高亮</td>
+          <td>Resend Code</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">MFA Invalid</td>
+          <td>驗證碼錯誤 (3次以上鎖定)</td>
+          <td>輸入框 shake 動畫，錯誤次數遞減提示 "2 attempts remaining"</td>
+          <td>重新輸入 / Contact Support</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Network Error</td>
+          <td>API 無回應 / 離線</td>
+          <td>頁面頂部出現持續性 Banner：紅底白字 "Connection lost. Reconnecting..."，含進度動畫</td>
+          <td>自動重連 (exponential backoff) / 手動 Retry</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">API Rate Limit</td>
+          <td>超過 API 請求上限</td>
+          <td>Toast notification：黃色警告 "Rate limit reached. Please wait."</td>
+          <td>自動 cooldown 後重試</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Save Failed</td>
+          <td>Journal / Strategy 儲存失敗</td>
+          <td>Save 按鈕變為紅色 + "Save Failed"，下方顯示錯誤原因</td>
+          <td>Retry / Save as Draft</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Backtest Error</td>
+          <td>策略邏輯錯誤 / 數據不足</td>
+          <td>Progress bar 變紅，Inspector 顯示錯誤日誌（Code block 格式）</td>
+          <td>Edit Strategy / Change Parameters</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Notifications / Toast -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">通知系統 / Notification Toast</h3>
+  <div class="card" style="margin-bottom:24px">
+    <table class="spec-table">
+      <thead><tr><th>類型</th><th>樣式</th><th>持續時間</th><th>位置</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:700"><span style="color:var(--primary)">●</span> Success</td><td>左側 Primary Green 色條 + Check icon + 訊息文字</td><td>3s auto-dismiss</td><td>右上角，距 Top bar 8px</td></tr>
+        <tr><td style="font-weight:700"><span style="color:var(--mac-red)">●</span> Error</td><td>左側 Red 色條 + Error icon + 訊息 + 可選 Action 按鈕</td><td>需手動關閉</td><td>右上角</td></tr>
+        <tr><td style="font-weight:700"><span style="color:var(--mac-yellow)">●</span> Warning</td><td>左側 Yellow 色條 + Warning icon + 訊息文字</td><td>5s auto-dismiss</td><td>右上角</td></tr>
+        <tr><td style="font-weight:700"><span style="color:var(--blue)">●</span> Info</td><td>左側 Blue 色條 + Info icon + 訊息文字</td><td>3s auto-dismiss</td><td>右上角</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:12px">多個 Toast 堆疊顯示，間距 8px，最新在上方。進入動畫：slideInRight 200ms + fadeIn。離開：fadeOut 150ms + height collapse。最多同時顯示 3 個。</p>
+  </div>
+
+  <!-- Onboarding -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">新手引導 / Onboarding</h3>
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)">首次登入引導流程（4 步驟）</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px;background:rgba(88,166,255,0.06);border:1px solid rgba(88,166,255,0.15);border-radius:10px;padding:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--blue);margin-bottom:6px">STEP 1</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Welcome</div>
+        <div style="font-size:11px;color:var(--text-dim)">品牌歡迎畫面，介紹平台核心功能。Full-screen modal + 品牌動畫</div>
+      </div>
+      <div style="flex:1;min-width:180px;background:rgba(19,236,128,0.06);border:1px solid rgba(19,236,128,0.15);border-radius:10px;padding:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--primary);margin-bottom:6px">STEP 2</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Connect Exchange</div>
+        <div style="font-size:11px;color:var(--text-dim)">引導連接交易所 API。支援手動輸入 Key 或 OAuth 授權。可跳過此步驟</div>
+      </div>
+      <div style="flex:1;min-width:180px;background:rgba(240,136,62,0.06);border:1px solid rgba(240,136,62,0.15);border-radius:10px;padding:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--orange);margin-bottom:6px">STEP 3</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Preferences</div>
+        <div style="font-size:11px;color:var(--text-dim)">選擇預設資產類別、時區、貨幣單位。使用 Chip Selector 多選 UI</div>
+      </div>
+      <div style="flex:1;min-width:180px;background:rgba(188,140,255,0.06);border:1px solid rgba(188,140,255,0.15);border-radius:10px;padding:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--purple);margin-bottom:6px">STEP 4</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Quick Tour</div>
+        <div style="font-size:11px;color:var(--text-dim)">Spotlight 式導覽：依序高亮 Sidebar → Dashboard → Journal → Strategy Lab。含跳過選項</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:16px">進度指示器：底部 4 個圓點 (dot indicator)，完成步驟填色。整體 Onboarding 完成後設定 <code>user.preferences.onboarding_completed = true</code>，不再顯示。使用者可從 Settings → General 重新觸發。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 16. PERMISSIONS ═══════════ -->
+<section class="section" id="permissions">
+  <div class="section-label">16 — Permissions & Roles</div>
+  <h2 class="section-title">權限與角色系統</h2>
+  <p class="section-desc">基於角色的存取控制 (RBAC) 架構，定義不同使用者層級對平台功能的存取權限。</p>
+
+  <!-- Role Definitions -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">角色定義 / Role Definitions</h3>
+  <div class="card-grid card-grid-4" style="margin-bottom:32px">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(255,189,46,0.12);color:var(--mac-yellow);">
+        <span class="material-symbols-outlined">shield_person</span>
+      </div>
+      <h4>Owner</h4>
+      <p>帳戶擁有者，具備全部權限，包含帳務管理、刪除帳戶、管理其他使用者角色</p>
+      <div class="tag tag-orange" style="margin-top:8px">最高權限</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(88,166,255,0.12);color:var(--blue);">
+        <span class="material-symbols-outlined">admin_panel_settings</span>
+      </div>
+      <h4>Admin</h4>
+      <p>管理員，可管理 API Keys、修改全域設定、檢視所有使用者的交易數據</p>
+      <div class="tag tag-blue" style="margin-top:8px">管理權限</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--primary-dim);color:var(--primary);">
+        <span class="material-symbols-outlined">trending_up</span>
+      </div>
+      <h4>Trader</h4>
+      <p>標準交易者，可操作自己的 Journal、Strategy、Portfolio，無法存取他人數據</p>
+      <div class="tag tag-green" style="margin-top:8px">標準權限</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(255,255,255,0.06);color:var(--text-dim);">
+        <span class="material-symbols-outlined">visibility</span>
+      </div>
+      <h4>Viewer</h4>
+      <p>唯讀使用者，可檢視共享的 Dashboard 和 Portfolio，不可建立或修改任何數據</p>
+      <div class="tag" style="background:rgba(255,255,255,0.06);color:var(--text-muted);margin-top:8px">唯讀</div>
+    </div>
+  </div>
+
+  <!-- Permission Matrix -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">權限矩陣 / Permission Matrix</h3>
+  <div class="card" style="margin-bottom:32px;overflow-x:auto">
+    <table class="perm-matrix">
+      <thead>
+        <tr>
+          <th style="text-align:left;min-width:200px">功能</th>
+          <th>Owner</th>
+          <th>Admin</th>
+          <th>Trader</th>
+          <th>Viewer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5" style="font-size:10px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px;padding-top:16px">Trading Journal</td></tr>
+        <tr><td>檢視自己的交易紀錄</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">共享</td></tr>
+        <tr><td>新增 / 編輯 / 刪除交易</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td></tr>
+        <tr><td>檢視他人交易紀錄</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td><td class="perm-deny">✗</td></tr>
+        <tr><td colspan="5" style="font-size:10px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:1px;padding-top:16px">Backtesting</td></tr>
+        <tr><td>執行回測</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td></tr>
+        <tr><td>檢視回測結果</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">共享</td></tr>
+        <tr><td>刪除回測紀錄</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">僅自己</td><td class="perm-deny">✗</td></tr>
+        <tr><td colspan="5" style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;padding-top:16px">Strategy Lab</td></tr>
+        <tr><td>建立 / 編輯策略</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td></tr>
+        <tr><td>啟用 / 停用策略</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">僅自己</td><td class="perm-deny">✗</td></tr>
+        <tr><td>刪除策略</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">僅自己</td><td class="perm-deny">✗</td></tr>
+        <tr><td colspan="5" style="font-size:10px;font-weight:800;color:#13ec80;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Portfolio & Dashboard</td></tr>
+        <tr><td>檢視 Dashboard</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td></tr>
+        <tr><td>檢視 Portfolio</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">共享</td></tr>
+        <tr><td>編輯持倉</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td></tr>
+        <tr><td colspan="5" style="font-size:10px;font-weight:800;color:var(--mac-yellow);text-transform:uppercase;letter-spacing:1px;padding-top:16px">系統管理</td></tr>
+        <tr><td>管理 API Keys (CRUD)</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">僅自己</td><td class="perm-deny">✗</td></tr>
+        <tr><td>管理使用者角色</td><td class="perm-check">✓</td><td class="perm-limited">不可改 Owner</td><td class="perm-deny">✗</td><td class="perm-deny">✗</td></tr>
+        <tr><td>全域設定 (Settings)</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-limited">個人偏好</td><td class="perm-limited">個人偏好</td></tr>
+        <tr><td>匯出全部數據</td><td class="perm-check">✓</td><td class="perm-check">✓</td><td class="perm-deny">✗</td><td class="perm-deny">✗</td></tr>
+        <tr><td>刪除帳戶</td><td class="perm-check">✓</td><td class="perm-deny">✗</td><td class="perm-deny">✗</td><td class="perm-deny">✗</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- API Key Management -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">API Key 管理流程</h3>
+  <div class="card-grid card-grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <h4 style="margin-bottom:12px">API Key CRUD 流程</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:8px">
+        <div><span style="font-weight:700;color:var(--text)">Create：</span>Settings → API Keys tab → "Add New Key" → 選擇交易所 (Binance / Coinbase / Interactive Brokers 等) → 輸入 API Key + Secret → 選擇權限 (Read Only / Read + Trade) → Confirm → 顯示成功 Toast</div>
+        <div><span style="font-weight:700;color:var(--text)">Read：</span>列表顯示已連接的 Key，僅顯示前 4 碼 + 遮罩 (••••••) + 交易所圖示 + 連線狀態 + 最後使用時間</div>
+        <div><span style="font-weight:700;color:var(--text)">Update：</span>可修改 Label 名稱與權限層級，Secret 不可檢視或修改（需重新建立）</div>
+        <div><span style="font-weight:700;color:var(--text)">Delete：</span>二次確認 Modal → 輸入 "DELETE" 確認文字 → 成功後 Toast + 列表更新</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 style="margin-bottom:12px">安全規範</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:8px">
+        <div>• API Secret 僅在建立時顯示一次，之後永久遮罩</div>
+        <div>• 所有 Key 使用 AES-256-GCM 加密儲存</div>
+        <div>• 連線驗證：建立後自動 ping 交易所 API 確認有效性</div>
+        <div>• 異常偵測：連續 5 次 API 錯誤自動停用 Key 並通知</div>
+        <div>• 權限分離：Read Only Key 無法觸發任何交易操作</div>
+        <div>• 審計日誌：所有 Key 操作記錄至 Audit Log，含 IP + Timestamp</div>
+        <div>• Session 管理：MFA 驗證後 15 分鐘內可操作 Key，逾時需重新驗證</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit / Session -->
+  <div class="card">
+    <h4 style="margin-bottom:12px">Session 與認證策略</h4>
+    <table class="spec-table">
+      <thead><tr><th>項目</th><th>規格</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:700">Session TTL</td><td>Access Token: 15 分鐘 / Refresh Token: 7 天 (Remember Me: 30 天)</td></tr>
+        <tr><td style="font-weight:700">MFA 觸發條件</td><td>新裝置登入 / 30 天未使用的裝置 / 敏感操作 (API Key 管理、角色變更、帳戶刪除)</td></tr>
+        <tr><td style="font-weight:700">MFA 重試限制</td><td>最多 5 次錯誤嘗試，之後鎖定 15 分鐘。3 次鎖定後需 Email 驗證解鎖</td></tr>
+        <tr><td style="font-weight:700">OAuth Session</td><td>依循 OAuth 2.0 PKCE flow，Token 儲存於 Keychain (macOS)</td></tr>
+        <tr><td style="font-weight:700">併行登入</td><td>最多 3 個同時活躍 Session，新登入踢出最舊 Session 並通知</td></tr>
+        <tr><td style="font-weight:700">Audit Log 保留</td><td>90 天，Owner/Admin 可從 Settings → Security 檢視</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 17. TECH ARCHITECTURE ═══════════ -->
+<section class="section" id="tech-arch">
+  <div class="section-label">17 — Technical Architecture</div>
+  <h2 class="section-title">技術架構</h2>
+  <p class="section-desc">以 SwiftUI 原生 macOS 為主體的技術選型，採用 Clean Architecture 分層設計，預留未來跨平台擴展能力。</p>
+
+  <!-- Tech Stack Overview -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">技術棧總覽 / Tech Stack</h3>
+  <div class="card-grid card-grid-3" style="margin-bottom:32px">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(88,166,255,0.12);color:var(--blue);">
+        <span class="material-symbols-outlined">laptop_mac</span>
+      </div>
+      <h4>Frontend / Client</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <div><span style="font-weight:700;color:var(--text)">Framework：</span>SwiftUI (macOS 14+)</div>
+        <div><span style="font-weight:700;color:var(--text)">Language：</span>Swift 5.9+</div>
+        <div><span style="font-weight:700;color:var(--text)">最低支援：</span>macOS Sonoma 14.0</div>
+        <div><span style="font-weight:700;color:var(--text)">圖表：</span>Swift Charts framework</div>
+        <div><span style="font-weight:700;color:var(--text)">Navigation：</span>NavigationSplitView (3-column)</div>
+        <div><span style="font-weight:700;color:var(--text)">狀態管理：</span>@Observable (Observation framework)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--primary-dim);color:var(--primary);">
+        <span class="material-symbols-outlined">dns</span>
+      </div>
+      <h4>Backend / API</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <div><span style="font-weight:700;color:var(--text)">Framework：</span>Vapor 4 (Swift) 或 Hummingbird</div>
+        <div><span style="font-weight:700;color:var(--text)">API Style：</span>REST (v1)，未來可擴展 GraphQL</div>
+        <div><span style="font-weight:700;color:var(--text)">Auth：</span>JWT + OAuth 2.0 PKCE</div>
+        <div><span style="font-weight:700;color:var(--text)">行情 API：</span>延遲行情 (REST polling, 15s interval)</div>
+        <div><span style="font-weight:700;color:var(--text)">未來擴展：</span>WebSocket 即時串流</div>
+        <div><span style="font-weight:700;color:var(--text)">回測引擎：</span>Server-side Swift async task</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(240,136,62,0.12);color:var(--orange);">
+        <span class="material-symbols-outlined">storage</span>
+      </div>
+      <h4>Data / Infra</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <div><span style="font-weight:700;color:var(--text)">本機資料庫：</span>SwiftData (Core Data)</div>
+        <div><span style="font-weight:700;color:var(--text)">遠端資料庫：</span>PostgreSQL 16</div>
+        <div><span style="font-weight:700;color:var(--text)">ORM：</span>Fluent (Vapor) 或 Swift SQL client</div>
+        <div><span style="font-weight:700;color:var(--text)">快取：</span>Redis (session + 行情快取)</div>
+        <div><span style="font-weight:700;color:var(--text)">安全儲存：</span>macOS Keychain (tokens/secrets)</div>
+        <div><span style="font-weight:700;color:var(--text)">部署：</span>Docker → Railway / Fly.io / AWS ECS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">系統架構圖 / System Architecture</h3>
+  <div class="flow-container" style="margin-bottom:32px">
+    <!-- Client Layer -->
+    <div style="font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center">Client Layer — macOS App (SwiftUI)</div>
+    <div class="flow-row">
+      <div class="flow-node auth" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Views</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">SwiftUI Views</span>
+      </div>
+      <span class="flow-arrow">↔</span>
+      <div class="flow-node auth" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">ViewModels</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">@Observable</span>
+      </div>
+      <span class="flow-arrow">↔</span>
+      <div class="flow-node auth" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Services</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Domain Logic</span>
+      </div>
+      <span class="flow-arrow">↔</span>
+      <div class="flow-node auth" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Repositories</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Data Access</span>
+      </div>
+    </div>
+
+    <div class="flow-vline"></div>
+    <div style="text-align:center;font-size:10px;color:var(--text-muted);font-weight:700;margin:4px 0">SwiftData (Local) ↕ REST API (Remote)</div>
+    <div class="flow-vline"></div>
+
+    <!-- Server Layer -->
+    <div style="font-size:10px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center">Server Layer — Vapor / Hummingbird (Swift)</div>
+    <div class="flow-row">
+      <div class="flow-node main" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Routes</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">REST Endpoints</span>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node main" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Middleware</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Auth / Rate Limit</span>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node main" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Controllers</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Business Logic</span>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node main" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Models</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Fluent ORM</span>
+      </div>
+    </div>
+
+    <div class="flow-vline"></div>
+
+    <!-- Data Layer -->
+    <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center">Data Layer</div>
+    <div class="flow-row">
+      <div class="flow-node settings" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">PostgreSQL</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Primary DB</span>
+      </div>
+      <div class="flow-node settings" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Redis</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Cache / Session</span>
+      </div>
+      <div class="flow-node settings" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">Keychain</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Secrets (Client)</span>
+      </div>
+      <div class="flow-node sub" style="font-size:11px;flex-direction:column;padding:12px 20px">
+        <span style="font-weight:800">3rd Party APIs</span>
+        <span style="font-size:9px;opacity:0.7;font-weight:500">Exchange / Market</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SwiftUI App Structure -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">SwiftUI 專案結構 / Project Structure</h3>
+  <div class="card" style="margin-bottom:32px">
+    <div style="font-family:'SF Mono',Monaco,monospace;font-size:12px;line-height:2;color:var(--text-dim);background:rgba(0,0,0,0.3);padding:20px;border-radius:8px;overflow-x:auto">
+<span style="color:var(--primary);font-weight:700">FMSYSApp/</span>
+├── <span style="color:var(--blue)">App/</span>
+│   ├── FMSYSApp.swift              <span style="color:var(--text-muted)"># @main entry, WindowGroup + Settings</span>
+│   ├── AppState.swift              <span style="color:var(--text-muted)"># Global @Observable state</span>
+│   └── Router.swift                <span style="color:var(--text-muted)"># Navigation path management</span>
+├── <span style="color:var(--blue)">Features/</span>
+│   ├── <span style="color:var(--blue)">Auth/</span>
+│   │   ├── LoginView.swift
+│   │   ├── MFAView.swift
+│   │   └── AuthViewModel.swift
+│   ├── <span style="color:var(--blue)">Dashboard/</span>
+│   │   ├── DashboardView.swift
+│   │   ├── EquityCurveChart.swift  <span style="color:var(--text-muted)"># Swift Charts</span>
+│   │   ├── MarketOverviewCard.swift
+│   │   └── DashboardViewModel.swift
+│   ├── <span style="color:var(--blue)">Journal/</span>
+│   │   ├── JournalListView.swift
+│   │   ├── JournalDetailView.swift
+│   │   ├── TradeRowView.swift
+│   │   └── JournalViewModel.swift
+│   ├── <span style="color:var(--blue)">Backtesting/</span>
+│   │   ├── BacktestView.swift
+│   │   ├── BacktestResultCard.swift
+│   │   └── BacktestViewModel.swift
+│   ├── <span style="color:var(--blue)">StrategyLab/</span>
+│   │   ├── StrategyListView.swift
+│   │   ├── StrategyCardView.swift
+│   │   ├── InspectorPanel.swift
+│   │   ├── CodeEditorView.swift
+│   │   └── StrategyViewModel.swift
+│   ├── <span style="color:var(--blue)">Portfolio/</span>
+│   │   ├── PortfolioView.swift
+│   │   ├── PositionTableView.swift
+│   │   └── PortfolioViewModel.swift
+│   └── <span style="color:var(--blue)">Settings/</span>
+│       ├── SettingsView.swift      <span style="color:var(--text-muted)"># macOS Settings scene</span>
+│       ├── GeneralTab.swift
+│       ├── APIKeysTab.swift
+│       └── SettingsViewModel.swift
+├── <span style="color:var(--orange)">Core/</span>
+│   ├── <span style="color:var(--orange)">Models/</span>
+│   │   ├── User.swift
+│   │   ├── Trade.swift
+│   │   ├── Strategy.swift
+│   │   ├── BacktestResult.swift
+│   │   ├── Portfolio.swift
+│   │   └── Position.swift
+│   ├── <span style="color:var(--orange)">Services/</span>
+│   │   ├── AuthService.swift       <span style="color:var(--text-muted)"># Login, MFA, OAuth, Token refresh</span>
+│   │   ├── TradeService.swift
+│   │   ├── StrategyService.swift
+│   │   ├── BacktestService.swift
+│   │   ├── PortfolioService.swift
+│   │   └── MarketDataService.swift <span style="color:var(--text-muted)"># Delayed quotes polling</span>
+│   ├── <span style="color:var(--orange)">Repositories/</span>
+│   │   ├── LocalRepository.swift   <span style="color:var(--text-muted)"># SwiftData CRUD</span>
+│   │   └── RemoteRepository.swift  <span style="color:var(--text-muted)"># API client</span>
+│   └── <span style="color:var(--orange)">Networking/</span>
+│       ├── APIClient.swift         <span style="color:var(--text-muted)"># URLSession + async/await</span>
+│       ├── Endpoints.swift
+│       ├── AuthInterceptor.swift   <span style="color:var(--text-muted)"># Auto token refresh</span>
+│       └── DTOs/                   <span style="color:var(--text-muted)"># Codable request/response</span>
+├── <span style="color:var(--purple)">Shared/</span>
+│   ├── <span style="color:var(--purple)">Components/</span>
+│   │   ├── MacWindowChrome.swift   <span style="color:var(--text-muted)"># Custom title bar styling</span>
+│   │   ├── SidebarView.swift
+│   │   ├── StatusBarView.swift
+│   │   ├── KPICard.swift
+│   │   ├── ToggleSwitch.swift
+│   │   ├── ToastOverlay.swift
+│   │   ├── EmptyStateView.swift
+│   │   └── SkeletonView.swift
+│   ├── <span style="color:var(--purple)">Extensions/</span>
+│   ├── <span style="color:var(--purple)">Theme/</span>
+│   │   ├── Colors.swift            <span style="color:var(--text-muted)"># Design system color tokens</span>
+│   │   ├── Typography.swift
+│   │   └── Spacing.swift
+│   └── <span style="color:var(--purple)">Utilities/</span>
+│       ├── KeychainManager.swift
+│       ├── DateFormatters.swift
+│       └── Validators.swift
+└── <span style="color:var(--text-muted)">Resources/</span>
+    ├── Assets.xcassets
+    └── Localizable.xcstrings
+    </div>
+  </div>
+
+  <!-- Key Architecture Decisions -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">關鍵架構決策 / Key Decisions</h3>
+  <div class="card-grid card-grid-2" style="margin-bottom:32px">
+    <div class="card">
+      <h4 style="margin-bottom:12px">MVVM + Service Layer</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:8px">
+        <div><span style="font-weight:700;color:var(--text)">View：</span>純 SwiftUI 宣告式 UI，不含業務邏輯。使用 <code>NavigationSplitView</code> 實現三欄佈局，對應設計稿的 Sidebar + Main + Inspector 結構</div>
+        <div><span style="font-weight:700;color:var(--text)">ViewModel：</span>使用 Swift 5.9 <code>@Observable</code> macro，取代舊版 ObservableObject。每個 Feature Module 一個 ViewModel，管理 UI 狀態與 Service 呼叫</div>
+        <div><span style="font-weight:700;color:var(--text)">Service：</span>純商業邏輯層，不依賴 UI framework。負責 Repository 協調、資料轉換、驗證規則。可獨立單元測試</div>
+        <div><span style="font-weight:700;color:var(--text)">Repository：</span>統一資料存取介面，內部決定從 SwiftData (local) 或 REST API (remote) 取資料。Offline-first 策略</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 style="margin-bottom:12px">Offline-First 離線優先策略</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:8px">
+        <div><span style="font-weight:700;color:var(--text)">本機儲存：</span>SwiftData 作為 single source of truth，所有讀取優先從本機載入</div>
+        <div><span style="font-weight:700;color:var(--text)">同步策略：</span>背景 sync task，以 <code>updated_at</code> 時間戳比對差異，增量同步</div>
+        <div><span style="font-weight:700;color:var(--text)">衝突解決：</span>Last-Write-Wins (LWW) 策略，伺服器為權威來源</div>
+        <div><span style="font-weight:700;color:var(--text)">離線操作：</span>新增/編輯 Trade 時先寫入本機，標記為 <code>pendingSync</code>，網路恢復後自動上傳</div>
+        <div><span style="font-weight:700;color:var(--text)">優勢：</span>即時回應、無網路也能完整使用 Journal 和 Strategy 編輯功能</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NavigationSplitView Mapping -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">NavigationSplitView 對應設計稿</h3>
+  <div class="card" style="margin-bottom:32px">
+    <div style="display:flex;gap:2px;height:180px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px">
+      <div style="width:180px;background:rgba(88,166,255,0.06);padding:16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--border)">
+        <span style="font-size:9px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1px">Sidebar (Column 1)</span>
+        <span style="font-size:10px;color:var(--text-dim);margin-top:4px">NavigationSplitView sidebar:</span>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px">
+          <div style="font-size:10px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:4px">📊 Dashboard</div>
+          <div style="font-size:10px;background:rgba(19,236,128,0.1);padding:4px 8px;border-radius:4px;color:var(--primary)">📓 Journal ▾</div>
+          <div style="font-size:10px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:4px">📈 Backtesting</div>
+          <div style="font-size:10px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:4px">🧪 Strategy Lab</div>
+          <div style="font-size:10px;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:4px">💰 Portfolio</div>
+        </div>
+      </div>
+      <div style="flex:1;background:rgba(19,236,128,0.03);padding:16px;border-right:1px solid var(--border)">
+        <span style="font-size:9px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px">Content (Column 2)</span>
+        <span style="font-size:10px;color:var(--text-dim);display:block;margin-top:4px">主要內容區域</span>
+        <div style="margin-top:12px;font-size:10px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px">
+          <div>• Dashboard → Equity Curve + Market + Stats + Trades</div>
+          <div>• Journal → Trade List 或 Detail View</div>
+          <div>• Backtesting → Equity Curve + KPI Cards</div>
+          <div>• Strategy → Strategy Card Grid</div>
+          <div>• Portfolio → Summary + Performance + Positions</div>
+        </div>
+      </div>
+      <div style="width:200px;background:rgba(240,136,62,0.04);padding:16px">
+        <span style="font-size:9px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px">Detail (Column 3)</span>
+        <span style="font-size:10px;color:var(--text-dim);display:block;margin-top:4px">Inspector / Properties</span>
+        <div style="margin-top:12px;font-size:10px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px">
+          <div>• Strategy Lab → Code + Params</div>
+          <div>• Journal Detail → Metadata</div>
+          <div>• Portfolio → Allocation Chart</div>
+          <div style="margin-top:8px;font-style:italic">可透過 toolbar toggle 顯示/隱藏</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim)">
+      SwiftUI <code>NavigationSplitView</code> 原生支援三欄佈局，自動處理視窗縮放時的 column collapse 行為（對應設計文件第 14 節 Responsive 斷點規則）。使用 <code>navigationSplitViewColumnWidth(min:ideal:max:)</code> 控制各欄寬度範圍。
+    </div>
+  </div>
+
+  <!-- Data Flow -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">資料流 / Data Flow</h3>
+  <div class="card" style="margin-bottom:32px">
+    <table class="spec-table">
+      <thead><tr><th>操作</th><th>Flow</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700">讀取交易列表</td>
+          <td><code>View → VM → Service → Repository(Local) → SwiftData</code></td>
+          <td>優先讀本機快取，背景觸發 remote sync</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">新增交易紀錄</td>
+          <td><code>View → VM → Service → Repo(Local+Remote)</code></td>
+          <td>先寫本機（即時 UI 更新），再 async 上傳</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">執行回測</td>
+          <td><code>View → VM → Service → APIClient → Server</code></td>
+          <td>純 server-side 運算，Client 輪詢進度</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">取得行情</td>
+          <td><code>Timer(15s) → MarketDataService → APIClient → Redis Cache</code></td>
+          <td>定時 polling，Server 端 Redis 快取避免重複呼叫交易所 API</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">OAuth 登入</td>
+          <td><code>ASWebAuthenticationSession → AuthService → Keychain</code></td>
+          <td>系統 Auth UI → Token 存 Keychain → 自動 refresh</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700">Settings 變更</td>
+          <td><code>View → VM → UserDefaults (local) + API (remote)</code></td>
+          <td>偏好設定立即生效（local），背景同步至 server</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- API Design -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">REST API 端點設計</h3>
+  <div class="card" style="margin-bottom:32px;overflow-x:auto">
+    <table class="spec-table">
+      <thead><tr><th>Method</th><th>Endpoint</th><th>說明</th><th>Auth</th></tr></thead>
+      <tbody>
+        <tr><td colspan="4" style="font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1px;padding-top:14px">Authentication</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/auth/login</code></td><td>Email + Password 登入</td><td>—</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/auth/oauth/callback</code></td><td>OAuth 回調處理</td><td>—</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/auth/mfa/verify</code></td><td>MFA TOTP 驗證</td><td>Partial</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/auth/refresh</code></td><td>Token 刷新</td><td>Refresh Token</td></tr>
+
+        <tr><td colspan="4" style="font-size:10px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px;padding-top:14px">Trades / Journal</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/trades</code></td><td>交易列表 (分頁 + 篩選)</td><td>JWT</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/trades</code></td><td>新增交易</td><td>JWT</td></tr>
+        <tr><td><code>PUT</code></td><td><code>/api/v1/trades/:id</code></td><td>更新交易</td><td>JWT</td></tr>
+        <tr><td><code>DELETE</code></td><td><code>/api/v1/trades/:id</code></td><td>刪除交易</td><td>JWT</td></tr>
+
+        <tr><td colspan="4" style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;padding-top:14px">Strategies</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/strategies</code></td><td>策略列表</td><td>JWT</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/strategies</code></td><td>建立策略</td><td>JWT</td></tr>
+        <tr><td><code>PUT</code></td><td><code>/api/v1/strategies/:id</code></td><td>更新策略</td><td>JWT</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/v1/strategies/:id/backtest</code></td><td>觸發回測</td><td>JWT</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/strategies/:id/backtest/:btId</code></td><td>取得回測結果</td><td>JWT</td></tr>
+
+        <tr><td colspan="4" style="font-size:10px;font-weight:800;color:#13ec80;text-transform:uppercase;letter-spacing:1px;padding-top:14px">Portfolio</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/portfolio</code></td><td>投資組合摘要</td><td>JWT</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/portfolio/positions</code></td><td>持倉列表</td><td>JWT</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/portfolio/performance</code></td><td>績效曲線數據</td><td>JWT</td></tr>
+
+        <tr><td colspan="4" style="font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;padding-top:14px">Market Data / Settings</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/market/quotes?symbols=...</code></td><td>批量延遲行情</td><td>JWT</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/v1/users/me/settings</code></td><td>取得使用者設定</td><td>JWT</td></tr>
+        <tr><td><code>PUT</code></td><td><code>/api/v1/users/me/settings</code></td><td>更新設定</td><td>JWT</td></tr>
+        <tr><td><code>GET/POST/DELETE</code></td><td><code>/api/v1/users/me/api-keys</code></td><td>API Key 管理</td><td>JWT + MFA</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Key macOS-Specific -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">macOS 原生整合 / Platform Integration</h3>
+  <div class="card-grid card-grid-2" style="margin-bottom:32px">
+    <div class="card">
+      <h4 style="margin-bottom:12px">macOS 專屬功能</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px">
+        <div><span style="font-weight:700;color:var(--text)">Menu Bar：</span>原生 macOS Menu Bar 整合，<code>CommandGroup</code> 實現快捷鍵（⌘K, ⌘N 等）</div>
+        <div><span style="font-weight:700;color:var(--text)">Settings Scene：</span>使用 <code>Settings { }</code> scene，自動整合至 App 選單「偏好設定⋯」</div>
+        <div><span style="font-weight:700;color:var(--text)">Touch Bar：</span>MacBook Pro Touch Bar 顯示快速操作（New Trade / Run Backtest）</div>
+        <div><span style="font-weight:700;color:var(--text)">Notifications：</span>UNUserNotificationCenter 推送回測完成、P&L 警示</div>
+        <div><span style="font-weight:700;color:var(--text)">Spotlight：</span>Core Spotlight 索引交易紀錄，系統級搜尋</div>
+        <div><span style="font-weight:700;color:var(--text)">Handoff：</span>未來跨平台時支援 iOS/iPad 接續使用</div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 style="margin-bottom:12px">安全性與儲存</h4>
+      <div style="font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:6px">
+        <div><span style="font-weight:700;color:var(--text)">Keychain：</span>JWT Token、API Key Secret 存入 macOS Keychain，<code>kSecClassGenericPassword</code></div>
+        <div><span style="font-weight:700;color:var(--text)">App Sandbox：</span>啟用 Sandbox，僅開放 Network (outgoing) 權限</div>
+        <div><span style="font-weight:700;color:var(--text)">Hardened Runtime：</span>Notarization 必備，確保 App 完整性</div>
+        <div><span style="font-weight:700;color:var(--text)">App Transport Security：</span>僅允許 HTTPS 連線</div>
+        <div><span style="font-weight:700;color:var(--text)">Biometric Auth：</span>Touch ID 保護 App 開啟（可選）</div>
+        <div><span style="font-weight:700;color:var(--text)">Data Protection：</span>SwiftData SQLite 檔案使用 <code>completeFileProtection</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Future Expansion -->
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">未來擴展規劃 / Future Roadmap</h3>
+  <div class="card">
+    <table class="spec-table">
+      <thead><tr><th>階段</th><th>項目</th><th>技術方案</th><th>影響範圍</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-green">Phase 2</span></td>
+          <td style="font-weight:700">即時行情串流</td>
+          <td>Server 端 WebSocket gateway → Client <code>URLSessionWebSocketTask</code>；Redis Pub/Sub 分發</td>
+          <td>MarketDataService、Dashboard、新增 WebSocketClient</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-green">Phase 2</span></td>
+          <td style="font-weight:700">iOS / iPadOS 版本</td>
+          <td>共用 Core/ 層（Models, Services, Repositories），新建 iOS-specific Views。SwiftUI multiplatform target</td>
+          <td>新增 iOS target，Features/ 層部分重寫 UI</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">Phase 3</span></td>
+          <td style="font-weight:700">自動交易執行</td>
+          <td>Server-side strategy executor + Exchange API integration。需額外安全審計</td>
+          <td>新增 ExecutionService、Order model、風控模組</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">Phase 3</span></td>
+          <td style="font-weight:700">AI 交易助理</td>
+          <td>整合 LLM API（Claude / GPT）分析交易日誌模式、情緒偏差、策略建議</td>
+          <td>新增 AIService、Journal 頁面加入 Insight panel</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-purple">Phase 4</span></td>
+          <td style="font-weight:700">Web 版本</td>
+          <td>前端 Next.js + TailwindCSS（復用設計系統），後端 API 不變</td>
+          <td>獨立 Web 前端專案，共用 API 層</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-purple">Phase 4</span></td>
+          <td style="font-weight:700">社群功能</td>
+          <td>策略分享、績效排行。需新增 Social graph model + Privacy controls</td>
+          <td>新增 Community module、權限擴展</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<div style="text-align:center;padding:48px 32px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">
+  <div style="font-weight:700;margin-bottom:4px">FMSYS Trading Suite Pro — Design Architecture Document</div>
+  <div>Version 1.2 · March 2026 · macOS Desktop Application (SwiftUI)</div>
+</div>
+
+<script>
+  // Smooth scroll + active nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(item.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+      }
+    });
+  });
+  // IntersectionObserver for active nav
+  const sections = document.querySelectorAll('.section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        document.querySelectorAll('.nav-item').forEach(n => {
+          n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-80px 0px -60% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
