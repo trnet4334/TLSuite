@@ -38,12 +38,18 @@ struct FMSYSApp: App {
     var body: some Scene {
         WindowGroup {
             MainAppView(
-                appState: AppState(),
+                appState: {
+                    let state = AppState()
+                    #if DEBUG
+                    state.markAuthenticated()
+                    #endif
+                    return state
+                }(),
                 authService: authService,
                 modelContainer: modelContainer
             )
-            .frame(minWidth: 480, minHeight: 640)
+            .frame(minWidth: 1000, minHeight: 640)
         }
-        .defaultSize(width: 480, height: 700)
+        .defaultSize(width: 1280, height: 800)
     }
 }
