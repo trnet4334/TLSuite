@@ -129,5 +129,55 @@ extension FMSYSTests {
             let sut = DashboardViewModel(trades: [])
             #expect(sut.avgRR == 0.0)
         }
+
+        // MARK: - Task 4 tests
+
+        @Test func bestStreakCountsLongestWinRun() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            // W W L W W W → best = 3
+            let trades = [
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(0)),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(1)),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, exitAt: date(2)),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(3)),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(4)),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(5)),
+            ]
+            let sut = DashboardViewModel(trades: trades)
+            #expect(sut.bestStreak == 3)
+        }
+
+        @Test func bestStreakIs0WithNoClosedTrades() throws {
+            let sut = DashboardViewModel(trades: [])
+            #expect(sut.bestStreak == 0)
+        }
+
+        @Test func currentStreakPositiveForWins() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            let trades = [
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, exitAt: date(0)),  // L
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(1)),  // W
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(2)),  // W
+            ]
+            let sut = DashboardViewModel(trades: trades)
+            #expect(sut.currentStreak == 2)
+        }
+
+        @Test func currentStreakNegativeForLosses() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            let trades = [
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(0)),  // W
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, exitAt: date(1)),  // L
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, exitAt: date(2)),  // L
+            ]
+            let sut = DashboardViewModel(trades: trades)
+            #expect(sut.currentStreak == -2)
+        }
     }
 }

@@ -78,4 +78,37 @@ public final class DashboardViewModel {
         guard !rrs.isEmpty else { return 0 }
         return rrs.reduce(0, +) / Double(rrs.count)
     }
+
+    // MARK: - Task 4: Streak metrics
+
+    private func sortedClosed() -> [Trade] {
+        closedTrades.sorted { ($0.exitAt ?? $0.entryAt) < ($1.exitAt ?? $1.entryAt) }
+    }
+
+    private func isWin(_ trade: Trade) -> Bool {
+        guard let exitPrice = trade.exitPrice else { return false }
+        let multiplier = trade.direction == .long ? 1.0 : -1.0
+        return (exitPrice - trade.entryPrice) * multiplier > 0
+    }
+
+    public var bestStreak: Int {
+        var best = 0, current = 0
+        for trade in sortedClosed() {
+            if isWin(trade) { current += 1; best = max(best, current) }
+            else { current = 0 }
+        }
+        return best
+    }
+
+    public var currentStreak: Int {
+        let sorted = sortedClosed()
+        guard let last = sorted.last else { return 0 }
+        let targetWin = isWin(last)
+        var streak = 0
+        for trade in sorted.reversed() {
+            guard isWin(trade) == targetWin else { break }
+            streak += targetWin ? 1 : -1
+        }
+        return streak
+    }
 }
