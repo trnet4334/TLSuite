@@ -23,9 +23,9 @@ public struct MFAVerificationView: View {
                 // Window chrome row
                 HStack {
                     HStack(spacing: 6) {
-                        Circle().fill(Color(hex: "#ff5f57")).frame(width: 12, height: 12)
-                        Circle().fill(Color(hex: "#ffbd2e")).frame(width: 12, height: 12)
-                        Circle().fill(Color(hex: "#28c840")).frame(width: 12, height: 12)
+                        Circle().fill(Color.fmsLoss).frame(width: 12, height: 12)
+                        Circle().fill(Color.fmsWarning).frame(width: 12, height: 12)
+                        Circle().fill(Color.fmsPrimary).frame(width: 12, height: 12)
                     }
                     Spacer()
                     Text("FMSYS")

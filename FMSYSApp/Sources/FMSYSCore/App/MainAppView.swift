@@ -38,6 +38,7 @@ public struct MainAppView: View {
             } detail: {
                 screenContent
             }
+            .navigationSplitViewStyle(.prominentDetail)
             StatusBar()
         }
     }

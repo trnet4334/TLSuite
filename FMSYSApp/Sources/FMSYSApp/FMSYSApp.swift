@@ -23,7 +23,9 @@ struct FMSYSApp: App {
     }()
 
     private let authService: AuthService = {
-        let baseURL = URL(string: "https://api.fmsys.io/v1")!
+        guard let baseURL = URL(string: "https://api.fmsys.io/v1") else {
+            fatalError("Invalid base URL: configuration error")
+        }
         return AuthService(
             client: APIClient(),
             keychain: KeychainManager(),
