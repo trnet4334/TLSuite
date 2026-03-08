@@ -123,7 +123,7 @@ public struct LoginView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-                .background(Color(hex: "#1c1c1e"), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
