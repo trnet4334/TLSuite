@@ -120,7 +120,7 @@ public struct MFAVerificationView: View {
                     .foregroundStyle(Color.fmsOnSurface)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(Color.black.opacity(0.15), in: Capsule())
+                    .background(Color.fmsBackground.opacity(0.5), in: Capsule())
                     .padding(.bottom, 32)
                 }
                 .padding(.horizontal, 40)
