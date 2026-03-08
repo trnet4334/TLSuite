@@ -125,7 +125,7 @@ public final class DashboardViewModel {
         }
         var cumulative = 0.0
         return filtered.map { trade in
-            guard let exitPrice = trade.exitPrice else { return EquityPoint(date: trade.entryAt, value: cumulative) }
+            let exitPrice = trade.exitPrice ?? trade.entryPrice
             let multiplier = trade.direction == .long ? 1.0 : -1.0
             cumulative += (exitPrice - trade.entryPrice) * multiplier * trade.positionSize
             return EquityPoint(date: trade.exitAt ?? trade.entryAt, value: cumulative)
