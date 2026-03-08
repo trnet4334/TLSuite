@@ -72,6 +72,7 @@ public struct MainAppView: View {
 
     @ViewBuilder
     private var authFlow: some View {
+        NavigationStack {
         LoginView(
             viewModel: authViewModel,
             onAuthenticated: { appState.markAuthenticated() },
@@ -96,6 +97,7 @@ public struct MainAppView: View {
                     onAuthenticated: { appState.markAuthenticated() }
                 )
             }
+        }
         }
     }
 }
