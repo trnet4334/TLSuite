@@ -51,8 +51,9 @@ public final class DashboardViewModel {
 
     public var totalPnL: Double {
         closedTrades.reduce(0.0) { sum, trade in
+            guard let exitPrice = trade.exitPrice else { return sum }
             let multiplier = trade.direction == .long ? 1.0 : -1.0
-            return sum + (trade.exitPrice! - trade.entryPrice) * multiplier * trade.positionSize
+            return sum + (exitPrice - trade.entryPrice) * multiplier * trade.positionSize
         }
     }
 }
