@@ -42,4 +42,17 @@ public final class DashboardViewModel {
     public init(trades: [Trade]) {
         self.trades = trades
     }
+
+    public var closedTrades: [Trade] {
+        trades.filter { $0.exitPrice != nil }
+    }
+
+    public var totalTrades: Int { trades.count }
+
+    public var totalPnL: Double {
+        closedTrades.reduce(0.0) { sum, trade in
+            let multiplier = trade.direction == .long ? 1.0 : -1.0
+            return sum + (trade.exitPrice! - trade.entryPrice) * multiplier * trade.positionSize
+        }
+    }
 }

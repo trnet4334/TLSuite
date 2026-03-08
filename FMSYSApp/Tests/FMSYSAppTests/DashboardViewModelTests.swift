@@ -55,5 +55,38 @@ extension FMSYSTests {
             #expect(DashboardRange.ninetyDays.label == "90D")
             #expect(DashboardRange.allTime.label == "All")
         }
+
+        @Test func totalPnLSumsClosedLongTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, positionSize: 2.0) // +1.0
+            let t2 = makeTrade(context: ctx, entryPrice: 2.0, exitPrice: 1.8, positionSize: 1.0) // -0.2
+            let sut = DashboardViewModel(trades: [t1, t2])
+            #expect(abs(sut.totalPnL - 0.8) < 0.0001)
+        }
+
+        @Test func totalPnLHandlesShortTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t = makeTrade(context: ctx, entryPrice: 2.0, exitPrice: 1.5, direction: .short, positionSize: 1.0) // +0.5
+            let sut = DashboardViewModel(trades: [t])
+            #expect(abs(sut.totalPnL - 0.5) < 0.0001)
+        }
+
+        @Test func totalPnLIgnoresOpenTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let closed = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 2.0)
+            let open   = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil)
+            let sut = DashboardViewModel(trades: [closed, open])
+            #expect(abs(sut.totalPnL - 1.0) < 0.0001)
+        }
+
+        @Test func totalTradesCountsAll() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let trades = [
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5),
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil)
+            ]
+            let sut = DashboardViewModel(trades: trades)
+            #expect(sut.totalTrades == 2)
+        }
     }
 }
