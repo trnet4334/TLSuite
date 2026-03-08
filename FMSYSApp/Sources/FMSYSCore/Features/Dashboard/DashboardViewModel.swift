@@ -56,4 +56,26 @@ public final class DashboardViewModel {
             return sum + (exitPrice - trade.entryPrice) * multiplier * trade.positionSize
         }
     }
+
+    public var winRate: Double {
+        guard !closedTrades.isEmpty else { return 0 }
+        let wins = closedTrades.filter { trade in
+            guard let exitPrice = trade.exitPrice else { return false }
+            let multiplier = trade.direction == .long ? 1.0 : -1.0
+            return (exitPrice - trade.entryPrice) * multiplier > 0
+        }
+        return Double(wins.count) / Double(closedTrades.count)
+    }
+
+    public var avgRR: Double {
+        guard !trades.isEmpty else { return 0 }
+        let rrs = trades.compactMap { trade -> Double? in
+            let reward = abs(trade.takeProfit - trade.entryPrice)
+            let risk   = abs(trade.entryPrice - trade.stopLoss)
+            guard risk > 0 else { return nil }
+            return reward / risk
+        }
+        guard !rrs.isEmpty else { return 0 }
+        return rrs.reduce(0, +) / Double(rrs.count)
+    }
 }

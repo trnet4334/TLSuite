@@ -88,5 +88,46 @@ extension FMSYSTests {
             let sut = DashboardViewModel(trades: trades)
             #expect(sut.totalTrades == 2)
         }
+
+        // MARK: - Task 3 tests
+
+        @Test func winRateIs1WhenAllWins() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let trades = [
+                makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5),
+                makeTrade(context: ctx, entryPrice: 2.0, exitPrice: 2.5)
+            ]
+            let sut = DashboardViewModel(trades: trades)
+            #expect(abs(sut.winRate - 1.0) < 0.0001)
+        }
+
+        @Test func winRateIs0WhenNoClosedTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let open = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil)
+            let sut = DashboardViewModel(trades: [open])
+            #expect(sut.winRate == 0.0)
+        }
+
+        @Test func winRateCalculatesMixed() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let win  = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5)
+            let loss = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5)
+            let sut = DashboardViewModel(trades: [win, loss])
+            #expect(abs(sut.winRate - 0.5) < 0.0001)
+        }
+
+        @Test func avgRRCalculatesRatio() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            // entry=1.0, sl=0.9 (risk=0.1), tp=1.3 (reward=0.3) → R:R = 3.0
+            let t = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil,
+                              stopLoss: 0.9, takeProfit: 1.3)
+            let sut = DashboardViewModel(trades: [t])
+            #expect(abs(sut.avgRR - 3.0) < 0.0001)
+        }
+
+        @Test func avgRRIs0WhenNoTrades() throws {
+            let sut = DashboardViewModel(trades: [])
+            #expect(sut.avgRR == 0.0)
+        }
     }
 }
