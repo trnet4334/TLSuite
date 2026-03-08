@@ -11,11 +11,11 @@ public struct SidebarView: View {
     public var body: some View {
         VStack(spacing: 0) {
             List(selection: $selection) {
-                navItem(.dashboard,   icon: "chart.bar.fill",         label: "Dashboard",    shortcut: "1")
+                navItem(.dashboard,   icon: "chart.bar.fill",         label: "Dashboard",    shortcut: Character("1"))
                 journalSection
-                navItem(.backtesting, icon: "arrow.clockwise.circle", label: "Backtesting",  shortcut: "3")
-                navItem(.strategyLab, icon: "flask.fill",             label: "Strategy Lab", shortcut: "4")
-                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: "5")
+                navItem(.backtesting, icon: "arrow.clockwise.circle", label: "Backtesting",  shortcut: Character("3"))
+                navItem(.strategyLab, icon: "flask.fill",             label: "Strategy Lab", shortcut: Character("4"))
+                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("5"))
             }
             .listStyle(.sidebar)
             .frame(maxHeight: .infinity)
@@ -26,10 +26,10 @@ public struct SidebarView: View {
         .background(Color.fmsSurface)
     }
 
-    private func navItem(_ screen: AppScreen, icon: String, label: String, shortcut: String) -> some View {
+    private func navItem(_ screen: AppScreen, icon: String, label: String, shortcut: Character) -> some View {
         Label(label, systemImage: icon)
             .tag(screen)
-            .keyboardShortcut(KeyEquivalent(shortcut.first!), modifiers: .command)
+            .keyboardShortcut(KeyEquivalent(shortcut), modifiers: .command)
     }
 
     private var journalSection: some View {

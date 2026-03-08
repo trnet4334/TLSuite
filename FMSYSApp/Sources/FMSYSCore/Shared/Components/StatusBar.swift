@@ -13,7 +13,7 @@ public struct StatusBar: View {
             Text("Core Version: 2.1.0")
                 .foregroundStyle(Color.fmsMuted)
             divider
-            Text("macOS 14")
+            Text("macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
                 .foregroundStyle(Color.fmsMuted)
         }
         .font(.system(size: 11, weight: .medium).monospacedDigit())
