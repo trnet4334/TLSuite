@@ -111,4 +111,24 @@ public final class DashboardViewModel {
         }
         return streak
     }
+
+    // MARK: - Task 5: Equity curve
+
+    public func equityCurve(range: DashboardRange) -> [EquityPoint] {
+        let sorted = sortedClosed()
+        let filtered: [Trade]
+        if let days = range.days {
+            let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+            filtered = sorted.filter { ($0.exitAt ?? $0.entryAt) >= cutoff }
+        } else {
+            filtered = sorted
+        }
+        var cumulative = 0.0
+        return filtered.map { trade in
+            guard let exitPrice = trade.exitPrice else { return EquityPoint(date: trade.entryAt, value: cumulative) }
+            let multiplier = trade.direction == .long ? 1.0 : -1.0
+            cumulative += (exitPrice - trade.entryPrice) * multiplier * trade.positionSize
+            return EquityPoint(date: trade.exitAt ?? trade.entryAt, value: cumulative)
+        }
+    }
 }

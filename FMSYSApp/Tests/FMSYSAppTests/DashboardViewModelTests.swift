@@ -179,5 +179,40 @@ extension FMSYSTests {
             let sut = DashboardViewModel(trades: trades)
             #expect(sut.currentStreak == -2)
         }
+
+        // MARK: - Task 5 tests
+
+        @Test func equityCurveAllTimeReturnsCumulativePnL() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, positionSize: 1.0, exitAt: date(-2)) // +0.5
+            let t2 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.8, positionSize: 1.0, exitAt: date(-1)) // -0.2
+            let sut = DashboardViewModel(trades: [t1, t2])
+            let curve = sut.equityCurve(range: .allTime)
+            #expect(curve.count == 2)
+            #expect(abs(curve[0].value - 0.5) < 0.0001)
+            #expect(abs(curve[1].value - 0.3) < 0.0001)
+        }
+
+        @Test func equityCurveFiltersBy7Days() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            let old    = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-10))
+            let recent = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-2))
+            let sut = DashboardViewModel(trades: [old, recent])
+            let curve = sut.equityCurve(range: .sevenDays)
+            #expect(curve.count == 1)
+        }
+
+        @Test func equityCurveExcludesOpenTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let closed = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: Date())
+            let open   = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil)
+            let sut = DashboardViewModel(trades: [closed, open])
+            let curve = sut.equityCurve(range: .allTime)
+            #expect(curve.count == 1)
+        }
     }
 }
