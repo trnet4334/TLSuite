@@ -50,7 +50,7 @@ public struct MainAppView: View {
         case .dashboard:
             DashboardView(trades: loadTrades())
         case .journal:
-            JournalDetailViewStub(
+            JournalDetailView(
                 category: journalCategory,
                 modelContainer: modelContainer
             )
@@ -103,9 +103,3 @@ public struct MainAppView: View {
     }
 }
 
-// Temporary stub — will be replaced in Task 4
-struct JournalDetailViewStub: View {
-    let category: JournalCategory
-    let modelContainer: ModelContainer
-    var body: some View { Text("Journal — \(category.rawValue)") }
-}
