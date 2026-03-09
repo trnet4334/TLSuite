@@ -1,11 +1,14 @@
+// Sources/FMSYSCore/App/SidebarView.swift
 import SwiftUI
 
 public struct SidebarView: View {
     @Binding var selection: AppScreen
+    @Binding var journalCategory: JournalCategory
     @State private var journalExpanded = true
 
-    public init(selection: Binding<AppScreen>) {
+    public init(selection: Binding<AppScreen>, journalCategory: Binding<JournalCategory>) {
         self._selection = selection
+        self._journalCategory = journalCategory
     }
 
     public var body: some View {
@@ -34,17 +37,27 @@ public struct SidebarView: View {
 
     private var journalSection: some View {
         DisclosureGroup(isExpanded: $journalExpanded) {
-            ForEach(["Stocks", "ETFs", "Forex", "Crypto"], id: \.self) { cat in
-                Text(cat)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.fmsMuted)
-                    .padding(.leading, 8)
-                    .tag(AppScreen.journal)
+            ForEach(JournalCategory.allCases.filter { $0 != .all }, id: \.self) { cat in
+                Button {
+                    selection = .journal
+                    journalCategory = cat
+                } label: {
+                    Text(cat.rawValue)
+                        .font(.system(size: 12))
+                        .foregroundStyle(journalCategory == cat && selection == .journal
+                            ? Color.fmsPrimary
+                            : Color.fmsMuted)
+                        .padding(.leading, 8)
+                }
+                .buttonStyle(.plain)
             }
         } label: {
             Label("Journal", systemImage: "book.fill")
                 .tag(AppScreen.journal)
                 .keyboardShortcut("2", modifiers: .command)
+                .simultaneousGesture(TapGesture().onEnded {
+                    journalCategory = .all
+                })
         }
     }
 

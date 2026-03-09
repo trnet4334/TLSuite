@@ -6,6 +6,7 @@ public struct MainAppView: View {
     @State private var appState: AppState
     @State private var authViewModel: AuthViewModel
     @State private var selectedScreen: AppScreen = .dashboard
+    @State private var journalCategory: JournalCategory = .all
 
     private let authService: any AuthServiceProtocol
     private let modelContainer: ModelContainer
@@ -34,7 +35,7 @@ public struct MainAppView: View {
     private var appShell: some View {
         VStack(spacing: 0) {
             NavigationSplitView {
-                SidebarView(selection: $selectedScreen)
+                SidebarView(selection: $selectedScreen, journalCategory: $journalCategory)
             } detail: {
                 screenContent
             }
@@ -49,11 +50,9 @@ public struct MainAppView: View {
         case .dashboard:
             DashboardView(trades: loadTrades())
         case .journal:
-            TradeListView(
-                viewModel: TradeViewModel(
-                    repository: TradeRepository(context: modelContainer.mainContext),
-                    userId: "current-user"
-                )
+            JournalDetailViewStub(
+                category: journalCategory,
+                modelContainer: modelContainer
             )
         case .backtesting:
             BacktestingView()
@@ -70,6 +69,7 @@ public struct MainAppView: View {
     }
 
     // MARK: - Auth flow
+
 
     @ViewBuilder
     private var authFlow: some View {
@@ -101,4 +101,11 @@ public struct MainAppView: View {
         }
         }
     }
+}
+
+// Temporary stub — will be replaced in Task 4
+struct JournalDetailViewStub: View {
+    let category: JournalCategory
+    let modelContainer: ModelContainer
+    var body: some View { Text("Journal — \(category.rawValue)") }
 }
