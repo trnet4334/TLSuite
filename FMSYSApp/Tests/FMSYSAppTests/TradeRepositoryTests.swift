@@ -264,4 +264,44 @@ struct TradeRepositoryTests {
         #expect(trade.greeksTheta == -0.12)
         #expect(trade.greeksVega == 0.28)
     }
+
+    // MARK: - findAll(userId:journalCategory:)
+
+    @Test func findAllFiltersByCategoryWhenNotAll() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let crypto = makeTrade(asset: "BTC/USDT", journalCategory: .crypto)
+        let stocks = makeTrade(asset: "AAPL", journalCategory: .stocksETFs)
+        try sut.create(crypto)
+        try sut.create(stocks)
+
+        let result = try sut.findAll(userId: "user-1", journalCategory: .crypto)
+        #expect(result.count == 1)
+        #expect(result.first?.asset == "BTC/USDT")
+    }
+
+    @Test func findAllReturnsAllTradesWhenCategoryIsAll() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let crypto = makeTrade(asset: "BTC/USDT", journalCategory: .crypto)
+        let stocks = makeTrade(asset: "AAPL", journalCategory: .stocksETFs)
+        try sut.create(crypto)
+        try sut.create(stocks)
+
+        let result = try sut.findAll(userId: "user-1", journalCategory: .all)
+        #expect(result.count == 2)
+    }
+
+    @Test func saveUpdatesJournalCategoryField() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let trade = makeTrade()
+        try sut.create(trade)
+
+        trade.journalCategory = .forex
+        try sut.save()
+
+        let fetched = try sut.findAll(userId: "user-1", journalCategory: .forex)
+        #expect(fetched.count == 1)
+    }
 }
