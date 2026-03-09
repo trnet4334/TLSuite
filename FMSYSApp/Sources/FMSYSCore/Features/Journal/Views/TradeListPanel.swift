@@ -7,6 +7,8 @@ public struct TradeListPanel: View {
     @Binding var selectedTrade: Trade?
     @Binding var sortByPnL: Bool
 
+    @State private var activeFilter: String = "All"
+
     public init(
         category: JournalCategory,
         trades: [Trade],
@@ -23,13 +25,70 @@ public struct TradeListPanel: View {
         VStack(spacing: 0) {
             listHeader
             Divider()
-            if trades.isEmpty {
+            filterBar
+            Divider()
+            if filteredTrades.isEmpty {
                 emptyState
             } else {
                 tradeList
             }
         }
         .background(Color.fmsSurface)
+        .onChange(of: category) { _, _ in activeFilter = "All" }
+    }
+
+    @ViewBuilder
+    private var filterBar: some View {
+        switch category {
+        case .all:
+            EmptyView()
+        case .stocksETFs:
+            segmentedFilter(options: ["All", "Buy", "Sell"])
+        case .crypto:
+            segmentedFilter(options: ["All", "Spot", "Futures"])
+        case .forex:
+            EmptyView()
+        case .options:
+            segmentedFilter(options: ["All", "Call", "Put"])
+        }
+    }
+
+    private func segmentedFilter(options: [String]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                ForEach(options, id: \.self) { opt in
+                    Button(opt) { activeFilter = opt }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11, weight: activeFilter == opt ? .bold : .regular))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            activeFilter == opt ? Color.fmsPrimary.opacity(0.15) : Color.clear,
+                            in: Capsule()
+                        )
+                        .foregroundStyle(activeFilter == opt ? Color.fmsPrimary : Color.fmsMuted)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+        }
+    }
+
+    private var filteredTrades: [Trade] {
+        guard activeFilter != "All" else { return trades }
+        switch category {
+        case .stocksETFs:
+            if activeFilter == "Buy"  { return trades.filter { $0.direction == .long } }
+            if activeFilter == "Sell" { return trades.filter { $0.direction == .short } }
+        case .crypto:
+            if activeFilter == "Spot"    { return trades.filter { ($0.leverage ?? 1) <= 1 } }
+            if activeFilter == "Futures" { return trades.filter { ($0.leverage ?? 1) > 1 } }
+        case .options:
+            if activeFilter == "Call" { return trades.filter { $0.direction == .long } }
+            if activeFilter == "Put"  { return trades.filter { $0.direction == .short } }
+        default: break
+        }
+        return trades
     }
 
     private var listHeader: some View {
@@ -53,7 +112,7 @@ public struct TradeListPanel: View {
     }
 
     private var tradeList: some View {
-        List(trades, id: \.id, selection: $selectedTrade) { trade in
+        List(filteredTrades, id: \.id, selection: $selectedTrade) { trade in
             tradeCard(trade)
                 .tag(trade)
                 .listRowBackground(
