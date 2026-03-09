@@ -216,6 +216,31 @@ struct TradeRepositoryTests {
         #expect(trade.greeksVega == nil)
     }
 
+    // MARK: - entryTime / exitTime
+
+    @Test func tradeEntryTimeDefaultsToNil() throws {
+        let trade = makeTrade()
+        #expect(trade.entryTime == nil)
+        #expect(trade.exitTime == nil)
+    }
+
+    @Test func tradeTimesCanBeSet() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let trade = makeTrade()
+        try sut.create(trade)
+
+        let entry = Date(timeIntervalSinceReferenceDate: 1_000_000)
+        let exit = Date(timeIntervalSinceReferenceDate: 1_003_600)
+        trade.entryTime = entry
+        trade.exitTime = exit
+        try sut.save()
+
+        let fetched = try #require(try sut.findById(trade.id))
+        #expect(fetched.entryTime == entry)
+        #expect(fetched.exitTime == exit)
+    }
+
     @Test func tradeCryptoFieldsCanBeSet() throws {
         let trade = makeTrade()
         trade.journalCategory = .crypto

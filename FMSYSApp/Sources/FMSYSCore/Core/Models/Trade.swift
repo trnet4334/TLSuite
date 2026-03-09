@@ -38,6 +38,8 @@ public final class Trade {
     // Timing
     public var entryAt: Date
     public var exitAt: Date?
+    public var entryTime: Date?
+    public var exitTime: Date?
 
     // Metadata
     public var notes: String?
@@ -107,6 +109,8 @@ public final class Trade {
         entryAt: Date,
         exitPrice: Double? = nil,
         exitAt: Date? = nil,
+        entryTime: Date? = nil,
+        exitTime: Date? = nil,
         notes: String? = nil,
         emotionTag: EmotionTag? = nil,
         screenshotURL: String? = nil,
@@ -139,6 +143,8 @@ public final class Trade {
         self.entryAt = entryAt
         self.exitPrice = exitPrice
         self.exitAt = exitAt
+        self.entryTime = entryTime
+        self.exitTime = exitTime
         self.notes = notes
         self.emotionTagRaw = emotionTag?.rawValue
         self.screenshotURL = screenshotURL
