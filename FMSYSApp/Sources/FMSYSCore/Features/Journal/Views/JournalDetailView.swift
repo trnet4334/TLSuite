@@ -83,12 +83,3 @@ public struct JournalDetailView: View {
     }
 }
 
-// MARK: - Stubs (replaced in Tasks 5–8)
-struct CryptoTradeCard: View { let trade: Trade; var body: some View { Text(trade.asset) } }
-struct StocksTradeCard: View { let trade: Trade; var body: some View { Text(trade.asset) } }
-struct ForexTradeCard: View { let trade: Trade; var body: some View { Text(trade.asset) } }
-struct OptionsTradeCard: View { let trade: Trade; var body: some View { Text(trade.asset) } }
-struct CryptoDetailPanel: View { let trade: Trade; let onSave: () -> Void; var body: some View { Text("Crypto") } }
-struct StocksDetailPanel: View { let trade: Trade; let onSave: () -> Void; var body: some View { Text("Stocks") } }
-struct ForexDetailPanel: View { let trade: Trade; let onSave: () -> Void; var body: some View { Text("Forex") } }
-struct OptionsDetailPanel: View { let trade: Trade; let onSave: () -> Void; var body: some View { Text("Options") } }
