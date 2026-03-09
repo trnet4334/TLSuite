@@ -1,0 +1,46 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Secrets & env
+.env
+.env.*
+*.pem
+*.p12
+*.p8
+Secrets.swift
+APIKeys.swift
+
+# Logs & temp
+*.log
+*.tmp
+*.swp
+*~
+
+# Project-specific ignored docs
+ARCHITECTURE.md
+FMSYS-Design-Architecture.html
+
+# Documentation build
+docs/_build/
