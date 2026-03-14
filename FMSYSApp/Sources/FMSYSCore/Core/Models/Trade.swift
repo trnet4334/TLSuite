@@ -11,10 +11,6 @@ public enum Direction: String, Codable {
     case long, short
 }
 
-public enum EmotionTag: String, Codable {
-    case confident, fearful, greedy, calm, frustrated, neutral
-}
-
 // MARK: - Trade
 
 @Model
