@@ -61,8 +61,10 @@ public final class ChecklistViewModel {
     }
 
     public func rename(id: UUID, title: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
         guard let idx = items.firstIndex(where: { $0.id == id }) else { return }
-        items[idx].title = title
+        items[idx].title = trimmed
         persist()
     }
 
