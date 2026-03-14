@@ -24,7 +24,7 @@ struct AllocationDonutView: View {
                                  clockwise: false)
                     }
                     ctx.stroke(path, with: .color(slice.color),
-                               style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                               style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt))
                     startAngle += sweep + gapAngle
                 }
             }
