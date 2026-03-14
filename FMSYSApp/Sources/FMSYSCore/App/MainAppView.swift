@@ -170,7 +170,7 @@ public struct MainAppView: View {
         case .backtesting:
             BacktestingView()
         case .strategyLab:
-            StrategyLabView()
+            StrategyLabView(modelContainer: modelContainer)
         case .portfolio:
             PortfolioView()
         }
