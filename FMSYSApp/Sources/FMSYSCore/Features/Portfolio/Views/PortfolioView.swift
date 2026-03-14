@@ -245,12 +245,16 @@ public struct PortfolioView: View {
 
     // MARK: - Helpers
 
-    private func formatted(_ value: Double) -> String {
+    private static let currencyFormatter: NumberFormatter = {
         let f = NumberFormatter()
         f.numberStyle = .currency
         f.currencySymbol = "$"
         f.maximumFractionDigits = 2
         f.minimumFractionDigits = 2
-        return f.string(from: NSNumber(value: value)) ?? "$\(value)"
+        return f
+    }()
+
+    private func formatted(_ value: Double) -> String {
+        Self.currencyFormatter.string(from: NSNumber(value: value)) ?? "$\(value)"
     }
 }
