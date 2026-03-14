@@ -70,6 +70,7 @@ private struct ChecklistRow: View {
     let onDelete: () -> Void
 
     @State private var editText = ""
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HStack(spacing: 10) {
@@ -98,7 +99,11 @@ private struct ChecklistRow: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsOnSurface)
                     .textFieldStyle(.plain)
-                    .onAppear { editText = item.title }
+                    .focused($isFocused)
+                    .onAppear {
+                        editText = item.title
+                        isFocused = true
+                    }
                     .onSubmit { onRename(editText) }
             } else {
                 Text(item.title)

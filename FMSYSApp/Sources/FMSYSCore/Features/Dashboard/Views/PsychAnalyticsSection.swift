@@ -26,26 +26,28 @@ public struct PsychAnalyticsSection: View {
                     .kerning(0.5)
             }
 
-            HStack(alignment: .top, spacing: 24) {
-                VStack(spacing: 12) {
-                    ScoreBar(label: "Discipline Score", value: analytics.disciplineScore, color: Color.fmsPrimary)
-                    ScoreBar(label: "Patience Index", value: analytics.patienceIndex, color: Color(red: 0.345, green: 0.651, blue: 1.0))
-                }
-                .frame(maxWidth: .infinity)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Emotion vs. P/L Heatmap")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(Color.fmsMuted)
-                        Spacer()
-                        legend
+            GeometryReader { geo in
+                HStack(alignment: .top, spacing: 24) {
+                    VStack(spacing: 12) {
+                        ScoreBar(label: "Discipline Score", value: analytics.disciplineScore, color: Color.fmsPrimary)
+                        ScoreBar(label: "Patience Index", value: analytics.patienceIndex, color: Color(red: 0.345, green: 0.651, blue: 1.0))
                     }
-                    heatmapGrid
+                    .frame(width: (geo.size.width - 24) / 3)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Emotion vs. P/L Heatmap")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(Color.fmsMuted)
+                            Spacer()
+                            legend
+                        }
+                        heatmapGrid
+                    }
+                    .frame(width: (geo.size.width - 24) * 2 / 3)
                 }
-                .frame(maxWidth: .infinity)
-                .layoutPriority(1)
             }
+            .frame(minHeight: 120)
         }
         .padding(20)
         .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))
