@@ -105,10 +105,10 @@ public struct MainAppView: View {
                 } label: {
                     Circle()
                         .fill(Color.fmsMuted.opacity(0.3))
-                        .frame(width: 28, height: 28)
+                        .frame(width: 32, height: 32)
                         .overlay {
                             Image(systemName: "person.fill")
-                                .font(.system(size: 14))
+                                .font(.system(size: 16))
                                 .foregroundStyle(Color.fmsMuted)
                         }
                 }
@@ -129,7 +129,7 @@ public struct MainAppView: View {
             .padding(.trailing, 12)
         }
         .frame(height: 48)
-        .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
+        .background(Color(NSColor.windowBackgroundColor))
         .overlay(alignment: .bottom) {
             Divider()
                 .overlay(Color.fmsMuted.opacity(0.15))
