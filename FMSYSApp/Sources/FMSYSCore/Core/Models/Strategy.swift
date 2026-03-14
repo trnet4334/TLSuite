@@ -1,9 +1,13 @@
 import Foundation
 import SwiftData
 
+// MARK: - StrategyStatus
+
 public enum StrategyStatus: String, Codable, CaseIterable {
     case active, paused, drafting, archived
 }
+
+// MARK: - Strategy
 
 @Model
 public final class Strategy {
