@@ -21,7 +21,7 @@ extension FMSYSTests {
 
         @Test func performanceCurveHasPoints() {
             let sut = PortfolioViewModel()
-            #expect(sut.performanceCurve.count > 0)
+            #expect(sut.performanceCurve.count == 7)
         }
 
         @Test func positionsContainsThreeStubs() {

@@ -42,8 +42,8 @@ public final class PortfolioViewModel {
     public var performanceCurve: [EquityPoint] {
         let cal = Calendar.current
         let now = Date()
-        let start = cal.date(from: cal.dateComponents([.year], from: now))!
-        let values: [Double] = [100_000, 108_000, 115_000, 112_000, 128_000, 135_000, 142_500]
+        let start = cal.date(from: cal.dateComponents([.year], from: now)) ?? now
+        let values: [Double] = [100_000, 108_000, 115_000, 112_000, 128_000, 135_000, 142_500.42]
         let step = now.timeIntervalSince(start) / Double(values.count - 1)
         return values.enumerated().map { idx, val in
             EquityPoint(date: start.addingTimeInterval(Double(idx) * step), value: val)
