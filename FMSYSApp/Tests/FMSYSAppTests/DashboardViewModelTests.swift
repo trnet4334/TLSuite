@@ -275,5 +275,16 @@ extension FMSYSTests {
             let total = cells.reduce(0) { $0 + $1.count }
             #expect(total == 1)
         }
+
+        @Test func psychAnalyticsIsEmptyWithNoTaggedTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5)
+            let t2 = makeTrade(context: ctx, entryPrice: 2.0, exitPrice: 1.5)
+            let sut = DashboardViewModel(trades: [t1, t2])
+            let result = sut.psychAnalytics
+            #expect(result.disciplineScore == 0.0)
+            #expect(result.patienceIndex == 0.0)
+            #expect(result.heatmapCells.isEmpty)
+        }
     }
 }
