@@ -52,6 +52,7 @@ public final class StrategyViewModel {
 
     @MainActor
     public func update(_ strategy: Strategy) {
+        // SwiftData @Model: mutation is in-place by design; stamp updatedAt before save
         strategy.updatedAt = Date()
         do {
             try repository.save()
@@ -88,19 +89,23 @@ public final class StrategyViewModel {
             ("Mean Reversion V2",   "Bollinger Band Scalp",  .paused,   0.588, 1.45),
             ("Volatility Breakout", "ATR Expansion",         .drafting, nil,   nil),
         ]
-        for (name, tag, status, wr, pf) in seed {
-            let s = Strategy(
-                userId: userId,
-                name: name,
-                indicatorTag: tag,
-                status: status,
-                logicCode: status == .active ? logic : "",
-                riskMgmtEnabled: status == .active,
-                winRate: wr,
-                profitFactor: pf
-            )
-            try? repository.create(s)
+        do {
+            for (name, tag, status, wr, pf) in seed {
+                let s = Strategy(
+                    userId: userId,
+                    name: name,
+                    indicatorTag: tag,
+                    status: status,
+                    logicCode: status == .active ? logic : "",
+                    riskMgmtEnabled: status == .active,
+                    winRate: wr,
+                    profitFactor: pf
+                )
+                try repository.create(s)
+            }
+            defaults.set(true, forKey: Self.seededKey)
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        defaults.set(true, forKey: Self.seededKey)
     }
 }

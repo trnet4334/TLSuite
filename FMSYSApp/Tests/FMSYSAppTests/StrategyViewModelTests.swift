@@ -37,11 +37,11 @@ extension FMSYSTests {
             let (sut, _container) = try makeSUT()
             _ = _container
             sut.load()
-            let before = sut.strategies.count
+            let countBefore = sut.strategies.count
             sut.add()
-            #expect(sut.strategies.count == before + 1)
-            #expect(sut.strategies.first?.status == .drafting)
+            #expect(sut.strategies.count == countBefore + 1)
             #expect(sut.selectedStrategy?.status == .drafting)
+            #expect(sut.selectedStrategy?.name == "New Strategy")
         }
 
         @Test func deleteRemovesStrategyAndUpdatesSelection() throws {
