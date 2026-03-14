@@ -50,20 +50,20 @@ extension FMSYSTests {
         // MARK: - User profile
 
         @Test func userDisplayNameDefaultsToTradingDesk() {
-            try? KeychainManager().clearAll()
-            let sut = AppState(keychain: KeychainManager())
+            try? keychain.clearAll()
+            let sut = AppState(keychain: keychain)
             #expect(sut.userDisplayName == "Trading Desk")
         }
 
         @Test func userEmailDefaultsToPlaceholder() {
-            try? KeychainManager().clearAll()
-            let sut = AppState(keychain: KeychainManager())
+            try? keychain.clearAll()
+            let sut = AppState(keychain: keychain)
             #expect(sut.userEmail == "trader@fmsys.app")
         }
 
         @Test func userRoleDefaultsToTrader() {
-            try? KeychainManager().clearAll()
-            let sut = AppState(keychain: KeychainManager())
+            try? keychain.clearAll()
+            let sut = AppState(keychain: keychain)
             #expect(sut.userRole == "Trader")
         }
     }

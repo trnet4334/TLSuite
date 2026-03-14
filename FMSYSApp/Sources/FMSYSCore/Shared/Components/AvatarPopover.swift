@@ -64,7 +64,7 @@ public struct AvatarPopover: View {
                 }
                 .buttonStyle(.plain)
 
-                Button(role: .destructive) {
+                Button {
                     onSignOut()
                 } label: {
                     Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
