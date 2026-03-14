@@ -2,6 +2,11 @@
 import SwiftUI
 import Charts
 
+private struct SparkPoint: Identifiable {
+    let id: Int
+    let value: Double
+}
+
 public struct StrategyCard: View {
     let strategy: Strategy
     let isSelected: Bool
@@ -16,6 +21,7 @@ public struct StrategyCard: View {
         }
     }
 
+    // MARK: - Stub sparkline data (Phase N wires real equityCurve)
     private var sparklinePoints: [Double] {
         switch strategy.status {
         case .active:   return [10, 12, 11, 15, 14, 18, 20]
@@ -23,6 +29,10 @@ public struct StrategyCard: View {
         case .drafting: return [10, 10, 11, 10, 12, 11, 13]
         case .archived: return [20, 18, 15, 12, 10, 8, 7]
         }
+    }
+
+    private var sparkPoints: [SparkPoint] {
+        sparklinePoints.enumerated().map { SparkPoint(id: $0.offset, value: $0.element) }
     }
 
     public var body: some View {
@@ -44,23 +54,22 @@ public struct StrategyCard: View {
             .padding(.bottom, 12)
 
             // Sparkline
-            Chart {
-                ForEach(Array(sparklinePoints.enumerated()), id: \.offset) { idx, val in
-                    LineMark(
-                        x: .value("t", idx),
-                        y: .value("v", val)
-                    )
-                    .foregroundStyle(statusColor)
-                    .lineStyle(strategy.status == .drafting
-                        ? StrokeStyle(lineWidth: 1.5, dash: [4])
-                        : StrokeStyle(lineWidth: 1.5))
-                }
+            Chart(sparkPoints) { point in
+                LineMark(
+                    x: .value("t", point.id),
+                    y: .value("v", point.value)
+                )
+                .foregroundStyle(statusColor)
+                .lineStyle(strategy.status == .drafting
+                    ? StrokeStyle(lineWidth: 1.5, dash: [4])
+                    : StrokeStyle(lineWidth: 1.5))
             }
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
             .frame(height: 48)
             .opacity(strategy.status == .paused ? 0.6 : 1.0)
             .padding(.bottom, 12)
+            .accessibilityHidden(true)
 
             // Metrics
             Divider()
@@ -103,7 +112,6 @@ public struct StrategyCard: View {
     private var statusBadge: some View {
         Text(strategy.status.rawValue.capitalized)
             .font(.system(size: 9, weight: .bold))
-            .textCase(.uppercase)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(statusColor.opacity(0.15), in: Capsule())
