@@ -24,4 +24,61 @@ struct StrategyRepositoryTests {
         #expect(s.emaSlowPeriod == 21)
         #expect(s.winRate == nil)
     }
+
+    // MARK: - StrategyRepository Tests
+
+    private func makeRepository() throws -> (StrategyRepository, ModelContext, ModelContainer) {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Strategy.self, configurations: config)
+        let context = container.mainContext
+        return (StrategyRepository(context: context), context, container)
+    }
+
+    private func makeStrategy(
+        userId: String = "u1",
+        name: String = "Test Strategy",
+        status: StrategyStatus = .active
+    ) -> Strategy {
+        Strategy(userId: userId, name: name, indicatorTag: "EMA", status: status)
+    }
+
+    @Test func insertAndFindAll() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let s = makeStrategy()
+        try sut.insert(s)
+        let all = try sut.findAll(userId: "u1")
+        #expect(all.count == 1)
+        #expect(all.first?.name == "Test Strategy")
+    }
+
+    @Test func findAllFiltersByUserId() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        try sut.insert(makeStrategy(userId: "u1"))
+        try sut.insert(makeStrategy(userId: "u2"))
+        let result = try sut.findAll(userId: "u1")
+        #expect(result.count == 1)
+    }
+
+    @Test func findAllByStatusFilters() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        try sut.insert(makeStrategy(status: .active))
+        try sut.insert(makeStrategy(status: .paused))
+        try sut.insert(makeStrategy(status: .drafting))
+        let active = try sut.findAll(userId: "u1", status: .active)
+        #expect(active.count == 1)
+        #expect(active.first?.status == .active)
+    }
+
+    @Test func deleteRemovesStrategy() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let s = makeStrategy()
+        try sut.insert(s)
+        try sut.delete(s)
+        let all = try sut.findAll(userId: "u1")
+        #expect(all.isEmpty)
+    }
 }
