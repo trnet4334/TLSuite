@@ -8,6 +8,8 @@ public struct StrategyRepository {
         self.context = context
     }
 
+    // MARK: - Read
+
     public func findAll(userId: String) throws -> [Strategy] {
         let uid = userId
         let descriptor = FetchDescriptor<Strategy>(
@@ -27,14 +29,29 @@ public struct StrategyRepository {
         return try context.fetch(descriptor)
     }
 
-    public func insert(_ strategy: Strategy) throws {
+    public func findById(_ id: UUID) throws -> Strategy? {
+        let targetId = id
+        var descriptor = FetchDescriptor<Strategy>(
+            predicate: #Predicate { $0.id == targetId }
+        )
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).first
+    }
+
+    // MARK: - Create
+
+    public func create(_ strategy: Strategy) throws {
         context.insert(strategy)
         try context.save()
     }
 
+    // MARK: - Update
+
     public func save() throws {
         try context.save()
     }
+
+    // MARK: - Delete
 
     public func delete(_ strategy: Strategy) throws {
         context.delete(strategy)

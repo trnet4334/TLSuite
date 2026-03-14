@@ -46,7 +46,7 @@ struct StrategyRepositoryTests {
         let (sut, _, _container) = try makeRepository()
         _ = _container
         let s = makeStrategy()
-        try sut.insert(s)
+        try sut.create(s)
         let all = try sut.findAll(userId: "u1")
         #expect(all.count == 1)
         #expect(all.first?.name == "Test Strategy")
@@ -55,8 +55,8 @@ struct StrategyRepositoryTests {
     @Test func findAllFiltersByUserId() throws {
         let (sut, _, _container) = try makeRepository()
         _ = _container
-        try sut.insert(makeStrategy(userId: "u1"))
-        try sut.insert(makeStrategy(userId: "u2"))
+        try sut.create(makeStrategy(userId: "u1"))
+        try sut.create(makeStrategy(userId: "u2"))
         let result = try sut.findAll(userId: "u1")
         #expect(result.count == 1)
     }
@@ -64,9 +64,9 @@ struct StrategyRepositoryTests {
     @Test func findAllByStatusFilters() throws {
         let (sut, _, _container) = try makeRepository()
         _ = _container
-        try sut.insert(makeStrategy(status: .active))
-        try sut.insert(makeStrategy(status: .paused))
-        try sut.insert(makeStrategy(status: .drafting))
+        try sut.create(makeStrategy(status: .active))
+        try sut.create(makeStrategy(status: .paused))
+        try sut.create(makeStrategy(status: .drafting))
         let active = try sut.findAll(userId: "u1", status: .active)
         #expect(active.count == 1)
         #expect(active.first?.status == .active)
@@ -76,9 +76,23 @@ struct StrategyRepositoryTests {
         let (sut, _, _container) = try makeRepository()
         _ = _container
         let s = makeStrategy()
-        try sut.insert(s)
+        try sut.create(s)
         try sut.delete(s)
         let all = try sut.findAll(userId: "u1")
         #expect(all.isEmpty)
+    }
+
+    @Test func findAllReturnsSortedByCreatedAtDescending() throws {
+        let (sut, _, _container) = try makeRepository()
+        _ = _container
+        let older = makeStrategy(name: "Older")
+        // Insert older first, then newer — repository should return newer first
+        try sut.create(older)
+        let newer = makeStrategy(name: "Newer")
+        // Manually set createdAt to simulate time difference
+        newer.createdAt = older.createdAt.addingTimeInterval(60)
+        try sut.create(newer)
+        let all = try sut.findAll(userId: "u1")
+        #expect(all.first?.name == "Newer")
     }
 }
