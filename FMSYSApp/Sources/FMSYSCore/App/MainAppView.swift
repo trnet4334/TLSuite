@@ -7,6 +7,10 @@ public struct MainAppView: View {
     @State private var authViewModel: AuthViewModel
     @State private var selectedScreen: AppScreen = .dashboard
     @State private var journalCategory: JournalCategory = .all
+    @State private var showNotificationsPopover = false
+    @State private var showSharePopover = false
+    @State private var showSettingsPopover = false
+    @State private var showAvatarPopover = false
 
     private let authService: any AuthServiceProtocol
     private let modelContainer: ModelContainer
@@ -34,6 +38,7 @@ public struct MainAppView: View {
 
     private var appShell: some View {
         VStack(spacing: 0) {
+            titleBar
             NavigationSplitView {
                 SidebarView(selection: $selectedScreen, journalCategory: $journalCategory)
             } detail: {
@@ -41,6 +46,114 @@ public struct MainAppView: View {
             }
             .navigationSplitViewStyle(.prominentDetail)
             StatusBar()
+        }
+    }
+
+    // MARK: - Title bar
+
+    private var titleBar: some View {
+        HStack(spacing: 0) {
+            // Space for macOS window traffic lights
+            Spacer().frame(width: 80)
+
+            Spacer()
+
+            // Centered search stub
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.fmsMuted.opacity(0.6))
+                Text("Search trades, journals, analytics...")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.fmsMuted.opacity(0.6))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .frame(width: 320)
+            .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.fmsMuted.opacity(0.1), lineWidth: 1)
+            )
+
+            Spacer()
+
+            // Right controls
+            HStack(spacing: 4) {
+                toolbarIconButton(systemName: "bell", isPresented: $showNotificationsPopover) {
+                    Text("Notifications coming soon")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.fmsOnSurface)
+                        .padding(16)
+                }
+                toolbarIconButton(systemName: "square.and.arrow.up", isPresented: $showSharePopover) {
+                    Text("Export & Share coming soon")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.fmsOnSurface)
+                        .padding(16)
+                }
+                toolbarIconButton(systemName: "gearshape", isPresented: $showSettingsPopover) {
+                    Text("Settings coming soon")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.fmsOnSurface)
+                        .padding(16)
+                }
+
+                // Avatar
+                Button {
+                    showAvatarPopover.toggle()
+                } label: {
+                    Circle()
+                        .fill(Color.fmsMuted.opacity(0.3))
+                        .frame(width: 28, height: 28)
+                        .overlay {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.fmsMuted)
+                        }
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showAvatarPopover, arrowEdge: .top) {
+                    AvatarPopover(
+                        displayName: appState.userDisplayName,
+                        email: appState.userEmail,
+                        role: appState.userRole,
+                        onSignOut: {
+                            showAvatarPopover = false
+                            appState.markLoggedOut()
+                        }
+                    )
+                }
+                .padding(.leading, 4)
+            }
+            .padding(.trailing, 12)
+        }
+        .frame(height: 48)
+        .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
+        .overlay(alignment: .bottom) {
+            Divider()
+                .overlay(Color.fmsMuted.opacity(0.15))
+        }
+    }
+
+    @ViewBuilder
+    private func toolbarIconButton<Content: View>(
+        systemName: String,
+        isPresented: Binding<Bool>,
+        @ViewBuilder popoverContent: @escaping () -> Content
+    ) -> some View {
+        Button {
+            isPresented.wrappedValue.toggle()
+        } label: {
+            Image(systemName: systemName)
+                .font(.system(size: 15))
+                .foregroundStyle(Color.fmsMuted)
+                .frame(width: 32, height: 32)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .popover(isPresented: isPresented, arrowEdge: .top) {
+            popoverContent()
         }
     }
 
