@@ -23,7 +23,7 @@ public struct SidebarView: View {
             .listStyle(.sidebar)
             .frame(maxHeight: .infinity)
 
-            equityCard
+            bottomCard(for: selection)
         }
         .frame(minWidth: 256, maxWidth: 256)
         .background(Color.fmsSurface)
@@ -61,6 +61,18 @@ public struct SidebarView: View {
         }
     }
 
+    @ViewBuilder
+    private func bottomCard(for screen: AppScreen) -> some View {
+        switch screen {
+        case .strategyLab:
+            strategyLabCard
+        case .portfolio:
+            portfolioCard
+        default:
+            equityCard
+        }
+    }
+
     private var equityCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Total Equity")
@@ -78,6 +90,74 @@ public struct SidebarView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.fmsPrimary.opacity(0.3), lineWidth: 1)
+        )
+        .padding(12)
+    }
+
+    private var strategyLabCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Active Labs")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(Color.fmsPrimary)
+                .textCase(.uppercase)
+                .tracking(0.5)
+            Text("4 Running")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Color.fmsOnSurface)
+            HStack(spacing: 4) {
+                Image(systemName: "memorychip")
+                    .font(.system(size: 10))
+                Text("82% CPU Usage")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundStyle(Color.fmsPrimary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [Color.fmsPrimary.opacity(0.1), Color.clear],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.fmsPrimary.opacity(0.2), lineWidth: 1)
+        )
+        .padding(12)
+    }
+
+    private var portfolioCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Total Equity")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(Color.fmsPrimary)
+                .textCase(.uppercase)
+                .tracking(0.5)
+            Text("$142,500.42")
+                .font(.system(size: 18, weight: .bold).monospacedDigit())
+                .foregroundStyle(Color.fmsOnSurface)
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 10))
+                Text("+12.5% MTD")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundStyle(Color.fmsPrimary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [Color.fmsPrimary.opacity(0.1), Color.clear],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.fmsPrimary.opacity(0.2), lineWidth: 1)
         )
         .padding(12)
     }
