@@ -24,7 +24,8 @@ extension FMSYSTests {
             stopLoss: Double? = nil,
             takeProfit: Double? = nil,
             positionSize: Double = 1.0,
-            exitAt: Date? = nil
+            exitAt: Date? = nil,
+            emotionTag: EmotionTag? = nil
         ) -> Trade {
             let sl = stopLoss ?? (direction == .long ? entryPrice - 10 : entryPrice + 10)
             let tp = takeProfit ?? (direction == .long ? entryPrice + 20 : entryPrice - 20)
@@ -39,7 +40,8 @@ extension FMSYSTests {
                 positionSize: positionSize,
                 entryAt: Date(),
                 exitPrice: exitPrice,
-                exitAt: exitAt ?? (exitPrice != nil ? Date() : nil)
+                exitAt: exitAt ?? (exitPrice != nil ? Date() : nil),
+                emotionTag: emotionTag
             )
             context.insert(trade)
             return trade
@@ -47,13 +49,12 @@ extension FMSYSTests {
 
         // MARK: - Task 1 test
 
-        @Test func dashboardRangeAllCasesExist() {
-            let ranges = DashboardRange.allCases
-            #expect(ranges.count == 4)
-            #expect(DashboardRange.sevenDays.label == "7D")
-            #expect(DashboardRange.thirtyDays.label == "30D")
-            #expect(DashboardRange.ninetyDays.label == "90D")
-            #expect(DashboardRange.allTime.label == "All")
+        @Test func dashboardRangeNewLabels() {
+            #expect(DashboardRange.oneWeek.label == "1W")
+            #expect(DashboardRange.oneMonth.label == "1M")
+            #expect(DashboardRange.threeMonths.label == "3M")
+            #expect(DashboardRange.ytd.label == "YTD")
+            #expect(DashboardRange.allCases.count == 4)
         }
 
         @Test func totalPnLSumsClosedLongTrades() throws {
@@ -189,20 +190,20 @@ extension FMSYSTests {
             let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, positionSize: 1.0, exitAt: date(-2)) // +0.5
             let t2 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.8, positionSize: 1.0, exitAt: date(-1)) // -0.2
             let sut = DashboardViewModel(trades: [t1, t2])
-            let curve = sut.equityCurve(range: .allTime)
+            let curve = sut.equityCurve(range: .oneMonth)
             #expect(curve.count == 2)
             #expect(abs(curve[0].value - 0.5) < 0.0001)
             #expect(abs(curve[1].value - 0.3) < 0.0001)
         }
 
-        @Test func equityCurveFiltersBy7Days() throws {
+        @Test func equityCurveFiltersBy1Week() throws {
             let (ctx, _container) = try makeContainer(); _ = _container
             let base = Date()
             func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
             let old    = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-10))
             let recent = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-2))
             let sut = DashboardViewModel(trades: [old, recent])
-            let curve = sut.equityCurve(range: .sevenDays)
+            let curve = sut.equityCurve(range: .oneWeek)
             #expect(curve.count == 1)
         }
 
@@ -211,8 +212,68 @@ extension FMSYSTests {
             let closed = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: Date())
             let open   = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: nil)
             let sut = DashboardViewModel(trades: [closed, open])
-            let curve = sut.equityCurve(range: .allTime)
+            let curve = sut.equityCurve(range: .oneMonth)
             #expect(curve.count == 1)
+        }
+
+        // MARK: - New range tests
+
+        @Test func equityCurveFiltersBy1Month() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let base = Date()
+            func date(_ offset: Int) -> Date { Calendar.current.date(byAdding: .day, value: offset, to: base)! }
+            let old    = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-40))
+            let recent = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, exitAt: date(-10))
+            let sut = DashboardViewModel(trades: [old, recent])
+            let curve = sut.equityCurve(range: .oneMonth)
+            #expect(curve.count == 1)
+        }
+
+        // MARK: - psychAnalytics tests
+
+        @Test func disciplineScoreIs1WhenAllCalm() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, emotionTag: .calm)
+            let t2 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, emotionTag: .confident)
+            let sut = DashboardViewModel(trades: [t1, t2])
+            #expect(abs(sut.psychAnalytics.disciplineScore - 1.0) < 0.001)
+        }
+
+        @Test func disciplineScoreIs0WhenAllFearful() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, emotionTag: .fearful)
+            let sut = DashboardViewModel(trades: [t])
+            #expect(sut.psychAnalytics.disciplineScore == 0.0)
+        }
+
+        @Test func patienceIndexExcludesFrustratedTrades() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let patient   = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, emotionTag: .calm)
+            let impatient = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, emotionTag: .frustrated)
+            let sut = DashboardViewModel(trades: [patient, impatient])
+            #expect(abs(sut.psychAnalytics.patienceIndex - 0.5) < 0.001)
+        }
+
+        @Test func heatmapCellsCountByEmotionAndPL() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let t1 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 0.5, emotionTag: .fearful)
+            let t2 = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, emotionTag: .fearful)
+            let sut = DashboardViewModel(trades: [t1, t2])
+            let cells = sut.psychAnalytics.heatmapCells
+            let fearLoss   = cells.first { $0.emotion == "Fear" && $0.plBucket == .loss }
+            let fearProfit = cells.first { $0.emotion == "Fear" && $0.plBucket == .profit }
+            #expect(fearLoss?.count == 1)
+            #expect(fearProfit?.count == 1)
+        }
+
+        @Test func heatmapExcludesTradesWithNoEmotionTag() throws {
+            let (ctx, _container) = try makeContainer(); _ = _container
+            let noTag  = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5)
+            let tagged = makeTrade(context: ctx, entryPrice: 1.0, exitPrice: 1.5, emotionTag: .calm)
+            let sut = DashboardViewModel(trades: [noTag, tagged])
+            let cells = sut.psychAnalytics.heatmapCells
+            let total = cells.reduce(0) { $0 + $1.count }
+            #expect(total == 1)
         }
     }
 }
