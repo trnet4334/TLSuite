@@ -3,6 +3,14 @@ import SwiftUI
 
 public struct BacktestTradeLogTable: View {
 
+    private enum ColumnWidth {
+        static let date:     CGFloat = 140
+        static let symbol:   CGFloat = 100
+        static let strategy: CGFloat = 160
+        static let type:     CGFloat = 80
+        static let profit:   CGFloat = 120
+    }
+
     let result: BacktestResult
 
     public init(result: BacktestResult) {
@@ -55,11 +63,11 @@ public struct BacktestTradeLogTable: View {
 
     private var columnHeaderRow: some View {
         HStack(spacing: 0) {
-            colHeader("Date",       width: 140)
-            colHeader("Symbol",     width: 100)
-            colHeader("Strategy",   width: 160)
-            colHeader("Type",       width: 80)
-            colHeader("Net Profit", width: 120)
+            colHeader("Date",       width: ColumnWidth.date)
+            colHeader("Symbol",     width: ColumnWidth.symbol)
+            colHeader("Strategy",   width: ColumnWidth.strategy)
+            colHeader("Type",       width: ColumnWidth.type)
+            colHeader("Net Profit", width: ColumnWidth.profit)
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -95,29 +103,25 @@ public struct BacktestTradeLogTable: View {
             Text(Self.dateFormatter.string(from: entry.date))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.fmsOnSurface)
-                .frame(width: 140, alignment: .leading)
+                .frame(width: ColumnWidth.date, alignment: .leading)
 
             symbolBadge(entry.symbol)
-                .frame(width: 100, alignment: .leading)
+                .frame(width: ColumnWidth.symbol, alignment: .leading)
 
             Text(entry.strategy)
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsOnSurface)
-                .frame(width: 160, alignment: .leading)
+                .frame(width: ColumnWidth.strategy, alignment: .leading)
 
             Text(entry.direction == .long ? "Long" : "Short")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(entry.direction == .long ? Color.fmsPrimary : Color.fmsLoss)
-                .frame(width: 80, alignment: .leading)
+                .frame(width: ColumnWidth.type, alignment: .leading)
 
-            Text(
-                entry.netProfit >= 0
-                    ? String(format: "+$%.2f", entry.netProfit)
-                    : String(format: "-$%.2f", abs(entry.netProfit))
-            )
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(entry.netProfit >= 0 ? Color.fmsPrimary : Color.fmsLoss)
-            .frame(width: 120, alignment: .leading)
+            Text(profitText(entry.netProfit))
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(profitColor(entry.netProfit))
+                .frame(width: ColumnWidth.profit, alignment: .leading)
 
             Spacer()
 
@@ -130,6 +134,29 @@ public struct BacktestTradeLogTable: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(rowAccessibilityLabel(entry))
+    }
+
+    private func rowAccessibilityLabel(_ entry: BacktestTradeEntry) -> String {
+        let direction = entry.direction == .long ? "Long" : "Short"
+        let profit = entry.netProfit >= 0
+            ? String(format: "+$%.2f", entry.netProfit)
+            : String(format: "-$%.2f", abs(entry.netProfit))
+        let dateStr = Self.dateFormatter.string(from: entry.date)
+        return "\(entry.symbol), \(direction), \(profit), \(dateStr)"
+    }
+
+    private func profitText(_ value: Double) -> String {
+        if value > 0 { return String(format: "+$%.2f", value) }
+        if value < 0 { return String(format: "-$%.2f", abs(value)) }
+        return String(format: "$%.2f", value)  // zero: neutral display
+    }
+
+    private func profitColor(_ value: Double) -> Color {
+        if value > 0 { return Color.fmsPrimary }
+        if value < 0 { return Color.fmsLoss }
+        return Color.fmsMuted  // zero: neutral
     }
 
     // MARK: Helpers
@@ -159,6 +186,7 @@ public struct BacktestTradeLogTable: View {
             .foregroundStyle(Color.fmsMuted)
             .tracking(0.8)
             .frame(width: width, alignment: .leading)
+            .accessibilityAddTraits(.isHeader)
     }
 
     @ViewBuilder
