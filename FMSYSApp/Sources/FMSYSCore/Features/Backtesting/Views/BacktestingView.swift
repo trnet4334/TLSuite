@@ -1,22 +1,81 @@
+// Sources/FMSYSCore/Features/Backtesting/Views/BacktestingView.swift
 import SwiftUI
+import SwiftData
 
 public struct BacktestingView: View {
-    public init() {}
+
+    @State private var viewModel: BacktestViewModel
+
+    public init(modelContainer: ModelContainer) {
+        let context = ModelContext(modelContainer)
+        _viewModel = State(initialValue: BacktestViewModel(context: context))
+    }
 
     public var body: some View {
-        ZStack {
-            Color.fmsBackground.frame(maxWidth: .infinity, maxHeight: .infinity)
-            VStack(spacing: 16) {
-                Image(systemName: "arrow.clockwise.circle")
-                    .font(.system(size: 48))
-                    .foregroundStyle(Color.fmsMuted)
-                Text("Backtesting")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.fmsOnSurface)
-                Text("Coming soon")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.fmsMuted)
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 24) {
+                headerRow
+
+                if let result = viewModel.selectedResult {
+                    BacktestEquityCurveSection(result: result)
+                    BacktestKPICards(result: result)
+                    BacktestTradeLogTable(result: result)
+                } else {
+                    emptyState
+                }
             }
+            .padding(24)
         }
+        .background(Color.fmsBackground)
+        .onAppear { viewModel.load() }
+    }
+
+    // MARK: Header
+
+    private var headerRow: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Backtesting Analysis")
+                    .font(.system(size: 20, weight: .heavy))
+                    .foregroundStyle(Color.fmsOnSurface)
+                if let result = viewModel.selectedResult {
+                    Text("Strategy: \(result.strategyName) - \(result.assetPair) (\(result.timeframe.rawValue.uppercased()))")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.fmsMuted)
+                }
+            }
+            Spacer()
+            newBacktestButton
+        }
+    }
+
+    private var newBacktestButton: some View {
+        Button {
+            // TODO: Phase 4 — trigger backtest from strategy
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 14))
+                Text("New Backtest")
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .foregroundStyle(Color.black)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+            .background(Color.fmsPrimary)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: Empty state
+
+    private var emptyState: some View {
+        ContentUnavailableView(
+            "No Backtests Yet",
+            systemImage: "arrow.clockwise.circle",
+            description: Text("Run a backtest from the Strategy Lab to see results here.")
+        )
+        .frame(maxWidth: .infinity, minHeight: 300)
     }
 }

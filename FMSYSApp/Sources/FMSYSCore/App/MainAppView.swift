@@ -168,7 +168,7 @@ public struct MainAppView: View {
                 modelContainer: modelContainer
             )
         case .backtesting:
-            BacktestingView()
+            BacktestingView(modelContainer: modelContainer)
         case .strategyLab:
             StrategyLabView(modelContainer: modelContainer)
         case .portfolio:
