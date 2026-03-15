@@ -2,42 +2,58 @@ import SwiftUI
 
 public struct ForexTradeCard: View {
     let trade: Trade
+    let isSelected: Bool
 
-    public init(trade: Trade) { self.trade = trade }
-
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(trade.asset)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.fmsOnSurface)
-                Spacer()
-                directionBadge
-            }
-            HStack {
-                Text("Rate: \(trade.entryPrice, specifier: "%.4f")")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.fmsMuted)
-                Spacer()
-                pnlText
-            }
-            Text(trade.entryAt.formatted(date: .abbreviated, time: .omitted))
-                .font(.system(size: 11))
-                .foregroundStyle(Color.fmsMuted)
-        }
-        .padding(.vertical, 4)
+    public init(trade: Trade, isSelected: Bool = false) {
+        self.trade = trade
+        self.isSelected = isSelected
     }
 
-    private var directionBadge: some View {
-        Text(trade.direction == .long ? "BUY" : "SELL")
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(
-                trade.direction == .long ? Color.fmsPrimary.opacity(0.2) : Color.fmsLoss.opacity(0.2),
-                in: RoundedRectangle(cornerRadius: 4)
-            )
-            .foregroundStyle(trade.direction == .long ? Color.fmsPrimary : Color.fmsLoss)
+    public var body: some View {
+        HStack(spacing: 0) {
+            Rectangle()
+                .fill(isSelected ? Color.fmsPrimary : Color.clear)
+                .frame(width: 3)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Text(trade.asset)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color.fmsOnSurface)
+                    Spacer()
+                    pnlChangePill
+                }
+                HStack(alignment: .bottom) {
+                    Text(trade.entryPrice, format: .number.precision(.fractionLength(4)))
+                        .font(.system(size: 18, weight: .medium).monospacedDigit())
+                        .foregroundStyle(Color.fmsOnSurface)
+                    Spacer()
+                    pnlText
+                }
+                Text(lastTradeNote)
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.fmsMuted)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.fmsPrimary.opacity(0.06) : Color.clear)
+        }
+        .clipShape(Rectangle())
+    }
+
+    private var pnlChangePill: some View {
+        let pct: Double
+        if let exit = trade.exitPrice, trade.entryPrice > 0 {
+            pct = ((exit - trade.entryPrice) / trade.entryPrice) * 100
+        } else {
+            pct = 0.0
+        }
+        let color: Color = pct > 0 ? Color.fmsPrimary : (pct < 0 ? Color.fmsLoss : Color.fmsMuted)
+        let sign = pct >= 0 ? "+" : ""
+        return Text("\(sign)\(String(format: "%.2f", pct))%")
+            .font(.system(size: 10, weight: .semibold).monospacedDigit())
+            .foregroundStyle(color)
     }
 
     private var pnlText: some View {
@@ -45,6 +61,13 @@ public struct ForexTradeCard: View {
         return Text(pnl >= 0 ? "+$\(pnl, specifier: "%.2f")" : "-$\(abs(pnl), specifier: "%.2f")")
             .font(.system(size: 13, weight: .semibold).monospacedDigit())
             .foregroundStyle(pnl >= 0 ? Color.fmsPrimary : Color.fmsLoss)
+    }
+
+    private var lastTradeNote: String {
+        let pnl = computedPnL
+        if trade.exitPrice == nil { return "No active trades" }
+        if pnl >= 0 { return "Last trade: Profit $\(String(format: "%.2f", pnl))" }
+        return "Last trade: Loss -$\(String(format: "%.2f", abs(pnl)))"
     }
 
     private var computedPnL: Double {

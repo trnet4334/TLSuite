@@ -2,37 +2,51 @@ import SwiftUI
 
 public struct OptionsTradeCard: View {
     let trade: Trade
+    let isSelected: Bool
 
-    public init(trade: Trade) { self.trade = trade }
+    public init(trade: Trade, isSelected: Bool = false) {
+        self.trade = trade
+        self.isSelected = isSelected
+    }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(contractName)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.fmsOnSurface)
-                Spacer()
-                pnlText
-            }
-            HStack {
-                if let expiry = trade.expirationDate {
-                    Text("Exp: \(expiry.formatted(date: .abbreviated, time: .omitted))")
+        HStack(spacing: 0) {
+            Rectangle()
+                .fill(isSelected ? Color.fmsPrimary : Color.clear)
+                .frame(width: 3)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Text(contractName)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color.fmsOnSurface)
+                        .lineLimit(1)
+                    Spacer()
+                    pnlText
+                }
+                HStack {
+                    if let exp = trade.expirationDate {
+                        Text("Exp: \(exp.formatted(date: .abbreviated, time: .omitted))")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.fmsMuted)
+                    }
+                    Spacer()
+                    Text("Qty: \(trade.positionSize, specifier: "%.0f")")
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 }
-                Spacer()
-                Text("Qty: \(trade.positionSize, specifier: "%.0f")")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.fmsMuted)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.fmsPrimary.opacity(0.06) : Color.clear)
         }
-        .padding(.vertical, 4)
+        .clipShape(Rectangle())
     }
 
     private var contractName: String {
         let strike = trade.strikePrice.map { "$\(String(format: "%.0f", $0))" } ?? ""
         let type = trade.direction == .long ? "Call" : "Put"
-        return "\(trade.asset) \(strike) \(type)"
+        return "\(trade.asset) \(strike) \(type)".trimmingCharacters(in: .whitespaces)
     }
 
     private var pnlText: some View {

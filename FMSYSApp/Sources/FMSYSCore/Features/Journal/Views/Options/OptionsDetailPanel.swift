@@ -9,89 +9,48 @@ public struct OptionsDetailPanel: View {
         self.onSave = onSave
     }
 
+    private var contractSubtitle: String {
+        let type = trade.direction == .long ? "Call · Bullish Long" : "Put · Bearish Short"
+        if let exp = trade.expirationDate {
+            return "\(type) · Exp \(exp.formatted(.dateTime.month().day().year()))"
+        }
+        return type
+    }
+
     public var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                detailHeader
-                metricsRow1
-                metricsRow2
-                greeksSection
-                notesSection
-                screenshotSection
+        TradeDetailLayout(
+            trade: trade,
+            subtitle: contractSubtitle,
+            onDiscard: {},
+            onSave: onSave
+        ) {
+            VStack(spacing: 16) {
+                metricsGrid
+                greeksPanel
             }
-            .padding(24)
-        }
-        .background(Color.fmsBackground)
-    }
-
-    private var detailHeader: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(trade.asset)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.fmsOnSurface)
-                Text("ID: #\(trade.id.uuidString.prefix(8).uppercased())")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.fmsMuted)
-            }
-            Spacer()
-            Button("Save") { onSave() }
-                .buttonStyle(.plain)
-                .font(.system(size: 13, weight: .semibold))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(Color.fmsPrimary, in: RoundedRectangle(cornerRadius: 8))
-                .foregroundStyle(Color.fmsBackground)
         }
     }
 
-    private var metricsRow1: some View {
+    private var metricsGrid: some View {
         HStack(spacing: 12) {
-            metricField(label: "ENTRY PRICE") {
-                TextField("0.00", value: $trade.entryPrice, format: .number)
-            }
-            metricField(label: "ENTRY TIME") {
-                DatePicker("", selection: Binding(
-                    get: { trade.entryAt },
-                    set: { trade.entryAt = $0 }
-                ), displayedComponents: .hourAndMinute)
-                .labelsHidden()
-            }
-            metricField(label: "EXIT PRICE") {
-                TextField("0.00", value: Binding(
-                    get: { trade.exitPrice ?? 0 },
-                    set: { trade.exitPrice = $0 }
-                ), format: .number)
-            }
-            metricField(label: "EXIT TIME") {
-                DatePicker("", selection: Binding(
-                    get: { trade.exitAt ?? Date() },
-                    set: { trade.exitAt = $0 }
-                ), displayedComponents: .hourAndMinute)
-                .labelsHidden()
-            }
-        }
-    }
-
-    private var metricsRow2: some View {
-        HStack(spacing: 12) {
-            metricField(label: "STRIKE PRICE") {
+            MetricCard(label: "Strike Price") {
                 TextField("0.00", value: Binding(
                     get: { trade.strikePrice ?? 0 },
                     set: { trade.strikePrice = $0 }
                 ), format: .number)
             }
-            metricField(label: "EXPIRATION") {
+            MetricCard(label: "Expiration") {
                 DatePicker("", selection: Binding(
                     get: { trade.expirationDate ?? Date() },
                     set: { trade.expirationDate = $0 }
                 ), displayedComponents: .date)
                 .labelsHidden()
+                .font(.system(size: 13))
             }
-            metricField(label: "QTY") {
+            MetricCard(label: "Quantity") {
                 TextField("0", value: $trade.positionSize, format: .number)
             }
-            metricField(label: "COST BASIS") {
+            MetricCard(label: "Cost Basis") {
                 TextField("0.00", value: Binding(
                     get: { trade.costBasis ?? 0 },
                     set: { trade.costBasis = $0 }
@@ -100,96 +59,35 @@ public struct OptionsDetailPanel: View {
         }
     }
 
-    private var greeksSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("GREEKS")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
+    private var greeksPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Option Greeks", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Color.fmsOnSurface)
             HStack(spacing: 12) {
                 greekCell(label: "Delta", value: trade.greeksDelta)
                 greekCell(label: "Gamma", value: trade.greeksGamma)
                 greekCell(label: "Theta", value: trade.greeksTheta)
                 greekCell(label: "Vega",  value: trade.greeksVega)
             }
-            .padding(12)
-            .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 8))
+            .padding(16)
+            .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.fmsMuted.opacity(0.12), lineWidth: 1)
+            )
         }
     }
 
     private func greekCell(label: String, value: Double?) -> some View {
         VStack(spacing: 4) {
-            Text(label)
+            Text(label.uppercased())
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
-                .textCase(.uppercase)
-            Text(value.map { String(format: "%.2f", $0) } ?? "—")
-                .font(.system(size: 14, weight: .semibold).monospacedDigit())
+                .tracking(0.5)
+            Text(value.map { String(format: "%.3f", $0) } ?? "—")
+                .font(.system(size: 16, weight: .bold).monospacedDigit())
                 .foregroundStyle(Color.fmsOnSurface)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var notesSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("TRADE REFLECTION & ANALYSIS")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
-            TextEditor(text: Binding(
-                get: { trade.notes ?? "" },
-                set: { trade.notes = $0 }
-            ))
-            .font(.system(size: 13))
-            .foregroundStyle(Color.fmsOnSurface)
-            .frame(minHeight: 250)
-            .padding(12)
-            .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 10))
-            .scrollContentBackground(.hidden)
-        }
-    }
-
-    private var screenshotSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("CHART SCREENSHOTS")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
-            HStack(spacing: 12) {
-                uploadArea(label: "Entry Chart")
-                uploadArea(label: "Exit Chart")
-            }
-        }
-    }
-
-    private func uploadArea(label: String) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: "icloud.and.arrow.up")
-                .font(.system(size: 24))
-                .foregroundStyle(Color.fmsMuted)
-            Text(label)
-                .font(.system(size: 12))
-                .foregroundStyle(Color.fmsMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 120)
-        .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [6]))
-                .foregroundStyle(Color.fmsMuted.opacity(0.4))
-        )
-    }
-
-    @ViewBuilder
-    private func metricField<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(label)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
-            content()
-                .textFieldStyle(.plain)
-                .font(.system(size: 13))
-                .foregroundStyle(Color.fmsOnSurface)
-                .padding(10)
-                .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 8))
         }
         .frame(maxWidth: .infinity)
     }

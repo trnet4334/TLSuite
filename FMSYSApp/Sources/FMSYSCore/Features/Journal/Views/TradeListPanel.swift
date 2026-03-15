@@ -115,12 +115,8 @@ public struct TradeListPanel: View {
         List(filteredTrades, id: \.id, selection: $selectedTrade) { trade in
             tradeCard(trade)
                 .tag(trade)
-                .listRowBackground(
-                    selectedTrade?.id == trade.id
-                        ? Color.fmsPrimary.opacity(0.08)
-                        : Color.clear
-                )
-                .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -128,11 +124,12 @@ public struct TradeListPanel: View {
 
     @ViewBuilder
     private func tradeCard(_ trade: Trade) -> some View {
+        let selected = selectedTrade?.id == trade.id
         switch trade.journalCategory {
-        case .crypto:  CryptoTradeCard(trade: trade)
-        case .forex:   ForexTradeCard(trade: trade)
-        case .options: OptionsTradeCard(trade: trade)
-        default:       StocksTradeCard(trade: trade)
+        case .crypto:  CryptoTradeCard(trade: trade, isSelected: selected)
+        case .forex:   ForexTradeCard(trade: trade, isSelected: selected)
+        case .options: OptionsTradeCard(trade: trade, isSelected: selected)
+        default:       StocksTradeCard(trade: trade, isSelected: selected)
         }
     }
 
