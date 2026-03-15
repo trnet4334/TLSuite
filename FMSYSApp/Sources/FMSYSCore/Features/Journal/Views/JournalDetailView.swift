@@ -47,11 +47,22 @@ public struct JournalDetailView: View {
                 )
             }
         }
-        .onAppear { viewModel.loadTrades(category: category) }
+        .onAppear {
+            viewModel.loadTrades(category: category)
+            selectedTrade = sortedTrades.first
+        }
         .onChange(of: category) { _, newCategory in
-            selectedTrade = nil
             showingEntry = false
             viewModel.loadTrades(category: newCategory)
+            selectedTrade = sortedTrades.first
+        }
+        .onChange(of: sortByPnL) { _, _ in
+            selectedTrade = sortedTrades.first
+        }
+        .onChange(of: viewModel.trades) { _, _ in
+            if selectedTrade == nil {
+                selectedTrade = sortedTrades.first
+            }
         }
     }
 
