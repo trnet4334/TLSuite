@@ -56,6 +56,7 @@ public struct BacktestingView: View {
             HStack(spacing: 6) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 14))
+                    .accessibilityHidden(true)
                 Text("New Backtest")
                     .font(.system(size: 13, weight: .semibold))
             }
