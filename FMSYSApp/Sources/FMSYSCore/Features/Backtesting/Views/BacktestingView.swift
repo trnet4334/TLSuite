@@ -27,7 +27,7 @@ public struct BacktestingView: View {
             .padding(24)
         }
         .background(Color.fmsBackground)
-        .onAppear { viewModel.load() }
+        .task { viewModel.load() }
     }
 
     // MARK: Header
@@ -66,7 +66,7 @@ public struct BacktestingView: View {
             .background(Color.fmsPrimary)
             .clipShape(RoundedRectangle(cornerRadius: 8))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
     }
 
     // MARK: Empty state
@@ -77,6 +77,5 @@ public struct BacktestingView: View {
             systemImage: "arrow.clockwise.circle",
             description: Text("Run a backtest from the Strategy Lab to see results here.")
         )
-        .frame(maxWidth: .infinity, minHeight: 300)
     }
 }
