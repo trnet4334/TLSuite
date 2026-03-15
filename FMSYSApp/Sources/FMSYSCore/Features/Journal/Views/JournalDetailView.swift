@@ -9,6 +9,7 @@ public struct JournalDetailView: View {
     @State private var viewModel: TradeViewModel
     @State private var selectedTrade: Trade?
     @State private var sortByPnL = false
+    @State private var showingEntry = false
 
     public init(category: JournalCategory, modelContainer: ModelContainer) {
         self.category = category
@@ -20,21 +21,36 @@ public struct JournalDetailView: View {
     }
 
     public var body: some View {
-        HSplitView {
-            TradeListPanel(
-                category: category,
-                trades: sortedTrades,
-                selectedTrade: $selectedTrade,
-                sortByPnL: $sortByPnL
-            )
-            .frame(minWidth: 320, maxWidth: 320)
+        ZStack {
+            HSplitView {
+                TradeListPanel(
+                    category: category,
+                    trades: sortedTrades,
+                    selectedTrade: $selectedTrade,
+                    sortByPnL: $sortByPnL,
+                    onNewTrade: { showingEntry = true }
+                )
+                .frame(minWidth: 320, maxWidth: 320)
 
-            detailPanel
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                detailPanel
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+
+            if showingEntry {
+                TradeEntryView(
+                    initialCategory: category,
+                    viewModel: viewModel,
+                    onDismiss: {
+                        showingEntry = false
+                        viewModel.loadTrades(category: category)
+                    }
+                )
+            }
         }
         .onAppear { viewModel.loadTrades(category: category) }
         .onChange(of: category) { _, newCategory in
             selectedTrade = nil
+            showingEntry = false
             viewModel.loadTrades(category: newCategory)
         }
     }
@@ -82,4 +98,3 @@ public struct JournalDetailView: View {
         sortByPnL ? viewModel.trades.sorted { pnl($0) > pnl($1) } : viewModel.trades
     }
 }
-
