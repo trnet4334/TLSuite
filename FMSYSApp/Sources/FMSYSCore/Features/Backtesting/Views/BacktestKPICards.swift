@@ -5,6 +5,9 @@ public struct BacktestKPICards: View {
 
     let result: BacktestResult
 
+    private let winRateTarget: Double      = 0.6
+    private let profitFactorTarget: Double = 2.0
+
     public init(result: BacktestResult) {
         self.result = result
     }
@@ -16,15 +19,15 @@ public struct BacktestKPICards: View {
                 iconColor:     .blue,
                 title:         "Win Rate",
                 value:         String(format: "%.1f%%", result.winRate * 100),
-                subtext:       result.winRate >= 0.6 ? "Above target (60%)" : "Below target (60%)",
-                subtextColor:  result.winRate >= 0.6 ? Color.fmsPrimary : Color.fmsLoss
+                subtext:       result.winRate >= winRateTarget ? "Above target (60%)" : "Below target (60%)",
+                subtextColor:  result.winRate >= winRateTarget ? Color.fmsPrimary : Color.fmsLoss
             )
             kpiCard(
                 systemIcon:    "chart.bar.fill",
                 iconColor:     .orange,
                 title:         "Profit Factor",
                 value:         String(format: "%.2f", result.profitFactor),
-                subtext:       result.profitFactor >= 2.0 ? "Excellent performance" : "Fair performance",
+                subtext:       result.profitFactor >= profitFactorTarget ? "Excellent performance" : "Fair performance",
                 subtextColor:  Color.fmsMuted
             )
             kpiCard(
@@ -52,6 +55,7 @@ public struct BacktestKPICards: View {
                 Image(systemName: systemIcon)
                     .font(.system(size: 14))
                     .foregroundStyle(iconColor)
+                    .accessibilityHidden(true)
                 Text(title.uppercased())
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
@@ -72,5 +76,6 @@ public struct BacktestKPICards: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.fmsMuted.opacity(0.15), lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
     }
 }
