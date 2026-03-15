@@ -15,7 +15,7 @@ public struct BacktestEquityPoint: Codable {
 }
 
 public struct BacktestTradeEntry: Codable, Identifiable {
-    public var id: UUID
+    public let id: UUID
     public let date: Date
     public let symbol: String
     public let strategy: String
@@ -70,11 +70,19 @@ public final class BacktestResult {
     }
 
     public var equityCurve: [BacktestEquityPoint] {
-        (try? JSONDecoder().decode([BacktestEquityPoint].self, from: equityCurveData)) ?? []
+        guard let result = try? JSONDecoder().decode([BacktestEquityPoint].self, from: equityCurveData) else {
+            assertionFailure("BacktestResult: failed to decode equityCurveData")
+            return []
+        }
+        return result
     }
 
     public var tradeLog: [BacktestTradeEntry] {
-        (try? JSONDecoder().decode([BacktestTradeEntry].self, from: tradeLogData)) ?? []
+        guard let result = try? JSONDecoder().decode([BacktestTradeEntry].self, from: tradeLogData) else {
+            assertionFailure("BacktestResult: failed to decode tradeLogData")
+            return []
+        }
+        return result
     }
 
     // MARK: Init
