@@ -16,12 +16,14 @@ public struct BacktestTradeLogTable: View {
     }()
 
     public var body: some View {
-        VStack(spacing: 0) {
+        let trades = result.tradeLog     // decode once
+
+        return VStack(spacing: 0) {
             tableHeader
             Divider().opacity(0.3)
             columnHeaderRow
             Divider().opacity(0.3)
-            tableBody
+            tableBody(trades: trades)
         }
         .background(Color.fmsSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -31,7 +33,7 @@ public struct BacktestTradeLogTable: View {
         )
     }
 
-    // MARK: Subviews
+    // MARK: Header
 
     private var tableHeader: some View {
         HStack {
@@ -65,16 +67,18 @@ public struct BacktestTradeLogTable: View {
         .background(Color.fmsMuted.opacity(0.05))
     }
 
+    // MARK: Table body
+
     @ViewBuilder
-    private var tableBody: some View {
-        if result.tradeLog.isEmpty {
+    private func tableBody(trades: [BacktestTradeEntry]) -> some View {
+        if trades.isEmpty {
             Text("No trades in log")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsMuted)
                 .frame(maxWidth: .infinity)
                 .padding(24)
         } else {
-            ForEach(result.tradeLog) { entry in
+            ForEach(trades) { entry in
                 tradeRow(entry)
                 Divider()
                     .opacity(0.15)
@@ -121,6 +125,7 @@ public struct BacktestTradeLogTable: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.fmsMuted)
                 .opacity(0.5)
+                .accessibilityHidden(true)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
