@@ -8,38 +8,34 @@ public struct BacktestEquityCurveSection: View {
 
     @State private var viewMode: ViewMode = .tradeByTrade
 
+    // Fix 5 (LOW): Named constant for daily stride
+    private let dailySampleStride = 5
+
     public init(result: BacktestResult) {
         self.result = result
     }
 
     // MARK: View modes
 
-    enum ViewMode: String, CaseIterable {
-        case daily       = "Daily"
+    // Fix 4 (LOW): Mark ViewMode as private
+    private enum ViewMode: String, CaseIterable {
+        case daily        = "Daily"
         case tradeByTrade = "Trade-by-Trade"
-    }
-
-    // MARK: Data
-
-    private var displayedPoints: [BacktestEquityPoint] {
-        let all = result.equityCurve
-        switch viewMode {
-        case .tradeByTrade:
-            return all
-        case .daily:
-            // Stub: sample every 5th point as proxy for "daily"
-            return all.enumerated().compactMap { idx, pt in idx % 5 == 0 ? pt : nil }
-        }
     }
 
     // MARK: Body
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        // Fix 1 (HIGH): Decode equityCurve once per render pass
+        let allPoints = result.equityCurve
+        let lastTradeNumber = allPoints.last?.tradeNumber ?? 0
+        let points = displayedPoints(from: allPoints)
+
+        return VStack(alignment: .leading, spacing: 0) {
             headerRow
                 .padding(.bottom, 16)
 
-            chartArea
+            chartArea(points: points, lastTradeNumber: lastTradeNumber)
         }
         .padding(20)
         .background(Color.fmsSurface)
@@ -93,8 +89,8 @@ public struct BacktestEquityCurveSection: View {
     }
 
     @ViewBuilder
-    private var chartArea: some View {
-        if displayedPoints.isEmpty {
+    private func chartArea(points: [BacktestEquityPoint], lastTradeNumber: Int) -> some View {
+        if points.isEmpty {
             Color.fmsMuted.opacity(0.1)
                 .frame(height: 200)
                 .overlay(
@@ -104,7 +100,7 @@ public struct BacktestEquityCurveSection: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         } else {
-            Chart(displayedPoints, id: \.tradeNumber) { pt in
+            Chart(points, id: \.tradeNumber) { pt in
                 AreaMark(
                     x: .value("Trade", pt.tradeNumber),
                     y: .value("Equity", pt.equity)
@@ -125,11 +121,14 @@ public struct BacktestEquityCurveSection: View {
                 .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round))
             }
             .frame(height: 200)
+            // Fix 2 (HIGH): Hide decorative chart from accessibility tree
+            .accessibilityHidden(true)
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 6)) { value in
                     AxisValueLabel {
                         if let v = value.as(Int.self) {
-                            Text(xLabel(for: v))
+                            // Fix 3 (MEDIUM): Pass lastTradeNumber; avoids re-decoding equityCurve
+                            Text(xLabel(for: v, lastTradeNumber: lastTradeNumber))
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(Color.fmsMuted)
                                 .textCase(.uppercase)
@@ -142,7 +141,7 @@ public struct BacktestEquityCurveSection: View {
                 AxisMarks { value in
                     AxisValueLabel {
                         if let v = value.as(Double.self) {
-                            Text("$\(Int(v / 1000))k")
+                            Text("$\(Int((v / 1000).rounded()))k")
                                 .font(.system(size: 9))
                                 .foregroundStyle(Color.fmsMuted)
                         }
@@ -155,10 +154,23 @@ public struct BacktestEquityCurveSection: View {
 
     // MARK: Helpers
 
-    private func xLabel(for tradeNumber: Int) -> String {
-        guard let last = result.equityCurve.last else { return "" }
-        if tradeNumber <= 1         { return "Start" }
-        if tradeNumber >= last.tradeNumber { return "End" }
+    // Fix 1 (HIGH): Private method receives already-decoded array; no re-decode
+    private func displayedPoints(from all: [BacktestEquityPoint]) -> [BacktestEquityPoint] {
+        switch viewMode {
+        case .tradeByTrade:
+            return all
+        case .daily:
+            // Stub: sample every dailySampleStride-th point as proxy for "daily"
+            return all.enumerated().compactMap { idx, pt in
+                idx % dailySampleStride == 0 ? pt : nil
+            }
+        }
+    }
+
+    // Fix 3 (MEDIUM): lastTradeNumber passed in; no re-decode of equityCurve
+    private func xLabel(for tradeNumber: Int, lastTradeNumber: Int) -> String {
+        if tradeNumber <= 1               { return "Start" }
+        if tradeNumber >= lastTradeNumber { return "End" }
         return "Trade \(tradeNumber)"
     }
 }
