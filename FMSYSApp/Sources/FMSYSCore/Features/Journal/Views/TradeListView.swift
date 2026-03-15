@@ -37,7 +37,11 @@ public struct TradeListView: View {
             }
         }
         .sheet(isPresented: $showingEntry) {
-            TradeEntryView(viewModel: viewModel)
+            TradeEntryView(
+                initialCategory: .all,
+                viewModel: viewModel,
+                onDismiss: { showingEntry = false }
+            )
         }
         .sheet(isPresented: $showingDashboard) {
             DashboardView(trades: viewModel.trades)
