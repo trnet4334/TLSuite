@@ -94,7 +94,7 @@ extension FMSYSTests {
             _ = _container
             let result = try makeResult()
             try repo.create(result)
-            let fetched = try repo.findAll().first!
+            let fetched = try #require(try repo.findAll().first)
             #expect(fetched.equityCurve.count == 2)
             #expect(fetched.equityCurve[0].tradeNumber == 1)
         }
@@ -104,9 +104,30 @@ extension FMSYSTests {
             _ = _container
             let result = try makeResult()
             try repo.create(result)
-            let fetched = try repo.findAll().first!
+            let fetched = try #require(try repo.findAll().first)
             #expect(fetched.tradeLog.count == 1)
             #expect(fetched.tradeLog[0].symbol == "BTC/USDT")
+        }
+
+        @Test func findById_returnsCorrectResult() throws {
+            let (repo, _, _container) = try makeRepository()
+            _ = _container
+            let result = try makeResult()
+            try repo.create(result)
+            let found = try #require(try repo.findById(result.id))
+            #expect(found.id == result.id)
+        }
+
+        @Test func deleteAll_byStrategyId_removesAll() throws {
+            let (repo, _, _container) = try makeRepository()
+            _ = _container
+            let sid = UUID()
+            try repo.create(try makeResult(strategyId: sid))
+            try repo.create(try makeResult(strategyId: sid))
+            try repo.create(try makeResult(strategyId: UUID()))  // different strategy
+            try repo.deleteAll(strategyId: sid)
+            #expect(try repo.findAll(strategyId: sid).count == 0)
+            #expect(try repo.findAll().count == 1)  // other strategy untouched
         }
     }
 }
