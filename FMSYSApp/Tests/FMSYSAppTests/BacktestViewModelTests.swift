@@ -11,6 +11,10 @@ extension FMSYSTests {
 
         private let seedKey = "fmsys.backtestSeeded"
 
+        init() {
+            UserDefaults.standard.removeObject(forKey: "fmsys.backtestSeeded")
+        }
+
         func makeViewModel() throws -> (BacktestViewModel, ModelContainer) {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
             let container = try ModelContainer(for: BacktestResult.self, configurations: config)
@@ -66,13 +70,21 @@ extension FMSYSTests {
             guard let first = vm.results.first else { return }
             vm.selectedResult = first
             vm.delete(first)
-            #expect(vm.selectedResult == nil || vm.selectedResult?.id != first.id)
+            #expect(vm.selectedResult == nil)
         }
 
         @Test func makeSeedResult_has250EquityPoints() throws {
             let result = try BacktestViewModel.makeSeedResult()
             #expect(result.equityCurve.count == 250)
             #expect(result.totalTrades == 250)
+        }
+
+        @Test func errorMessageIsNilOnCleanLoad() throws {
+            let (vm, _container) = try makeViewModel()
+            _ = _container
+            UserDefaults.standard.removeObject(forKey: seedKey)
+            vm.load()
+            #expect(vm.errorMessage == nil)
         }
 
         @Test func makeSeedResult_kpisMatchDesign() throws {

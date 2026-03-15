@@ -65,6 +65,9 @@ public final class BacktestViewModel {
             UserDefaults.standard.set(true, forKey: seededKey)
         } catch {
             // Do NOT write flag — will retry on next launch
+            #if DEBUG
+            print("BacktestViewModel: seed failed — \(error)")
+            #endif
         }
     }
 
@@ -77,7 +80,7 @@ public final class BacktestViewModel {
         // Build 250 equity points (random walk from 10,000)
         var equity = 10_000.0
         var equityPoints: [BacktestEquityPoint] = []
-        // Use a seeded sequence for reproducibility
+        // Non-deterministic random walk — equity values differ each launch (KPI fields are hardcoded)
         var rng = SystemRandomNumberGenerator()
         for i in 1...250 {
             let delta = Double.random(in: -200...350, using: &rng)
