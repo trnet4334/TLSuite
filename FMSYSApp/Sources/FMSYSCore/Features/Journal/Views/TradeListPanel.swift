@@ -6,6 +6,7 @@ public struct TradeListPanel: View {
     let trades: [Trade]
     @Binding var selectedTrade: Trade?
     @Binding var sortByPnL: Bool
+    let onNewTrade: () -> Void
 
     @State private var activeFilter: String = "All"
 
@@ -13,12 +14,14 @@ public struct TradeListPanel: View {
         category: JournalCategory,
         trades: [Trade],
         selectedTrade: Binding<Trade?>,
-        sortByPnL: Binding<Bool>
+        sortByPnL: Binding<Bool>,
+        onNewTrade: @escaping () -> Void
     ) {
         self.category = category
         self.trades = trades
         self._selectedTrade = selectedTrade
         self._sortByPnL = sortByPnL
+        self.onNewTrade = onNewTrade
     }
 
     public var body: some View {
@@ -99,6 +102,15 @@ public struct TradeListPanel: View {
                 .textCase(.uppercase)
             Spacer()
             Button {
+                onNewTrade()
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.fmsPrimary)
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 6)
+            Button {
                 sortByPnL.toggle()
             } label: {
                 Label(sortByPnL ? "P&L" : "Newest", systemImage: "arrow.up.arrow.down")
@@ -145,7 +157,7 @@ public struct TradeListPanel: View {
                 .font(.system(size: 13))
                 .foregroundStyle(Color.fmsMuted)
                 .multilineTextAlignment(.center)
-            Button("+ Log First Trade") {}
+            Button("+ Log First Trade") { onNewTrade() }
                 .buttonStyle(.plain)
                 .font(.system(size: 13, weight: .semibold))
                 .padding(.horizontal, 16)
