@@ -11,6 +11,7 @@ public struct MainAppView: View {
     @State private var showSharePopover = false
     @State private var showSettingsPopover = false
     @State private var showAvatarPopover = false
+    @State private var showSidebar = false
     @AppStorage("isDarkMode") private var isDarkMode = true
 
     private let authService: any AuthServiceProtocol
@@ -39,24 +40,51 @@ public struct MainAppView: View {
     // MARK: - Authenticated shell
 
     private var appShell: some View {
-        VStack(spacing: 0) {
-            titleBar
-            NavigationSplitView {
-                SidebarView(selection: $selectedScreen, journalCategory: $journalCategory)
-            } detail: {
+        ZStack(alignment: .topLeading) {
+            // Main content — always full width
+            VStack(spacing: 0) {
+                titleBar
                 screenContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                StatusBar()
             }
-            .navigationSplitViewStyle(.prominentDetail)
-            StatusBar()
+
+            // Sidebar overlay (covers title bar + content)
+            if showSidebar {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.25)) { showSidebar = false }
+                    }
+
+                SidebarView(selection: $selectedScreen, journalCategory: $journalCategory)
+                    .transition(.move(edge: .leading))
+                    .onChange(of: selectedScreen) { _, _ in
+                        withAnimation(.easeInOut(duration: 0.25)) { showSidebar = false }
+                    }
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: showSidebar)
     }
 
     // MARK: - Title bar
 
     private var titleBar: some View {
         HStack(spacing: 0) {
-            // Space for macOS window traffic lights
-            Spacer().frame(width: 80)
+            // Traffic lights + sidebar toggle
+            HStack(spacing: 4) {
+                Spacer().frame(width: 80)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) { showSidebar.toggle() }
+                } label: {
+                    Image(systemName: "sidebar.left")
+                        .font(.system(size: 15))
+                        .foregroundStyle(showSidebar ? Color.fmsPrimary : Color.fmsMuted)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
 
             Spacer()
 
