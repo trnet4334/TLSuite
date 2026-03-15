@@ -1,3 +1,4 @@
+// Sources/FMSYSCore/Shared/Components/AvatarPopover.swift
 import SwiftUI
 
 public struct AvatarPopover: View {
@@ -19,68 +20,107 @@ public struct AvatarPopover: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(spacing: 0) {
             // User info header
-            HStack(spacing: 12) {
-                Circle()
-                    .fill(Color.fmsMuted.opacity(0.3))
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.fmsMuted)
-                    }
-                VStack(alignment: .leading, spacing: 2) {
+            VStack(spacing: 8) {
+                ZStack(alignment: .bottomTrailing) {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.fmsPrimary.opacity(0.4), Color.fmsPrimary],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 64, height: 64)
+                        .overlay {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(Color.fmsBackground)
+                        }
+                    Circle()
+                        .fill(Color.fmsPrimary)
+                        .frame(width: 14, height: 14)
+                        .overlay(Circle().stroke(Color.fmsSurface, lineWidth: 2))
+                }
+
+                VStack(spacing: 4) {
                     Text(displayName)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(Color.fmsOnSurface)
                     Text(email)
-                        .font(.system(size: 11))
+                        .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
-                    Text(role)
+                    Text(role.uppercased())
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.fmsBackground)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.fmsPrimary, in: Capsule())
+                        .foregroundStyle(Color.fmsPrimary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.fmsPrimary.opacity(0.15), in: Capsule())
                 }
             }
-            .padding(16)
+            .padding(.vertical, 16)
 
             Divider()
 
-            // Actions
+            // Menu items
             VStack(spacing: 0) {
-                Button {
-                    // TODO: navigate to Settings screen
-                } label: {
-                    Label("Account Settings", systemImage: "gearshape")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.fmsOnSurface)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    onSignOut()
-                } label: {
-                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.fmsLoss)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+                menuRow(systemImage: "person", label: "Account Management") {}
+                menuRow(systemImage: "creditcard", label: "Subscription Management") {}
+                menuRow(systemImage: "lock.shield", label: "Security & Privacy") {}
+                menuRow(systemImage: "person.3", label: "Referral Program") {}
             }
             .padding(.vertical, 4)
+
+            Divider()
+
+            // Sign out
+            Button(action: onSignOut) {
+                HStack(spacing: 10) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.fmsLoss)
+                    Text("Sign Out")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.fmsLoss)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .padding(4)
         }
-        .frame(width: 260)
+        .frame(width: 280)
         .background(Color.fmsSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func menuRow(
+        systemImage: String,
+        label: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.fmsMuted)
+                    .frame(width: 28, height: 28)
+                    .background(Color.fmsMuted.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                Text(label)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.fmsOnSurface)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.fmsMuted)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
