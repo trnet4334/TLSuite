@@ -11,6 +11,7 @@ public struct MainAppView: View {
     @State private var showSharePopover = false
     @State private var showSettingsPopover = false
     @State private var showAvatarPopover = false
+    @AppStorage("isDarkMode") private var isDarkMode = true
 
     private let authService: any AuthServiceProtocol
     private let modelContainer: ModelContainer
@@ -29,6 +30,7 @@ public struct MainAppView: View {
     public var body: some View {
         if appState.isAuthenticated {
             appShell
+                .preferredColorScheme(isDarkMode ? .dark : .light)
         } else {
             authFlow
         }
@@ -81,22 +83,13 @@ public struct MainAppView: View {
             // Right controls
             HStack(spacing: 4) {
                 toolbarIconButton(systemName: "bell", isPresented: $showNotificationsPopover) {
-                    Text("Notifications coming soon")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.fmsOnSurface)
-                        .padding(16)
+                    NotificationsPopover()
                 }
                 toolbarIconButton(systemName: "square.and.arrow.up", isPresented: $showSharePopover) {
-                    Text("Export & Share coming soon")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.fmsOnSurface)
-                        .padding(16)
+                    SharePopover()
                 }
                 toolbarIconButton(systemName: "gearshape", isPresented: $showSettingsPopover) {
-                    Text("Settings coming soon")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.fmsOnSurface)
-                        .padding(16)
+                    SettingsPopover()
                 }
 
                 // Avatar
