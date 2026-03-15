@@ -77,6 +77,56 @@ public final class TradeViewModel {
     }
 
     @MainActor
+    public func createTrade(
+        asset: String,
+        journalCategory: JournalCategory,
+        direction: Direction,
+        entryPrice: Double,
+        exitPrice: Double?,
+        positionSize: Double,
+        notes: String?,
+        pipValue: Double?,
+        lotSize: Double?,
+        exposure: Double?,
+        leverage: Double?,
+        fundingRate: Double?,
+        walletAddress: String?,
+        strikePrice: Double?,
+        expirationDate: Date?,
+        costBasis: Double?
+    ) {
+        let trade = Trade(
+            userId: userId,
+            asset: asset,
+            assetCategory: journalCategory.assetCategory,
+            direction: direction,
+            entryPrice: entryPrice,
+            stopLoss: 0,
+            takeProfit: 0,
+            positionSize: positionSize,
+            entryAt: Date(),
+            exitPrice: exitPrice,
+            notes: notes?.isEmpty == true ? nil : notes,
+            journalCategory: journalCategory,
+            leverage: leverage,
+            fundingRate: fundingRate,
+            walletAddress: walletAddress?.isEmpty == true ? nil : walletAddress,
+            pipValue: pipValue,
+            lotSize: lotSize,
+            exposure: exposure,
+            strikePrice: strikePrice,
+            expirationDate: expirationDate,
+            costBasis: costBasis
+        )
+        do {
+            try repository.create(trade)
+            trades = try repository.findAll(userId: userId, journalCategory: self.journalCategory)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
     public func deleteTrade(_ trade: Trade) {
         do {
             try repository.delete(trade)
