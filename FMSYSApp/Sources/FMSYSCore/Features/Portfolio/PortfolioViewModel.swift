@@ -32,34 +32,102 @@ public enum PortfolioRange: String, CaseIterable {
 
 @Observable
 public final class PortfolioViewModel {
-    public let totalNetLiquidity: Double = 142_500.42
-    public let dailyPnL: Double          = 1_842.20
-    public let buyingPower: Double       = 58_210.15
-    public var selectedRange: PortfolioRange = .ytd
-    public let betaWeighting: Double     = 1.12
-    public let marginUtilization: Double = 0.32
 
-    public var performanceCurve: [EquityPoint] {
-        let cal = Calendar.current
-        let now = Date()
-        let start = cal.date(from: cal.dateComponents([.year], from: now)) ?? now
-        let values: [Double] = [100_000, 108_000, 115_000, 112_000, 128_000, 135_000, 142_500.42]
-        let step = now.timeIntervalSince(start) / Double(values.count - 1)
-        return values.enumerated().map { idx, val in
-            EquityPoint(date: start.addingTimeInterval(Double(idx) * step), value: val)
+    public var trades: [Trade]
+    public var selectedRange: PortfolioRange = .ytd
+
+    public init(trades: [Trade] = []) {
+        self.trades = trades
+    }
+
+    // MARK: - Closed / open split
+
+    public var openTrades: [Trade] {
+        trades.filter { $0.exitPrice == nil }
+    }
+
+    public var closedTrades: [Trade] {
+        trades.filter { $0.exitPrice != nil }
+    }
+
+    // MARK: - KPIs
+
+    public var totalPnL: Double {
+        closedTrades.reduce(0.0) { sum, t in
+            guard let exit = t.exitPrice else { return sum }
+            let m = t.direction == .long ? 1.0 : -1.0
+            return sum + (exit - t.entryPrice) * m * t.positionSize
         }
     }
 
-    public let positions: [PortfolioPosition] = [
-        PortfolioPosition(id: "AAPL", name: "Apple Inc.",      qty: 150,  lastPrice: 192.42,    marketValue: 28_863.00, unrealizedPnL:  1_420.15),
-        PortfolioPosition(id: "MSFT", name: "Microsoft Corp.", qty: 45,   lastPrice: 425.22,    marketValue: 19_134.90, unrealizedPnL:    682.40),
-        PortfolioPosition(id: "BTC",  name: "Bitcoin",         qty: 0.82, lastPrice: 64_310.00, marketValue: 52_734.20, unrealizedPnL:   -412.00),
-    ]
+    public var dailyPnL: Double {
+        let todayStart = Calendar.current.startOfDay(for: Date())
+        return closedTrades
+            .filter { ($0.exitAt ?? $0.entryAt) >= todayStart }
+            .reduce(0.0) { sum, t in
+                guard let exit = t.exitPrice else { return sum }
+                let m = t.direction == .long ? 1.0 : -1.0
+                return sum + (exit - t.entryPrice) * m * t.positionSize
+            }
+    }
 
-    public let allocation: [AllocationSlice] = [
-        AllocationSlice(id: "Stocks", name: "Stocks", percent: 0.452, color: Color(red: 0.231, green: 0.510, blue: 0.965)),
-        AllocationSlice(id: "ETFs",   name: "ETFs",   percent: 0.248, color: Color.fmsPrimary),
-        AllocationSlice(id: "Crypto", name: "Crypto", percent: 0.195, color: Color(red: 1.0,   green: 0.584, blue: 0.0)),
-        AllocationSlice(id: "Forex",  name: "Forex",  percent: 0.105, color: Color(red: 0.663, green: 0.329, blue: 1.0)),
-    ]
+    public var marginUtilization: Double {
+        guard !trades.isEmpty else { return 0 }
+        return Double(openTrades.count) / Double(max(trades.count, 1))
+    }
+
+    // MARK: - Equity curve
+
+    public var performanceCurve: [EquityPoint] {
+        let sorted = closedTrades.sorted { ($0.exitAt ?? $0.entryAt) < ($1.exitAt ?? $1.entryAt) }
+        var cumulative = 0.0
+        return sorted.map { t in
+            let exit = t.exitPrice ?? t.entryPrice
+            let m = t.direction == .long ? 1.0 : -1.0
+            cumulative += (exit - t.entryPrice) * m * t.positionSize
+            return EquityPoint(date: t.exitAt ?? t.entryAt, value: cumulative)
+        }
+    }
+
+    // MARK: - Positions (group open trades by asset)
+
+    public var positions: [PortfolioPosition] {
+        var grouped: [String: [Trade]] = [:]
+        for trade in openTrades { grouped[trade.asset, default: []].append(trade) }
+        return grouped.map { symbol, group in
+            let avgEntry = group.map(\.entryPrice).reduce(0, +) / Double(group.count)
+            let totalSize = group.map(\.positionSize).reduce(0, +)
+            let marketValue = avgEntry * totalSize
+            return PortfolioPosition(
+                id: symbol, name: symbol,
+                qty: totalSize,
+                lastPrice: avgEntry,
+                marketValue: marketValue,
+                unrealizedPnL: 0   // updated when live prices available
+            )
+        }.sorted { $0.marketValue > $1.marketValue }
+    }
+
+    // MARK: - Asset allocation (by journalCategory of open trades)
+
+    public var allocation: [AllocationSlice] {
+        let colors: [JournalCategory: Color] = [
+            .stocksETFs: Color(red: 0.231, green: 0.510, blue: 0.965),
+            .crypto:     Color(red: 1.0,   green: 0.584, blue: 0.0),
+            .forex:      Color(red: 0.663, green: 0.329, blue: 1.0),
+            .options:    Color.fmsPrimary,
+        ]
+        let total = Double(max(openTrades.count, 1))
+        return JournalCategory.allCases
+            .filter { $0 != .all }
+            .compactMap { cat -> AllocationSlice? in
+                let count = openTrades.filter { $0.journalCategory == cat }.count
+                guard count > 0 else { return nil }
+                return AllocationSlice(
+                    id: cat.rawValue, name: cat.rawValue,
+                    percent: Double(count) / total,
+                    color: colors[cat] ?? .gray
+                )
+            }
+    }
 }

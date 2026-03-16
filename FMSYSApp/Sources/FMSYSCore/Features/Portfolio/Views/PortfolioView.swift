@@ -3,9 +3,11 @@ import SwiftUI
 import Charts
 
 public struct PortfolioView: View {
-    @State private var viewModel = PortfolioViewModel()
+    @Bindable var viewModel: PortfolioViewModel
 
-    public init() {}
+    public init(viewModel: PortfolioViewModel) {
+        self.viewModel = viewModel
+    }
 
     public var body: some View {
         HSplitView {
@@ -35,15 +37,14 @@ public struct PortfolioView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 16) {
-            kpiCard(title: "Total Net Liquidity",
-                    value: formatted(viewModel.totalNetLiquidity),
-                    valueColor: Color.fmsOnSurface)
+            kpiCard(title: "Total P&L",
+                    value: formatted(viewModel.totalPnL),
+                    valueColor: viewModel.totalPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
             kpiCard(title: "Daily P/L",
-                    value: "+\(formatted(viewModel.dailyPnL))",
-                    subtitle: "(+1.31%)",
-                    valueColor: Color.fmsPrimary)
-            kpiCard(title: "Buying Power",
-                    value: formatted(viewModel.buyingPower),
+                    value: formatted(viewModel.dailyPnL),
+                    valueColor: viewModel.dailyPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
+            kpiCard(title: "Open Positions",
+                    value: "\(viewModel.openTrades.count)",
                     valueColor: Color.fmsOnSurface)
         }
     }

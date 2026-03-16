@@ -53,7 +53,7 @@ public final class AppStore {
         let allTrades = tradingService.trades
 
         self.dashboard = DashboardViewModel(trades: allTrades)
-        self.portfolio = PortfolioViewModel()
+        self.portfolio = PortfolioViewModel(trades: allTrades)
         self.strategyLab = StrategyViewModel(
             repository: StrategyRepository(context: context),
             userId: "current-user"
@@ -61,10 +61,14 @@ public final class AppStore {
         self.backtest = BacktestViewModel(context: context)
         self.journal = TradeViewModel(repository: tradeRepo, userId: "current-user")
 
-        // Keep dashboard trades in sync when journal mutates
-        self.journal.onTradesChanged = { [weak tradingService, weak dashboard = self.dashboard] in
+        // Keep dashboard and portfolio trades in sync when journal mutates
+        self.journal.onTradesChanged = { [weak tradingService,
+                                          weak dashboard = self.dashboard,
+                                          weak portfolio = self.portfolio] in
             tradingService?.loadAll()
-            dashboard?.trades = tradingService?.trades ?? []
+            let fresh = tradingService?.trades ?? []
+            dashboard?.trades = fresh
+            portfolio?.trades = fresh
         }
     }
 

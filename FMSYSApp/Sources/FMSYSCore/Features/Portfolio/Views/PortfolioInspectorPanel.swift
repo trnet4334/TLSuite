@@ -101,9 +101,9 @@ public struct PortfolioInspectorPanel: View {
                 .tracking(1)
 
             riskBar(
-                label: "Beta Weighting (SPY)",
-                fillFraction: viewModel.betaWeighting / 2.0,
-                displayValue: String(format: "%.2f", viewModel.betaWeighting),
+                label: "Position Exposure",
+                fillFraction: min(1.0, Double(viewModel.openTrades.count) / 10.0),
+                displayValue: "\(viewModel.openTrades.count) open",
                 color: Color(red: 0.231, green: 0.510, blue: 0.965)
             )
             riskBar(
