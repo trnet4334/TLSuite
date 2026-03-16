@@ -25,13 +25,12 @@ public struct SidebarView: View {
             }
             .listStyle(.sidebar)
             .scrollContentBackground(.hidden)
-            .background(Color.fmsSurface)
             .frame(maxHeight: .infinity)
 
             bottomCard(for: selection)
         }
         .frame(minWidth: 256, maxWidth: 256)
-        .background(Color.fmsSurface)
+        .background(.regularMaterial)
     }
 
     private func navItem(_ screen: AppScreen, icon: String, label: String, shortcut: Character) -> some View {

@@ -130,10 +130,10 @@ public struct MainAppView: View {
             .padding(.trailing, 12)
         }
         .frame(height: 48)
-        .background(Color.fmsSurface)
+        .background(.regularMaterial)
         .overlay(alignment: .bottom) {
             Divider()
-                .overlay(Color.fmsMuted.opacity(0.15))
+                .overlay(Color.fmsBorder)
         }
     }
 
