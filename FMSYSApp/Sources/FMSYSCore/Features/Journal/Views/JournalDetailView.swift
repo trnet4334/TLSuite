@@ -65,15 +65,15 @@ public struct JournalDetailView: View {
         if let trade = selectedTrade {
             switch trade.journalCategory {
             case .crypto:
-                CryptoDetailPanel(trade: trade, onSave: { viewModel.updateTrade(trade) })
+                CryptoDetailPanel(trade: trade, viewModel: viewModel, onSave: { viewModel.updateTrade(trade) })
             case .stocksETFs:
-                StocksDetailPanel(trade: trade, onSave: { viewModel.updateTrade(trade) })
+                StocksDetailPanel(trade: trade, viewModel: viewModel, onSave: { viewModel.updateTrade(trade) })
             case .forex:
-                ForexDetailPanel(trade: trade, onSave: { viewModel.updateTrade(trade) })
+                ForexDetailPanel(trade: trade, viewModel: viewModel, onSave: { viewModel.updateTrade(trade) })
             case .options:
-                OptionsDetailPanel(trade: trade, onSave: { viewModel.updateTrade(trade) })
+                OptionsDetailPanel(trade: trade, viewModel: viewModel, onSave: { viewModel.updateTrade(trade) })
             case .all:
-                StocksDetailPanel(trade: trade, onSave: { viewModel.updateTrade(trade) })
+                StocksDetailPanel(trade: trade, viewModel: viewModel, onSave: { viewModel.updateTrade(trade) })
             }
         } else {
             emptyDetailState

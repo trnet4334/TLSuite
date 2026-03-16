@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import SwiftData
@@ -141,5 +142,42 @@ public final class TradeViewModel {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    // MARK: - Attachments
+
+    public var attachments: [JournalAttachment] = []
+
+    @MainActor
+    public func loadAttachments(for tradeId: UUID) {
+        let all = (try? repository.context.fetch(FetchDescriptor<JournalAttachment>())) ?? []
+        attachments = all.filter { $0.tradeId == tradeId }
+    }
+
+    @MainActor
+    public func addAttachment(image: NSImage, tradeId: UUID) {
+        do {
+            let service = ImageCompressionService()
+            let result = try service.compress(image)
+            let attachment = JournalAttachment(
+                tradeId: tradeId,
+                imageData: result.imageData,
+                thumbnailData: result.thumbnailData,
+                originalFileName: "attachment-\(Int(Date().timeIntervalSince1970)).jpg"
+            )
+            repository.context.insert(attachment)
+            try repository.context.save()
+            loadAttachments(for: tradeId)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    public func deleteAttachment(_ attachment: JournalAttachment) {
+        guard let tradeId = attachments.first(where: { $0.id == attachment.id })?.tradeId else { return }
+        repository.context.delete(attachment)
+        try? repository.context.save()
+        loadAttachments(for: tradeId)
     }
 }

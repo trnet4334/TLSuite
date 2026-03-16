@@ -1,24 +1,30 @@
 // Sources/FMSYSCore/Features/Journal/Views/Shared/TradeDetailLayout.swift
 import SwiftUI
+import AppKit
 
 /// Shared layout shell for all category detail panels.
 /// Callers supply the 4-column metrics content via `metricsContent`.
 public struct TradeDetailLayout<Metrics: View>: View {
     @Bindable var trade: Trade
     let subtitle: String
+    let viewModel: TradeViewModel
     let onDiscard: () -> Void
     let onSave: () -> Void
     @ViewBuilder let metricsContent: () -> Metrics
 
+    @State private var showingFilePicker = false
+
     public init(
         trade: Trade,
         subtitle: String,
+        viewModel: TradeViewModel,
         onDiscard: @escaping () -> Void,
         onSave: @escaping () -> Void,
         @ViewBuilder metricsContent: @escaping () -> Metrics
     ) {
         self.trade = trade
         self.subtitle = subtitle
+        self.viewModel = viewModel
         self.onDiscard = onDiscard
         self.onSave = onSave
         self.metricsContent = metricsContent
@@ -30,12 +36,14 @@ public struct TradeDetailLayout<Metrics: View>: View {
                 heroHeader
                 metricsContent()
                 notesSection
-                chartSection
+                attachmentsSection
                 footerActions
             }
             .padding(32)
         }
         .background(Color.fmsBackground)
+        .onAppear { viewModel.loadAttachments(for: trade.id) }
+        .onChange(of: trade.id) { _, newId in viewModel.loadAttachments(for: newId) }
     }
 
     // MARK: Hero Header
@@ -84,39 +92,26 @@ public struct TradeDetailLayout<Metrics: View>: View {
         }
     }
 
-    // MARK: Chart Analysis
+    // MARK: Attachments
 
-    private var chartSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("Chart Analysis", systemImage: "photo")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(Color.fmsOnSurface)
-            HStack(spacing: 14) {
-                uploadArea(label: "Entry Chart")
-                uploadArea(label: "Exit Chart")
-            }
-        }
-    }
-
-    private func uploadArea(label: String) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: "plus.viewfinder")
-                .font(.system(size: 28))
-                .foregroundStyle(Color.fmsMuted)
-            Text(label)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.fmsMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .aspectRatio(16 / 9, contentMode: .fit)
-        .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(
-                    style: StrokeStyle(lineWidth: 1.5, dash: [6])
-                )
-                .foregroundStyle(Color.fmsMuted.opacity(0.35))
+    private var attachmentsSection: some View {
+        AttachmentsSection(
+            attachments: viewModel.attachments,
+            onAdd: { showingFilePicker = true },
+            onDelete: { viewModel.deleteAttachment($0) }
         )
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.image]
+        ) { result in
+            guard
+                let url = try? result.get(),
+                url.startAccessingSecurityScopedResource(),
+                let image = NSImage(contentsOf: url)
+            else { return }
+            url.stopAccessingSecurityScopedResource()
+            viewModel.addAttachment(image: image, tradeId: trade.id)
+        }
     }
 
     // MARK: Footer

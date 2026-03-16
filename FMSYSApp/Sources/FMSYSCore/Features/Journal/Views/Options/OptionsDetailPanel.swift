@@ -2,10 +2,12 @@ import SwiftUI
 
 public struct OptionsDetailPanel: View {
     @Bindable var trade: Trade
+    let viewModel: TradeViewModel
     let onSave: () -> Void
 
-    public init(trade: Trade, onSave: @escaping () -> Void) {
+    public init(trade: Trade, viewModel: TradeViewModel, onSave: @escaping () -> Void) {
         self.trade = trade
+        self.viewModel = viewModel
         self.onSave = onSave
     }
 
@@ -21,6 +23,7 @@ public struct OptionsDetailPanel: View {
         TradeDetailLayout(
             trade: trade,
             subtitle: contractSubtitle,
+            viewModel: viewModel,
             onDiscard: {},
             onSave: onSave
         ) {

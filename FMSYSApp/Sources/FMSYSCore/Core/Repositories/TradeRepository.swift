@@ -3,7 +3,7 @@ import SwiftData
 
 public struct TradeRepository {
 
-    private let context: ModelContext
+    public let context: ModelContext
 
     public init(context: ModelContext) {
         self.context = context
