@@ -10,6 +10,9 @@ public final class TradeViewModel {
     public var errorMessage: String?
     public var journalCategory: JournalCategory = .all
 
+    /// Called after any trade mutation (create/update/delete). Used by AppStore to keep TradingDataService in sync.
+    public var onTradesChanged: (() -> Void)?
+
     private let repository: TradeRepository
     private let userId: String
 
@@ -42,6 +45,7 @@ public final class TradeViewModel {
         do {
             try repository.save()
             trades = try repository.findAll(userId: userId, journalCategory: journalCategory)
+            onTradesChanged?()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -71,6 +75,7 @@ public final class TradeViewModel {
         do {
             try repository.create(trade)
             trades = try repository.findAll(userId: userId)
+            onTradesChanged?()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -121,6 +126,7 @@ public final class TradeViewModel {
         do {
             try repository.create(trade)
             trades = try repository.findAll(userId: userId, journalCategory: self.journalCategory)
+            onTradesChanged?()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -131,6 +137,7 @@ public final class TradeViewModel {
         do {
             try repository.delete(trade)
             trades = try repository.findAll(userId: userId)
+            onTradesChanged?()
         } catch {
             errorMessage = error.localizedDescription
         }

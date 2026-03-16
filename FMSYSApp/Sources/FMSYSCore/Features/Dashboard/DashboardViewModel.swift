@@ -68,7 +68,7 @@ public struct PsychAnalytics {
 
 @Observable
 public final class DashboardViewModel {
-    public let trades: [Trade]
+    public var trades: [Trade]
     public var selectedRange: DashboardRange = .oneMonth
 
     public init(trades: [Trade]) {
