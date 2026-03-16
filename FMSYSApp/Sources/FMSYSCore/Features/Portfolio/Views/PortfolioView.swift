@@ -37,15 +37,16 @@ public struct PortfolioView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 16) {
-            kpiCard(title: "Total P&L",
+            kpiCard(title: viewModel.selectedRange == .all ? "Total P&L" : "P&L · \(viewModel.selectedRange.rawValue)",
                     value: formatted(viewModel.totalPnL),
                     valueColor: viewModel.totalPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
             kpiCard(title: "Daily P/L",
                     value: formatted(viewModel.dailyPnL),
                     valueColor: viewModel.dailyPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
-            kpiCard(title: "Open Positions",
-                    value: "\(viewModel.openTrades.count)",
-                    valueColor: Color.fmsOnSurface)
+            kpiCard(title: "Win Rate · \(viewModel.selectedRange.rawValue)",
+                    value: String(format: "%.0f%%", viewModel.winRate * 100),
+                    subtitle: "\(viewModel.rangedClosedTrades.count) trades",
+                    valueColor: viewModel.winRate >= 0.5 ? Color.fmsPrimary : Color.fmsLoss)
         }
     }
 
@@ -88,7 +89,7 @@ public struct PortfolioView: View {
                     Text("Portfolio Performance")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.fmsOnSurface)
-                    Text("Cumulative account value growth")
+                    Text("Cumulative P/L · \(viewModel.selectedRange.label)")
                         .font(.system(size: 11))
                         .foregroundStyle(Color.fmsMuted)
                 }
@@ -96,25 +97,38 @@ public struct PortfolioView: View {
                 rangePicker
             }
 
-            Chart(viewModel.performanceCurve) { point in
-                AreaMark(x: .value("Date", point.date), y: .value("Value", point.value))
-                    .foregroundStyle(LinearGradient(
-                        colors: [Color.fmsPrimary.opacity(0.15), Color.fmsPrimary.opacity(0)],
-                        startPoint: .top, endPoint: .bottom
-                    ))
-                LineMark(x: .value("Date", point.date), y: .value("Value", point.value))
-                    .foregroundStyle(Color.fmsPrimary)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .month)) { _ in
-                    AxisValueLabel(format: .dateTime.month(.abbreviated), centered: true)
-                        .font(.system(size: 10, weight: .bold))
+            if viewModel.performanceCurve.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 32))
+                        .foregroundStyle(Color.fmsMuted.opacity(0.3))
+                    Text("No closed trades in this period")
+                        .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 220)
+            } else {
+                Chart(viewModel.performanceCurve) { point in
+                    AreaMark(x: .value("Date", point.date), y: .value("Value", point.value))
+                        .foregroundStyle(LinearGradient(
+                            colors: [Color.fmsPrimary.opacity(0.15), Color.fmsPrimary.opacity(0)],
+                            startPoint: .top, endPoint: .bottom
+                        ))
+                    LineMark(x: .value("Date", point.date), y: .value("Value", point.value))
+                        .foregroundStyle(Color.fmsPrimary)
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .month)) { _ in
+                        AxisValueLabel(format: .dateTime.month(.abbreviated), centered: true)
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Color.fmsMuted)
+                    }
+                }
+                .chartYAxis(.hidden)
+                .frame(height: 220)
             }
-            .chartYAxis(.hidden)
-            .frame(height: 220)
         }
         .padding(20)
         .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))

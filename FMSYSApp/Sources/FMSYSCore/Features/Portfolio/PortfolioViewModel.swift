@@ -26,6 +26,25 @@ public enum PortfolioRange: String, CaseIterable {
     case threeMonths = "3M"
     case ytd         = "YTD"
     case all         = "ALL"
+
+    public var cutoffDate: Date? {
+        let cal = Calendar.current
+        switch self {
+        case .oneMonth:    return cal.date(byAdding: .month,  value: -1,  to: Date())
+        case .threeMonths: return cal.date(byAdding: .month,  value: -3,  to: Date())
+        case .ytd:         return cal.dateComponents([.year], from: Date()).date.map { cal.startOfDay(for: $0) }
+        case .all:         return nil
+        }
+    }
+
+    public var label: String {
+        switch self {
+        case .oneMonth:    return "Last 30 days"
+        case .threeMonths: return "Last 3 months"
+        case .ytd:         return "Year to date"
+        case .all:         return "All time"
+        }
+    }
 }
 
 // MARK: - PortfolioViewModel
@@ -50,25 +69,29 @@ public final class PortfolioViewModel {
         trades.filter { $0.exitPrice != nil }
     }
 
-    // MARK: - KPIs
-
-    public var totalPnL: Double {
-        closedTrades.reduce(0.0) { sum, t in
-            guard let exit = t.exitPrice else { return sum }
-            let m = t.direction == .long ? 1.0 : -1.0
-            return sum + (exit - t.entryPrice) * m * t.positionSize
-        }
+    /// Closed trades within the currently selected range.
+    public var rangedClosedTrades: [Trade] {
+        guard let cutoff = selectedRange.cutoffDate else { return closedTrades }
+        return closedTrades.filter { ($0.exitAt ?? $0.entryAt) >= cutoff }
     }
 
+    // MARK: - KPIs (range-scoped)
+
+    /// P/L for the selected range.
+    public var totalPnL: Double { pnl(for: rangedClosedTrades) }
+
+    /// P/L for today.
     public var dailyPnL: Double {
         let todayStart = Calendar.current.startOfDay(for: Date())
-        return closedTrades
-            .filter { ($0.exitAt ?? $0.entryAt) >= todayStart }
-            .reduce(0.0) { sum, t in
-                guard let exit = t.exitPrice else { return sum }
-                let m = t.direction == .long ? 1.0 : -1.0
-                return sum + (exit - t.entryPrice) * m * t.positionSize
-            }
+        return pnl(for: closedTrades.filter { ($0.exitAt ?? $0.entryAt) >= todayStart })
+    }
+
+    /// Win rate (% profitable) for the selected range.
+    public var winRate: Double {
+        let closed = rangedClosedTrades
+        guard !closed.isEmpty else { return 0 }
+        let wins = closed.filter { pnl(for: [$0]) > 0 }.count
+        return Double(wins) / Double(closed.count)
     }
 
     public var marginUtilization: Double {
@@ -76,16 +99,26 @@ public final class PortfolioViewModel {
         return Double(openTrades.count) / Double(max(trades.count, 1))
     }
 
-    // MARK: - Equity curve
+    // MARK: - Equity curve (range-scoped, cumulative P/L)
 
     public var performanceCurve: [EquityPoint] {
-        let sorted = closedTrades.sorted { ($0.exitAt ?? $0.entryAt) < ($1.exitAt ?? $1.entryAt) }
+        let sorted = rangedClosedTrades.sorted { ($0.exitAt ?? $0.entryAt) < ($1.exitAt ?? $1.entryAt) }
         var cumulative = 0.0
         return sorted.map { t in
             let exit = t.exitPrice ?? t.entryPrice
             let m = t.direction == .long ? 1.0 : -1.0
             cumulative += (exit - t.entryPrice) * m * t.positionSize
             return EquityPoint(date: t.exitAt ?? t.entryAt, value: cumulative)
+        }
+    }
+
+    // MARK: - Private helpers
+
+    private func pnl(for trades: [Trade]) -> Double {
+        trades.reduce(0.0) { sum, t in
+            guard let exit = t.exitPrice else { return sum }
+            let m = t.direction == .long ? 1.0 : -1.0
+            return sum + (exit - t.entryPrice) * m * t.positionSize
         }
     }
 
