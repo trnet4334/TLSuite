@@ -16,7 +16,7 @@ struct FMSYSApp: App {
     private let modelContainer: ModelContainer = {
         do {
             let config = ModelConfiguration("fmsys", isStoredInMemoryOnly: false)
-            return try ModelContainer(for: Trade.self, Strategy.self, BacktestResult.self, configurations: config)
+            return try ModelContainer(for: Trade.self, Strategy.self, BacktestResult.self, JournalAttachment.self, configurations: config)
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
