@@ -11,7 +11,6 @@ public struct MainAppView: View {
     @State private var showSharePopover = false
     @State private var showSettingsPopover = false
     @State private var showAvatarPopover = false
-    @State private var showSidebar = false
     @AppStorage("isDarkMode") private var isDarkMode = true
 
     private let authService: any AuthServiceProtocol
@@ -40,47 +39,24 @@ public struct MainAppView: View {
     // MARK: - Authenticated shell
 
     private var appShell: some View {
-        ZStack(alignment: .topLeading) {
-            // Base: rail spans full height, title bar lives in the right column
+        VStack(spacing: 0) {
+            titleBar
+
             HStack(spacing: 0) {
-                SidebarRail(selection: $selectedScreen, onToggle: {
-                    withAnimation(.easeInOut(duration: 0.22)) { showSidebar.toggle() }
-                })
-                .frame(maxHeight: .infinity)
+                SidebarView(
+                    selection: $selectedScreen,
+                    journalCategory: $journalCategory
+                )
 
                 Divider()
 
-                VStack(spacing: 0) {
-                    titleBar
-                    screenContent
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    StatusBar()
-                }
+                screenContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .frame(maxHeight: .infinity)
 
-            // Expanded sidebar — overlays full left side including title bar
-            if showSidebar {
-                Color.black.opacity(0.25)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
-                    }
-
-                SidebarView(
-                    selection: $selectedScreen,
-                    journalCategory: $journalCategory,
-                    onToggle: {
-                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
-                    }
-                )
-                .frame(maxHeight: .infinity)
-                .transition(.move(edge: .leading))
-                .onChange(of: selectedScreen) { _, _ in
-                    withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
-                }
-            }
+            StatusBar()
         }
-        .animation(.easeInOut(duration: 0.22), value: showSidebar)
     }
 
     // MARK: - Title bar
