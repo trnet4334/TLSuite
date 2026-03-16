@@ -154,7 +154,7 @@ public struct MainAppView: View {
             .padding(.trailing, 12)
         }
         .frame(height: 48)
-        .background(Color(NSColor.windowBackgroundColor))
+        .background(Color.fmsSurface)
         .overlay(alignment: .bottom) {
             Divider()
                 .overlay(Color.fmsMuted.opacity(0.15))
