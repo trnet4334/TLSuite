@@ -50,13 +50,16 @@ public struct TradeDetailLayout<Metrics: View>: View {
 
     private var heroHeader: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(trade.asset)
                     .font(.system(size: 32, weight: .heavy))
                     .foregroundStyle(Color.fmsOnSurface)
                 Text(subtitle)
                     .font(.system(size: 14))
                     .foregroundStyle(Color.fmsMuted)
+                if let source = trade.dataSource {
+                    dataSourceChip(source)
+                }
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
@@ -70,6 +73,20 @@ public struct TradeDetailLayout<Metrics: View>: View {
                 }
             }
         }
+    }
+
+    private func dataSourceChip(_ source: String) -> some View {
+        let isManual = source == "Manual"
+        let icon = isManual ? "pencil" : "square.and.arrow.down"
+        return Label(source, systemImage: icon)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(isManual ? Color.fmsMuted : Color.fmsPrimary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(
+                (isManual ? Color.fmsMuted : Color.fmsPrimary).opacity(0.1),
+                in: Capsule()
+            )
     }
 
     // MARK: Notes

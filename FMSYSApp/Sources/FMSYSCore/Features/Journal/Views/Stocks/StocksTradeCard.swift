@@ -30,9 +30,14 @@ public struct StocksTradeCard: View {
                     Spacer()
                     pnlText
                 }
-                Text(trade.entryAt.formatted(date: .abbreviated, time: .omitted))
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.fmsMuted)
+                HStack(spacing: 6) {
+                    Text(trade.entryAt.formatted(date: .abbreviated, time: .omitted))
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.fmsMuted)
+                    if let src = trade.dataSource {
+                        TradeSourceBadge(source: src)
+                    }
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)

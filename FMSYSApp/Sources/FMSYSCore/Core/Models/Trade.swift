@@ -41,6 +41,7 @@ public final class Trade {
     public var notes: String?
     public var emotionTagRaw: String?
     public var screenshotURL: String?
+    public var dataSource: String?   // e.g. "Manual", "CSV: ibkr.csv", "API: Binance"
 
     // Sync
     public var pendingSync: Bool
@@ -110,6 +111,7 @@ public final class Trade {
         notes: String? = nil,
         emotionTag: EmotionTag? = nil,
         screenshotURL: String? = nil,
+        dataSource: String? = nil,
         pendingSync: Bool = true,
         journalCategory: JournalCategory = .stocksETFs,
         leverage: Double? = nil,
@@ -144,6 +146,7 @@ public final class Trade {
         self.notes = notes
         self.emotionTagRaw = emotionTag?.rawValue
         self.screenshotURL = screenshotURL
+        self.dataSource = dataSource
         self.pendingSync = pendingSync
         self.journalCategoryRaw = journalCategory.rawValue
         self.leverage = leverage

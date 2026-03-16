@@ -71,7 +71,8 @@ public final class TradeViewModel {
             stopLoss: stopLoss,
             takeProfit: takeProfit,
             positionSize: positionSize,
-            entryAt: Date()
+            entryAt: Date(),
+            dataSource: "Manual"
         )
         do {
             try repository.create(trade)
@@ -113,6 +114,7 @@ public final class TradeViewModel {
             entryAt: Date(),
             exitPrice: exitPrice,
             notes: notes?.isEmpty == true ? nil : notes,
+            dataSource: "Manual",
             journalCategory: journalCategory,
             leverage: leverage,
             fundingRate: fundingRate,

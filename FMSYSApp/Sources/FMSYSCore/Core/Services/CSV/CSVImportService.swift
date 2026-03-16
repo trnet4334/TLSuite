@@ -26,7 +26,8 @@ public struct CSVImportService {
     }
 
     /// Phase 2: Map rows to Trade objects using the detected (or user-supplied) format.
-    public func map(csvText: String, format: BrokerFormat, columnMapping: [String: String] = [:]) -> CSVImportResult {
+    /// `sourceLabel` is stored on every imported trade (e.g. "CSV: ibkr-trades.csv").
+    public func map(csvText: String, format: BrokerFormat, columnMapping: [String: String] = [:], sourceLabel: String = "") -> CSVImportResult {
         let rows = CSVParser.parse(csvText)
         var trades: [Trade] = []
         var failed: [(Int, Error)] = []
@@ -50,6 +51,7 @@ public struct CSVImportService {
                 case .generic, .unknown:
                     trade = try GenericTradeMapper.map(row: row, userId: userId)
                 }
+                if !sourceLabel.isEmpty { trade.dataSource = sourceLabel }
                 trades.append(trade)
             } catch {
                 failed.append((idx + 2, error))   // +2: 1-indexed, skip header

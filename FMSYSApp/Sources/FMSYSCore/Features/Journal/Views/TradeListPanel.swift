@@ -15,6 +15,7 @@ public struct TradeListPanel: View {
     @State private var showingMapping      = false
     @State private var showingPreview      = false
     @State private var csvText             = ""
+    @State private var csvFileName         = ""
     @State private var csvHeaders: [String] = []
     @State private var csvPreviewRows: [[String]] = []
     @State private var importResult: CSVImportResult?
@@ -59,17 +60,23 @@ public struct TradeListPanel: View {
             defer { url.stopAccessingSecurityScopedResource() }
             guard let text = try? String(contentsOf: url, encoding: .utf8) else { return }
             csvText = text
+            csvFileName = url.lastPathComponent
             let service = CSVImportService()
             let analysis = service.analyze(csvText: text)
             csvHeaders = analysis.headers
             csvPreviewRows = analysis.preview
             importFormat = analysis.format
-            if analysis.format == .unknown {
-                showingMapping = true
-            } else {
-                let res = service.map(csvText: text, format: analysis.format)
-                importResult = res
-                showingPreview = true
+            // Delay sheet presentation — the file picker sheet must fully dismiss first
+            // before a new sheet can be presented on macOS.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if analysis.format == .unknown {
+                    showingMapping = true
+                } else {
+                    let res = service.map(csvText: text, format: analysis.format,
+                                         sourceLabel: "CSV: \(url.lastPathComponent)")
+                    importResult = res
+                    showingPreview = true
+                }
             }
         }
         .sheet(isPresented: $showingMapping) {
@@ -78,10 +85,14 @@ public struct TradeListPanel: View {
                 preview: csvPreviewRows,
                 onConfirm: { mapping in
                     let service = CSVImportService()
-                    let res = service.map(csvText: csvText, format: .unknown, columnMapping: mapping)
+                    let res = service.map(csvText: csvText, format: .unknown,
+                                         columnMapping: mapping,
+                                         sourceLabel: "CSV: \(csvFileName)")
                     importResult = res
                     showingMapping = false
-                    showingPreview = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showingPreview = true
+                    }
                 },
                 onCancel: { showingMapping = false }
             )

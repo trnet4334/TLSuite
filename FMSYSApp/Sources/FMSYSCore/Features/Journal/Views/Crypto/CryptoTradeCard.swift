@@ -27,6 +27,9 @@ public struct CryptoTradeCard: View {
                     Text(trade.entryAt.formatted(date: .abbreviated, time: .shortened))
                         .font(.system(size: 11))
                         .foregroundStyle(Color.fmsMuted)
+                    if let src = trade.dataSource {
+                        TradeSourceBadge(source: src)
+                    }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 1) {
                         pnlText

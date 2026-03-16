@@ -30,10 +30,15 @@ public struct ForexTradeCard: View {
                     Spacer()
                     pnlText
                 }
-                Text(lastTradeNote)
-                    .font(.system(size: 10))
-                    .foregroundStyle(Color.fmsMuted)
-                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(lastTradeNote)
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.fmsMuted)
+                        .lineLimit(1)
+                    if let src = trade.dataSource {
+                        TradeSourceBadge(source: src)
+                    }
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)

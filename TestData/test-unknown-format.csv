@@ -1,0 +1,7 @@
+ticker,side,entry,exit,qty,opened_at,category,memo
+AAPL,buy,185.50,192.30,50,2024-03-01,stock,Breakout trade
+MSFT,buy,415.20,,30,2024-03-04,stock,Cloud play still open
+NVDA,sell,875.00,820.00,20,2024-03-06,stock,RSI reversal
+BTCUSD,buy,67500.00,71200.00,0.5,2024-03-01,crypto,Pre-halving
+ETHUSD,buy,3520.00,,2.5,2024-03-05,crypto,ETF momentum
+EURUSD,buy,1.0855,1.0920,100000,2024-03-07,forex,London breakout

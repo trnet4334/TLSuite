@@ -30,6 +30,9 @@ public struct OptionsTradeCard: View {
                             .font(.system(size: 12))
                             .foregroundStyle(Color.fmsMuted)
                     }
+                    if let src = trade.dataSource {
+                        TradeSourceBadge(source: src)
+                    }
                     Spacer()
                     Text("Qty: \(trade.positionSize, specifier: "%.0f")")
                         .font(.system(size: 12))
