@@ -41,21 +41,24 @@ public struct MainAppView: View {
 
     private var appShell: some View {
         ZStack(alignment: .topLeading) {
-            // Base: title bar + icon rail + content
-            VStack(spacing: 0) {
-                titleBar
-                HStack(spacing: 0) {
-                    SidebarRail(selection: $selectedScreen, onToggle: {
-                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar.toggle() }
-                    })
-                    Divider()
+            // Base: rail spans full height, title bar lives in the right column
+            HStack(spacing: 0) {
+                SidebarRail(selection: $selectedScreen, onToggle: {
+                    withAnimation(.easeInOut(duration: 0.22)) { showSidebar.toggle() }
+                })
+                .frame(maxHeight: .infinity)
+
+                Divider()
+
+                VStack(spacing: 0) {
+                    titleBar
                     screenContent
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    StatusBar()
                 }
-                StatusBar()
             }
 
-            // Expanded sidebar — overlays title bar + content
+            // Expanded sidebar — overlays full left side including title bar
             if showSidebar {
                 Color.black.opacity(0.25)
                     .ignoresSafeArea()
@@ -70,6 +73,7 @@ public struct MainAppView: View {
                         withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
                     }
                 )
+                .frame(maxHeight: .infinity)
                 .transition(.move(edge: .leading))
                 .onChange(of: selectedScreen) { _, _ in
                     withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
