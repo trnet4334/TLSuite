@@ -1,6 +1,6 @@
 // Sources/FMSYSCore/Features/Journal/Views/TradeListPanel.swift
 import SwiftUI
-import UniformTypeIdentifiers
+import AppKit
 
 public struct TradeListPanel: View {
     let category: JournalCategory
@@ -11,7 +11,6 @@ public struct TradeListPanel: View {
     let onImport: ([Trade]) -> Void
 
     @State private var activeFilter: String = "All"
-    @State private var showingCSVPicker    = false
     @State private var showingMapping      = false
     @State private var showingPreview      = false
     @State private var csvText             = ""
@@ -51,34 +50,6 @@ public struct TradeListPanel: View {
         }
         .background(Color.fmsSurface)
         .onChange(of: category) { _, _ in activeFilter = "All" }
-        .fileImporter(
-            isPresented: $showingCSVPicker,
-            allowedContentTypes: [.commaSeparatedText, .plainText]
-        ) { result in
-            guard let url = try? result.get(),
-                  url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
-            guard let text = try? String(contentsOf: url, encoding: .utf8) else { return }
-            csvText = text
-            csvFileName = url.lastPathComponent
-            let service = CSVImportService()
-            let analysis = service.analyze(csvText: text)
-            csvHeaders = analysis.headers
-            csvPreviewRows = analysis.preview
-            importFormat = analysis.format
-            // Delay sheet presentation — the file picker sheet must fully dismiss first
-            // before a new sheet can be presented on macOS.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if analysis.format == .unknown {
-                    showingMapping = true
-                } else {
-                    let res = service.map(csvText: text, format: analysis.format,
-                                         sourceLabel: "CSV: \(url.lastPathComponent)")
-                    importResult = res
-                    showingPreview = true
-                }
-            }
-        }
         .sheet(isPresented: $showingMapping) {
             ColumnMappingSheet(
                 csvHeaders: csvHeaders,
@@ -90,9 +61,7 @@ public struct TradeListPanel: View {
                                          sourceLabel: "CSV: \(csvFileName)")
                     importResult = res
                     showingMapping = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showingPreview = true
-                    }
+                    showingPreview = true
                 },
                 onCancel: { showingMapping = false }
             )
@@ -110,6 +79,46 @@ public struct TradeListPanel: View {
             }
         }
     }
+
+    // MARK: - CSV file picking via NSOpenPanel (avoids SwiftUI sheet conflict)
+
+    private func openCSVFile() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.commaSeparatedText, .plainText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.title = "Import Trades from CSV"
+        panel.prompt = "Import"
+
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            guard url.startAccessingSecurityScopedResource() else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else { return }
+
+            let service = CSVImportService()
+            let analysis = service.analyze(csvText: text)
+            let fileName = url.lastPathComponent
+
+            DispatchQueue.main.async {
+                csvText = text
+                csvFileName = fileName
+                csvHeaders = analysis.headers
+                csvPreviewRows = analysis.preview
+                importFormat = analysis.format
+
+                if analysis.format == .unknown {
+                    showingMapping = true
+                } else {
+                    importResult = service.map(csvText: text, format: analysis.format,
+                                              sourceLabel: "CSV: \(fileName)")
+                    showingPreview = true
+                }
+            }
+        }
+    }
+
+    // MARK: - Filter bar
 
     @ViewBuilder
     private var filterBar: some View {
@@ -165,6 +174,8 @@ public struct TradeListPanel: View {
         return trades
     }
 
+    // MARK: - Header
+
     private var listHeader: some View {
         HStack {
             Text(category == .all ? "All Trades" : category.rawValue)
@@ -173,7 +184,7 @@ public struct TradeListPanel: View {
                 .textCase(.uppercase)
             Spacer()
             Button {
-                showingCSVPicker = true
+                openCSVFile()
             } label: {
                 Image(systemName: "square.and.arrow.down")
                     .font(.system(size: 13))
@@ -203,6 +214,8 @@ public struct TradeListPanel: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
     }
+
+    // MARK: - Trade list
 
     private var tradeList: some View {
         List(filteredTrades, id: \.id, selection: $selectedTrade) { trade in
