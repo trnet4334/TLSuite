@@ -30,7 +30,7 @@ public struct SidebarView: View {
             bottomCard(for: selection)
         }
         .frame(minWidth: 256, maxWidth: 256)
-        .background(.regularMaterial)
+        .background(.thickMaterial)
     }
 
     private func navItem(_ screen: AppScreen, icon: String, label: String, shortcut: Character) -> some View {
