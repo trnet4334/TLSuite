@@ -44,7 +44,7 @@ public struct TradeListView: View {
             )
         }
         .sheet(isPresented: $showingDashboard) {
-            DashboardView(trades: viewModel.trades)
+            DashboardView(viewModel: DashboardViewModel(trades: viewModel.trades))
                 .frame(minWidth: 480, minHeight: 560)
         }
         .onAppear { viewModel.loadTrades() }

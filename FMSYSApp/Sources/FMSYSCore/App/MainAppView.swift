@@ -1,12 +1,9 @@
 // Sources/FMSYSCore/App/MainAppView.swift
 import SwiftUI
-import SwiftData
 
 public struct MainAppView: View {
-    @State private var appState: AppState
+    @State private var store: AppStore
     @State private var authViewModel: AuthViewModel
-    @State private var selectedScreen: AppScreen = .dashboard
-    @State private var journalCategory: JournalCategory = .all
     @State private var showNotificationsPopover = false
     @State private var showSharePopover = false
     @State private var showSettingsPopover = false
@@ -14,23 +11,21 @@ public struct MainAppView: View {
     @AppStorage("isDarkMode") private var isDarkMode = true
 
     private let authService: any AuthServiceProtocol
-    private let modelContainer: ModelContainer
 
     public init(
-        appState: AppState,
-        authService: any AuthServiceProtocol,
-        modelContainer: ModelContainer
+        store: AppStore,
+        authService: any AuthServiceProtocol
     ) {
-        self._appState = State(wrappedValue: appState)
+        self._store = State(wrappedValue: store)
         self._authViewModel = State(wrappedValue: AuthViewModel(authService: authService))
         self.authService = authService
-        self.modelContainer = modelContainer
     }
 
     public var body: some View {
-        if appState.isAuthenticated {
+        if store.isAuthenticated {
             appShell
                 .preferredColorScheme(isDarkMode ? .dark : .light)
+                .environment(store)
         } else {
             authFlow
         }
@@ -44,8 +39,8 @@ public struct MainAppView: View {
 
             HStack(spacing: 0) {
                 SidebarView(
-                    selection: $selectedScreen,
-                    journalCategory: $journalCategory
+                    selection: $store.selectedScreen,
+                    journalCategory: $store.journalCategory
                 )
 
                 Divider()
@@ -90,9 +85,29 @@ public struct MainAppView: View {
 
             // Right controls
             HStack(spacing: 4) {
-                toolbarIconButton(systemName: "bell", isPresented: $showNotificationsPopover) {
-                    NotificationsPopover()
+                // Bell with unread badge
+                Button {
+                    showNotificationsPopover.toggle()
+                } label: {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "bell")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color.fmsMuted)
+                            .frame(width: 32, height: 32)
+                            .contentShape(Rectangle())
+                        if store.notificationUnreadCount > 0 {
+                            Circle()
+                                .fill(Color.fmsPrimary)
+                                .frame(width: 7, height: 7)
+                                .offset(x: 2, y: -2)
+                        }
+                    }
                 }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showNotificationsPopover, arrowEdge: .top) {
+                    NotificationsPopover(unreadCount: $store.notificationUnreadCount)
+                }
+
                 toolbarIconButton(systemName: "square.and.arrow.up", isPresented: $showSharePopover) {
                     SharePopover()
                 }
@@ -116,12 +131,12 @@ public struct MainAppView: View {
                 .buttonStyle(.plain)
                 .popover(isPresented: $showAvatarPopover, arrowEdge: .top) {
                     AvatarPopover(
-                        displayName: appState.userDisplayName,
-                        email: appState.userEmail,
-                        role: appState.userRole,
+                        displayName: store.userDisplayName,
+                        email: store.userEmail,
+                        role: store.userRole,
                         onSignOut: {
                             showAvatarPopover = false
-                            appState.markLoggedOut()
+                            store.markLoggedOut()
                         }
                     )
                 }
@@ -160,60 +175,50 @@ public struct MainAppView: View {
 
     @ViewBuilder
     private var screenContent: some View {
-        switch selectedScreen {
+        switch store.selectedScreen {
         case .dashboard:
-            DashboardView(trades: loadTrades())
+            DashboardView(viewModel: store.dashboard)
         case .journal:
-            JournalDetailView(
-                category: journalCategory,
-                modelContainer: modelContainer
-            )
+            JournalDetailView(viewModel: store.journal, category: store.journalCategory)
         case .backtesting:
-            BacktestingView(modelContainer: modelContainer)
+            BacktestingView(viewModel: store.backtest)
         case .strategyLab:
-            StrategyLabView(modelContainer: modelContainer)
+            StrategyLabView(viewModel: store.strategyLab)
         case .portfolio:
-            PortfolioView()
+            PortfolioView(viewModel: store.portfolio)
         }
-    }
-
-    private func loadTrades() -> [Trade] {
-        let repo = TradeRepository(context: modelContainer.mainContext)
-        return (try? repo.findAll(userId: "current-user")) ?? []
     }
 
     // MARK: - Auth flow
 
-
     @ViewBuilder
     private var authFlow: some View {
         NavigationStack {
-        LoginView(
-            viewModel: authViewModel,
-            onAuthenticated: { appState.markAuthenticated() },
-            onMFARequired: { _, _ in }
-        )
-        .navigationDestination(
-            isPresented: Binding(
-                get: {
-                    if case .mfaRequired = authViewModel.state { return true }
-                    return false
-                },
-                set: { if !$0 { authViewModel.state = .idle } }
+            LoginView(
+                viewModel: authViewModel,
+                onAuthenticated: { store.markAuthenticated() },
+                onMFARequired: { _, _ in }
             )
-        ) {
-            if case .mfaRequired(let token, let userId) = authViewModel.state {
-                MFAVerificationView(
-                    viewModel: MFAViewModel(
-                        authService: authService,
-                        sessionToken: token,
-                        userId: userId
-                    ),
-                    onAuthenticated: { appState.markAuthenticated() }
+            .navigationDestination(
+                isPresented: Binding(
+                    get: {
+                        if case .mfaRequired = authViewModel.state { return true }
+                        return false
+                    },
+                    set: { if !$0 { authViewModel.state = .idle } }
                 )
+            ) {
+                if case .mfaRequired(let token, let userId) = authViewModel.state {
+                    MFAVerificationView(
+                        viewModel: MFAViewModel(
+                            authService: authService,
+                            sessionToken: token,
+                            userId: userId
+                        ),
+                        onAuthenticated: { store.markAuthenticated() }
+                    )
+                }
             }
-        }
         }
     }
 }
-

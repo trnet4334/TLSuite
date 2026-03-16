@@ -1,23 +1,17 @@
 // Sources/FMSYSCore/Features/Journal/Views/JournalDetailView.swift
 import SwiftUI
-import SwiftData
 
 public struct JournalDetailView: View {
     let category: JournalCategory
-    let modelContainer: ModelContainer
+    @Bindable var viewModel: TradeViewModel
 
-    @State private var viewModel: TradeViewModel
     @State private var selectedTrade: Trade?
     @State private var sortByPnL = false
     @State private var showingEntry = false
 
-    public init(category: JournalCategory, modelContainer: ModelContainer) {
+    public init(viewModel: TradeViewModel, category: JournalCategory) {
+        self.viewModel = viewModel
         self.category = category
-        self.modelContainer = modelContainer
-        self._viewModel = State(wrappedValue: TradeViewModel(
-            repository: TradeRepository(context: modelContainer.mainContext),
-            userId: "current-user"
-        ))
     }
 
     public var body: some View {

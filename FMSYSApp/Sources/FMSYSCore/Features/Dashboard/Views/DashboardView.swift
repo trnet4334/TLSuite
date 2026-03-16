@@ -2,11 +2,11 @@ import SwiftUI
 import Charts
 
 public struct DashboardView: View {
-    @State private var viewModel: DashboardViewModel
+    @Bindable var viewModel: DashboardViewModel
     @State private var checklistViewModel = ChecklistViewModel()
 
-    public init(trades: [Trade]) {
-        self._viewModel = State(wrappedValue: DashboardViewModel(trades: trades))
+    public init(viewModel: DashboardViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {

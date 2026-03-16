@@ -40,15 +40,14 @@ struct FMSYSApp: App {
     var body: some Scene {
         WindowGroup {
             MainAppView(
-                appState: {
-                    let state = AppState()
+                store: {
+                    let store = AppStore(modelContainer: modelContainer)
                     #if DEBUG
-                    state.markAuthenticated()
+                    store.markAuthenticated()
                     #endif
-                    return state
+                    return store
                 }(),
-                authService: authService,
-                modelContainer: modelContainer
+                authService: authService
             )
             .frame(minWidth: 1000, minHeight: 640)
         }

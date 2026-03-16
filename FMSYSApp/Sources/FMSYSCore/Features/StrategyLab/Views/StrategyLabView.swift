@@ -3,11 +3,10 @@ import SwiftUI
 import SwiftData
 
 public struct StrategyLabView: View {
-    @State private var viewModel: StrategyViewModel
+    @Bindable var viewModel: StrategyViewModel
 
-    public init(modelContainer: ModelContainer) {
-        let repo = StrategyRepository(context: modelContainer.mainContext)
-        self._viewModel = State(wrappedValue: StrategyViewModel(repository: repo))
+    public init(viewModel: StrategyViewModel) {
+        self.viewModel = viewModel
     }
 
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]

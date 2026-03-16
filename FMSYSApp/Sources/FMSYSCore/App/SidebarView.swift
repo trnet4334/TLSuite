@@ -35,6 +35,9 @@ public struct SidebarView: View {
 
     private func navItem(_ screen: AppScreen, icon: String, label: String, shortcut: Character) -> some View {
         Label(label, systemImage: icon)
+            .labelStyle(SidebarLabelStyle())
+            .font(.system(size: 17, weight: .bold))
+            .foregroundStyle(selection == screen ? Color.fmsPrimary : Color.fmsOnSurface)
             .tag(screen)
             .keyboardShortcut(KeyEquivalent(shortcut), modifiers: .command)
     }
@@ -47,7 +50,7 @@ public struct SidebarView: View {
                     journalCategory = cat
                 } label: {
                     Text(cat.rawValue)
-                        .font(.system(size: 12))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(journalCategory == cat && selection == .journal
                             ? Color.fmsPrimary
                             : Color.fmsMuted)
@@ -57,6 +60,9 @@ public struct SidebarView: View {
             }
         } label: {
             Label("Journal", systemImage: "book.fill")
+                .labelStyle(SidebarLabelStyle())
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(selection == .journal ? Color.fmsPrimary : Color.fmsOnSurface)
                 .tag(AppScreen.journal)
                 .keyboardShortcut("2", modifiers: .command)
                 .simultaneousGesture(TapGesture().onEnded {
@@ -164,5 +170,14 @@ public struct SidebarView: View {
                 .stroke(Color.fmsPrimary.opacity(0.2), lineWidth: 1)
         )
         .padding(12)
+    }
+}
+
+private struct SidebarLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 5) {
+            configuration.icon
+            configuration.title
+        }
     }
 }

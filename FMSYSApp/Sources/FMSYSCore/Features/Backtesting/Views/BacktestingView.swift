@@ -4,11 +4,10 @@ import SwiftData
 
 public struct BacktestingView: View {
 
-    @State private var viewModel: BacktestViewModel
+    @Bindable var viewModel: BacktestViewModel
 
-    public init(modelContainer: ModelContainer) {
-        let context = ModelContext(modelContainer)
-        _viewModel = State(initialValue: BacktestViewModel(context: context))
+    public init(viewModel: BacktestViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {
