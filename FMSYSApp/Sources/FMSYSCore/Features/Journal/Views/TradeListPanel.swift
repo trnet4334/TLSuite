@@ -1,5 +1,6 @@
 // Sources/FMSYSCore/Features/Journal/Views/TradeListPanel.swift
 import SwiftUI
+import UniformTypeIdentifiers
 
 public struct TradeListPanel: View {
     let category: JournalCategory
@@ -7,21 +8,32 @@ public struct TradeListPanel: View {
     @Binding var selectedTrade: Trade?
     @Binding var sortByPnL: Bool
     let onNewTrade: () -> Void
+    let onImport: ([Trade]) -> Void
 
     @State private var activeFilter: String = "All"
+    @State private var showingCSVPicker    = false
+    @State private var showingMapping      = false
+    @State private var showingPreview      = false
+    @State private var csvText             = ""
+    @State private var csvHeaders: [String] = []
+    @State private var csvPreviewRows: [[String]] = []
+    @State private var importResult: CSVImportResult?
+    @State private var importFormat: BrokerFormat = .unknown
 
     public init(
         category: JournalCategory,
         trades: [Trade],
         selectedTrade: Binding<Trade?>,
         sortByPnL: Binding<Bool>,
-        onNewTrade: @escaping () -> Void
+        onNewTrade: @escaping () -> Void,
+        onImport: @escaping ([Trade]) -> Void = { _ in }
     ) {
         self.category = category
         self.trades = trades
         self._selectedTrade = selectedTrade
         self._sortByPnL = sortByPnL
         self.onNewTrade = onNewTrade
+        self.onImport = onImport
     }
 
     public var body: some View {
@@ -38,6 +50,54 @@ public struct TradeListPanel: View {
         }
         .background(Color.fmsSurface)
         .onChange(of: category) { _, _ in activeFilter = "All" }
+        .fileImporter(
+            isPresented: $showingCSVPicker,
+            allowedContentTypes: [.commaSeparatedText, .plainText]
+        ) { result in
+            guard let url = try? result.get(),
+                  url.startAccessingSecurityScopedResource() else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else { return }
+            csvText = text
+            let service = CSVImportService()
+            let analysis = service.analyze(csvText: text)
+            csvHeaders = analysis.headers
+            csvPreviewRows = analysis.preview
+            importFormat = analysis.format
+            if analysis.format == .unknown {
+                showingMapping = true
+            } else {
+                let res = service.map(csvText: text, format: analysis.format)
+                importResult = res
+                showingPreview = true
+            }
+        }
+        .sheet(isPresented: $showingMapping) {
+            ColumnMappingSheet(
+                csvHeaders: csvHeaders,
+                preview: csvPreviewRows,
+                onConfirm: { mapping in
+                    let service = CSVImportService()
+                    let res = service.map(csvText: csvText, format: .unknown, columnMapping: mapping)
+                    importResult = res
+                    showingMapping = false
+                    showingPreview = true
+                },
+                onCancel: { showingMapping = false }
+            )
+        }
+        .sheet(isPresented: $showingPreview) {
+            if let result = importResult {
+                ImportPreviewSheet(
+                    result: result,
+                    onConfirm: {
+                        onImport(result.trades)
+                        showingPreview = false
+                    },
+                    onCancel: { showingPreview = false }
+                )
+            }
+        }
     }
 
     @ViewBuilder
@@ -101,6 +161,16 @@ public struct TradeListPanel: View {
                 .foregroundStyle(Color.fmsMuted)
                 .textCase(.uppercase)
             Spacer()
+            Button {
+                showingCSVPicker = true
+            } label: {
+                Image(systemName: "square.and.arrow.down")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.fmsMuted)
+            }
+            .buttonStyle(.plain)
+            .help("Import trades from CSV")
+            .padding(.trailing, 4)
             Button {
                 onNewTrade()
             } label: {

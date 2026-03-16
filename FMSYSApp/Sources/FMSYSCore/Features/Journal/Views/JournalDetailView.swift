@@ -22,7 +22,8 @@ public struct JournalDetailView: View {
                     trades: sortedTrades,
                     selectedTrade: $selectedTrade,
                     sortByPnL: $sortByPnL,
-                    onNewTrade: { showingEntry = true }
+                    onNewTrade: { showingEntry = true },
+                    onImport: { viewModel.importTrades($0) }
                 )
                 .frame(minWidth: 320, maxWidth: 320)
 

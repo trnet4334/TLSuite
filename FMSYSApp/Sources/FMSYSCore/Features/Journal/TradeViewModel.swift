@@ -180,4 +180,19 @@ public final class TradeViewModel {
         try? repository.context.save()
         loadAttachments(for: tradeId)
     }
+
+    // MARK: - Bulk Import
+
+    @MainActor
+    public func importTrades(_ newTrades: [Trade]) {
+        do {
+            for trade in newTrades {
+                try repository.create(trade)
+            }
+            trades = try repository.findAll(userId: userId)
+            onTradesChanged?()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
