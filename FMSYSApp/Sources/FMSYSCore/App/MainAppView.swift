@@ -40,58 +40,51 @@ public struct MainAppView: View {
     // MARK: - Authenticated shell
 
     private var appShell: some View {
-        VStack(spacing: 0) {
-            titleBar
-
-            ZStack(alignment: .topLeading) {
-                // Icon rail + content (permanent layout)
+        ZStack(alignment: .topLeading) {
+            // Base: title bar + icon rail + content
+            VStack(spacing: 0) {
+                titleBar
                 HStack(spacing: 0) {
-                    SidebarRail(selection: $selectedScreen)
+                    SidebarRail(selection: $selectedScreen, onToggle: {
+                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar.toggle() }
+                    })
                     Divider()
                     screenContent
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                StatusBar()
+            }
 
-                // Expanded sidebar overlay
-                if showSidebar {
-                    Color.black.opacity(0.25)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
-                        }
+            // Expanded sidebar — overlays title bar + content
+            if showSidebar {
+                Color.black.opacity(0.25)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
+                    }
 
-                    SidebarView(selection: $selectedScreen, journalCategory: $journalCategory)
-                        .transition(.move(edge: .leading))
-                        .onChange(of: selectedScreen) { _, _ in
-                            withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
-                        }
+                SidebarView(
+                    selection: $selectedScreen,
+                    journalCategory: $journalCategory,
+                    onToggle: {
+                        withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
+                    }
+                )
+                .transition(.move(edge: .leading))
+                .onChange(of: selectedScreen) { _, _ in
+                    withAnimation(.easeInOut(duration: 0.22)) { showSidebar = false }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .animation(.easeInOut(duration: 0.22), value: showSidebar)
-
-            StatusBar()
         }
+        .animation(.easeInOut(duration: 0.22), value: showSidebar)
     }
 
     // MARK: - Title bar
 
     private var titleBar: some View {
         HStack(spacing: 0) {
-            // Traffic lights + hamburger
-            HStack(spacing: 4) {
-                Spacer().frame(width: 80)
-                Button {
-                    withAnimation(.easeInOut(duration: 0.22)) { showSidebar.toggle() }
-                } label: {
-                    Image(systemName: "line.horizontal.3")
-                        .font(.system(size: 15))
-                        .foregroundStyle(showSidebar ? Color.fmsPrimary : Color.fmsMuted)
-                        .frame(width: 32, height: 32)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
+            // Space for macOS window traffic lights
+            Spacer().frame(width: 80)
 
             Spacer()
 

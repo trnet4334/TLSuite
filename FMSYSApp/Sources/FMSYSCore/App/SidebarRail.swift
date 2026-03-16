@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct SidebarRail: View {
     @Binding var selection: AppScreen
+    let onToggle: () -> Void
 
     private let items: [(AppScreen, String)] = [
         (.dashboard,   "chart.bar.fill"),
@@ -12,12 +13,24 @@ public struct SidebarRail: View {
         (.portfolio,   "dollarsign.circle.fill"),
     ]
 
-    public init(selection: Binding<AppScreen>) {
+    public init(selection: Binding<AppScreen>, onToggle: @escaping () -> Void) {
         self._selection = selection
+        self.onToggle = onToggle
     }
 
     public var body: some View {
         VStack(spacing: 4) {
+            // Hamburger toggle at top
+            Button(action: onToggle) {
+                Image(systemName: "line.horizontal.3")
+                    .font(.system(size: 19))
+                    .foregroundStyle(Color.fmsMuted)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 4)
+
+            // Nav icons
             ForEach(items, id: \.0) { screen, icon in
                 Button {
                     selection = screen

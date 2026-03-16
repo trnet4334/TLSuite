@@ -4,15 +4,37 @@ import SwiftUI
 public struct SidebarView: View {
     @Binding var selection: AppScreen
     @Binding var journalCategory: JournalCategory
+    let onToggle: () -> Void
     @State private var journalExpanded = true
 
-    public init(selection: Binding<AppScreen>, journalCategory: Binding<JournalCategory>) {
+    public init(
+        selection: Binding<AppScreen>,
+        journalCategory: Binding<JournalCategory>,
+        onToggle: @escaping () -> Void
+    ) {
         self._selection = selection
         self._journalCategory = journalCategory
+        self.onToggle = onToggle
     }
 
     public var body: some View {
         VStack(spacing: 0) {
+            // Header — overlays title bar area, contains hamburger to close
+            HStack {
+                Button(action: onToggle) {
+                    Image(systemName: "line.horizontal.3")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.fmsMuted)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
+            .frame(height: 48)
+            .padding(.leading, 10)
+
+            Divider()
+
             List(selection: $selection) {
                 navItem(.dashboard,   icon: "chart.bar.fill",         label: "Dashboard",    shortcut: Character("1"))
                 journalSection
