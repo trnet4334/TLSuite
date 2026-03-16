@@ -53,7 +53,7 @@ public enum PortfolioRange: String, CaseIterable {
 public final class PortfolioViewModel {
 
     public var trades: [Trade]
-    public var selectedRange: PortfolioRange = .ytd
+    public var selectedRange: PortfolioRange = .oneMonth
 
     public init(trades: [Trade] = []) {
         self.trades = trades
