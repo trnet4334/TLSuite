@@ -6,7 +6,6 @@ public struct MainAppView: View {
     @State private var authViewModel: AuthViewModel
     @State private var showNotificationsPopover = false
     @State private var showSharePopover = false
-    @State private var showSettingsPopover = false
     @State private var showAvatarPopover = false
     @AppStorage("isDarkMode") private var isDarkMode = true
 
@@ -110,9 +109,6 @@ public struct MainAppView: View {
 
                 toolbarIconButton(systemName: "square.and.arrow.up", isPresented: $showSharePopover) {
                     SharePopover()
-                }
-                toolbarIconButton(systemName: "gearshape", isPresented: $showSettingsPopover) {
-                    SettingsPopover()
                 }
 
                 // Avatar
