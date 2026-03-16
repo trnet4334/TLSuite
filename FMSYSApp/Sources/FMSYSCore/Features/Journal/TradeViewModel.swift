@@ -146,6 +146,13 @@ public final class TradeViewModel {
         }
     }
 
+    @MainActor
+    public func closeTrade(_ trade: Trade, exitPrice: Double, exitAt: Date = Date()) {
+        trade.exitPrice = exitPrice
+        trade.exitAt = exitAt
+        updateTrade(trade)
+    }
+
     // MARK: - Attachments
 
     public var attachments: [JournalAttachment] = []

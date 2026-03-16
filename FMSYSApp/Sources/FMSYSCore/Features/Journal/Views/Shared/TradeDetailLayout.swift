@@ -13,6 +13,7 @@ public struct TradeDetailLayout<Metrics: View>: View {
     @ViewBuilder let metricsContent: () -> Metrics
 
     @State private var showingFilePicker = false
+    @State private var showingCloseTrade = false
 
     public init(
         trade: Trade,
@@ -135,6 +136,25 @@ public struct TradeDetailLayout<Metrics: View>: View {
 
     private var footerActions: some View {
         HStack {
+            // Close Trade — only for open positions
+            if trade.exitPrice == nil {
+                Button {
+                    showingCloseTrade = true
+                } label: {
+                    Label("Close Trade", systemImage: "xmark.circle")
+                        .font(.system(size: 13, weight: .semibold))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(Color.fmsLoss)
+                        .background(Color.fmsLoss.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Color.fmsLoss.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+
             Spacer()
             Button("Discard") { onDiscard() }
                 .buttonStyle(.plain)
@@ -152,6 +172,16 @@ public struct TradeDetailLayout<Metrics: View>: View {
                 .foregroundStyle(Color.fmsBackground)
         }
         .padding(.top, 8)
+        .sheet(isPresented: $showingCloseTrade) {
+            CloseTradeSheet(
+                trade: trade,
+                onConfirm: { exitPrice, exitAt in
+                    viewModel.closeTrade(trade, exitPrice: exitPrice, exitAt: exitAt)
+                    showingCloseTrade = false
+                },
+                onCancel: { showingCloseTrade = false }
+            )
+        }
     }
 
     // MARK: P&L helpers
