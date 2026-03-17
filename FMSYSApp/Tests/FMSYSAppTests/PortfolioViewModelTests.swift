@@ -25,9 +25,9 @@ extension FMSYSTests {
             )
         }
 
-        @Test func defaultRangeIsYTD() {
+        @Test func defaultRangeIsOneMonth() {
             let sut = PortfolioViewModel()
-            #expect(sut.selectedRange == .ytd)
+            #expect(sut.selectedRange == .oneMonth)
         }
 
         @Test func emptyTradesYieldsZeroKPIs() {

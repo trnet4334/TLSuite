@@ -26,6 +26,9 @@ public struct DashboardView: View {
 
                 // Section 3: Psychological Analytics
                 PsychAnalyticsSection(analytics: viewModel.psychAnalytics)
+
+                // Section 4: Market News
+                MarketNewsCard()
             }
             .padding(24)
         }
