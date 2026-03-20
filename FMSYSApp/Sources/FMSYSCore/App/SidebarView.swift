@@ -17,12 +17,12 @@ public struct SidebarView: View {
     public var body: some View {
         VStack(spacing: 0) {
             List(selection: $selection) {
-                navItem(.dashboard,   icon: "chart.bar.fill",         label: "Dashboard",    shortcut: Character("1"))
+                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("1"))
                 journalSection
-                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("3"))
-                navItem(.newsFeed,    icon: "newspaper.fill",         label: "News Feed",    shortcut: Character("4"))
-                // TODO: Backtesting (⌘5) — future release
-                // TODO: Strategy Lab (⌘6) — future release
+                navItem(.newsFeed,    icon: "newspaper.fill",         label: "News Feed",    shortcut: Character("3"))
+                // TODO: Dashboard  — future release
+                // TODO: Backtesting — future release
+                // TODO: Strategy Lab — future release
             }
             .listStyle(.sidebar)
             .scrollContentBackground(.hidden)

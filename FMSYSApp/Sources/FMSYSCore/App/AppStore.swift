@@ -18,7 +18,7 @@ public final class AppStore {
 
     // MARK: - Navigation
 
-    public var selectedScreen: AppScreen = .dashboard
+    public var selectedScreen: AppScreen = .portfolio
     public var journalCategory: JournalCategory = .all
 
     // MARK: - UI State
