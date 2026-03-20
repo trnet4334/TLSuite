@@ -1,12 +1,15 @@
 // Sources/FMSYSCore/App/MainAppView.swift
+import AppKit
 import SwiftUI
 
 public struct MainAppView: View {
     @State private var store: AppStore
     @State private var authViewModel: AuthViewModel
-    @State private var showNotificationsPopover = false
+    @State private var showNotificationCenter = false
     @State private var showSharePopover = false
     @State private var showAvatarPopover = false
+    @State private var showSettings = false
+    @State private var settingsInitialTab: SettingsTab = .account
     @AppStorage("isDarkMode") private var isDarkMode = true
 
     private let authService: any AuthServiceProtocol
@@ -25,6 +28,40 @@ public struct MainAppView: View {
             appShell
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .environment(store)
+                .sheet(isPresented: $showSettings) {
+                    SettingsView(
+                        initialTab: settingsInitialTab,
+                        displayName: store.userDisplayName,
+                        email: store.userEmail,
+                        onDismiss: { showSettings = false }
+                    )
+                }
+                .sheet(isPresented: $showNotificationCenter) {
+                    NotificationCenterView(
+                        unreadCount: $store.notificationUnreadCount,
+                        onDismiss: { showNotificationCenter = false },
+                        onViewTrade: { tradeId in
+                            showNotificationCenter = false
+                            store.selectedScreen = .journal
+                            if let id = tradeId {
+                                store.journal.pendingTradeId = id
+                            }
+                        },
+                        onOpenURL: { url in
+                            NSWorkspace.shared.open(url)
+                        },
+                        onViewSecurity: {
+                            showNotificationCenter = false
+                            settingsInitialTab = .security
+                            showSettings = true
+                        },
+                        onViewAccount: {
+                            showNotificationCenter = false
+                            settingsInitialTab = .account
+                            showSettings = true
+                        }
+                    )
+                }
         } else {
             authFlow
         }
@@ -86,7 +123,7 @@ public struct MainAppView: View {
             HStack(spacing: 4) {
                 // Bell with unread badge
                 Button {
-                    showNotificationsPopover.toggle()
+                    showNotificationCenter = true
                 } label: {
                     ZStack(alignment: .topTrailing) {
                         Image(systemName: "bell")
@@ -103,9 +140,6 @@ public struct MainAppView: View {
                     }
                 }
                 .buttonStyle(.plain)
-                .popover(isPresented: $showNotificationsPopover, arrowEdge: .top) {
-                    NotificationsPopover(unreadCount: $store.notificationUnreadCount)
-                }
 
                 toolbarIconButton(systemName: "square.and.arrow.up", isPresented: $showSharePopover) {
                     SharePopover()
@@ -133,6 +167,11 @@ public struct MainAppView: View {
                         onSignOut: {
                             showAvatarPopover = false
                             store.markLoggedOut()
+                        },
+                        onShowSettings: { tab in
+                            showAvatarPopover = false
+                            settingsInitialTab = tab
+                            showSettings = true
                         }
                     )
                 }
@@ -182,6 +221,8 @@ public struct MainAppView: View {
             StrategyLabView(viewModel: store.strategyLab)
         case .portfolio:
             PortfolioView(viewModel: store.portfolio)
+        case .newsFeed:
+            NewsFeedView()
         }
     }
 
@@ -195,6 +236,7 @@ public struct MainAppView: View {
                 onAuthenticated: { store.markAuthenticated() },
                 onMFARequired: { _, _ in }
             )
+            .toolbar(.hidden)
             .navigationDestination(
                 isPresented: Binding(
                     get: {
@@ -213,6 +255,8 @@ public struct MainAppView: View {
                         ),
                         onAuthenticated: { store.markAuthenticated() }
                     )
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar(.hidden)
                 }
             }
         }

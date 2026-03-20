@@ -22,6 +22,7 @@ public struct SidebarView: View {
                 navItem(.backtesting, icon: "arrow.clockwise.circle", label: "Backtesting",  shortcut: Character("3"))
                 navItem(.strategyLab, icon: "flask.fill",             label: "Strategy Lab", shortcut: Character("4"))
                 navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("5"))
+                navItem(.newsFeed,    icon: "newspaper.fill",          label: "News Feed",    shortcut: Character("6"))
             }
             .listStyle(.sidebar)
             .scrollContentBackground(.hidden)
@@ -78,6 +79,8 @@ public struct SidebarView: View {
             strategyLabCard
         case .portfolio:
             portfolioCard
+        case .newsFeed:
+            newsFeedCard
         default:
             equityCard
         }
@@ -118,6 +121,40 @@ public struct SidebarView: View {
                 Image(systemName: "memorychip")
                     .font(.system(size: 10))
                 Text("82% CPU Usage")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundStyle(Color.fmsPrimary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [Color.fmsPrimary.opacity(0.1), Color.clear],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.fmsPrimary.opacity(0.2), lineWidth: 1)
+        )
+        .padding(12)
+    }
+
+    private var newsFeedCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Market News")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(Color.fmsPrimary)
+                .textCase(.uppercase)
+                .tracking(0.5)
+            Text("Live Feed")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Color.fmsOnSurface)
+            HStack(spacing: 4) {
+                Image(systemName: "dot.radiowaves.left.and.right")
+                    .font(.system(size: 10))
+                Text("4 Sources Active")
                     .font(.system(size: 11, weight: .bold))
             }
             .foregroundStyle(Color.fmsPrimary)

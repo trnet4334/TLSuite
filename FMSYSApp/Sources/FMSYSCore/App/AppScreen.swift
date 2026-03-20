@@ -6,4 +6,5 @@ public enum AppScreen: String, Hashable, CaseIterable {
     case backtesting = "Backtesting"
     case strategyLab = "Strategy Lab"
     case portfolio   = "Portfolio"
+    case newsFeed    = "News Feed"
 }
