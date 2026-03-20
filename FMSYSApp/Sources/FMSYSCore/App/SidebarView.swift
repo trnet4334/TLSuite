@@ -19,10 +19,10 @@ public struct SidebarView: View {
             List(selection: $selection) {
                 navItem(.dashboard,   icon: "chart.bar.fill",         label: "Dashboard",    shortcut: Character("1"))
                 journalSection
-                navItem(.backtesting, icon: "arrow.clockwise.circle", label: "Backtesting",  shortcut: Character("3"))
-                navItem(.strategyLab, icon: "flask.fill",             label: "Strategy Lab", shortcut: Character("4"))
-                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("5"))
-                navItem(.newsFeed,    icon: "newspaper.fill",          label: "News Feed",    shortcut: Character("6"))
+                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("3"))
+                navItem(.newsFeed,    icon: "newspaper.fill",         label: "News Feed",    shortcut: Character("4"))
+                // TODO: Backtesting (⌘5) — future release
+                // TODO: Strategy Lab (⌘6) — future release
             }
             .listStyle(.sidebar)
             .scrollContentBackground(.hidden)
