@@ -21,16 +21,16 @@ struct NewsFeedRightPanel: View {
     private let tickers: [TickerItem] = [
         TickerItem(symbol: "SPX",     name: "S&P 500",       price: "5,628",  change: "+1.46%", isPositive: true,
                    sparkPoints: [0.7, 0.65, 0.6, 0.5, 0.42, 0.35, 0.22, 0.1],
-                   color: Color(red: 0.074, green: 0.925, blue: 0.502)),
+                   color: Color.fmsPrimary),
         TickerItem(symbol: "NVDA",    name: "NVIDIA Corp.",  price: "$924",   change: "+6.20%", isPositive: true,
                    sparkPoints: [0.85, 0.78, 0.7, 0.58, 0.45, 0.3, 0.15, 0.05],
-                   color: Color(red: 0.074, green: 0.925, blue: 0.502)),
+                   color: Color.fmsPrimary),
         TickerItem(symbol: "BTC",     name: "Bitcoin",       price: "$62.4K", change: "−3.40%", isPositive: false,
                    sparkPoints: [0.2, 0.25, 0.22, 0.32, 0.42, 0.52, 0.6, 0.72],
-                   color: Color(red: 1.0, green: 0.373, blue: 0.341)),
+                   color: Color.fmsLoss),
         TickerItem(symbol: "EUR/USD", name: "Euro / Dollar", price: "1.0918", change: "+0.08%", isPositive: true,
                    sparkPoints: [0.5, 0.48, 0.52, 0.5, 0.46, 0.49, 0.5, 0.47],
-                   color: Color(red: 0.231, green: 0.510, blue: 0.965)),
+                   color: NewsCategory.stocks.color),
     ]
 
     // MARK: - Stub calendar events
@@ -56,7 +56,7 @@ struct NewsFeedRightPanel: View {
     private var sourceCounts: [(name: String, count: Int, color: Color)] {
         let palette: [(String, Color)] = [
             ("CoinTelegraph", NewsCategory.crypto.color),
-            ("MarketWatch",   Color(red: 0.074, green: 0.925, blue: 0.502)),
+            ("MarketWatch",   Color.fmsPrimary),
             ("Reuters",       NewsCategory.forex.color),
             ("ForexLive",     NewsCategory.stocks.color),
         ]
