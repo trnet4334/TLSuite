@@ -57,7 +57,7 @@ public final class MarketNewsService {
         isLoading = false
     }
 
-    private static func fetchFeed(_ feed: FeedConfig) async -> [NewsArticle] {
+    nonisolated private static func fetchFeed(_ feed: FeedConfig) async -> [NewsArticle] {
         guard let (data, _) = try? await URLSession.shared.data(from: feed.url) else { return [] }
         return RSSParser.parse(data: data, category: feed.category, sourceName: feed.sourceName)
     }

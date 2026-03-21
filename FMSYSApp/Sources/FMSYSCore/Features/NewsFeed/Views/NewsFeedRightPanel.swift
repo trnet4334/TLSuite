@@ -4,6 +4,7 @@ import SwiftUI
 struct NewsFeedRightPanel: View {
 
     let articles: [NewsArticle]
+    @Environment(LanguageManager.self) private var lang
 
     // MARK: - Stub ticker data
 
@@ -53,21 +54,16 @@ struct NewsFeedRightPanel: View {
     // MARK: - Source counts
 
     private var sourceCounts: [(name: String, count: Int, color: Color)] {
-        let names = [
-            ("CoinTelegraph", Color(red: 1.0, green: 0.584, blue: 0.0)),
+        let palette: [(String, Color)] = [
+            ("CoinTelegraph", NewsCategory.crypto.color),
             ("MarketWatch",   Color(red: 0.074, green: 0.925, blue: 0.502)),
-            ("Reuters",       Color(red: 0.663, green: 0.329, blue: 1.0)),
-            ("ForexLive",     Color(red: 0.231, green: 0.510, blue: 0.965)),
+            ("Reuters",       NewsCategory.forex.color),
+            ("ForexLive",     NewsCategory.stocks.color),
         ]
-        return names.map { (name, color) in
-            let count = articles.filter { $0.source == name }.count
-            return (name, count, color)
-        }
-        .sorted { $0.count > $1.count }
-    }
-
-    private var maxCount: Int {
-        sourceCounts.map(\.count).max() ?? 1
+        let grouped = Dictionary(grouping: articles, by: \.source)
+        return palette
+            .map { (name, color) in (name, grouped[name]?.count ?? 0, color) }
+            .sorted { $0.count > $1.count }
     }
 
     // MARK: - Body
@@ -92,7 +88,7 @@ struct NewsFeedRightPanel: View {
 
     private var trendingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("Trending Tickers")
+            sectionTitle(String(localized: "newsfeed.panel.trending_tickers", bundle: lang.bundle))
 
             ForEach(tickers, id: \.symbol) { ticker in
                 tickerRow(ticker)
@@ -134,7 +130,7 @@ struct NewsFeedRightPanel: View {
                     .foregroundStyle(Color.fmsOnSurface)
                 Text(ticker.change)
                     .font(.system(size: 10.5, weight: .bold).monospacedDigit())
-                    .foregroundStyle(ticker.isPositive ? Color.fmsPrimary : Color(red: 1, green: 0.373, blue: 0.341))
+                    .foregroundStyle(ticker.isPositive ? Color.fmsPrimary : Color.fmsLoss)
             }
         }
         .padding(10)
@@ -161,14 +157,14 @@ struct NewsFeedRightPanel: View {
 
     private var sentimentSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Market Sentiment")
+            sectionTitle(String(localized: "newsfeed.panel.market_sentiment", bundle: lang.bundle))
 
             VStack(spacing: 6) {
                 // Gauge arc
                 gaugeView(value: 74)
                     .frame(height: 90)
 
-                Text("Markets are in a greed phase — exercise risk management.")
+                Text("newsfeed.panel.sentiment.description", bundle: lang.bundle)
                     .font(.system(size: 10.5))
                     .foregroundStyle(Color.fmsMuted)
                     .multilineTextAlignment(.center)
@@ -186,12 +182,12 @@ struct NewsFeedRightPanel: View {
 
             // Fear zone (red) — first 30%
             GaugeArc(startAngle: .degrees(180), endAngle: .degrees(360), fraction: 0.30)
-                .stroke(Color(red: 1, green: 0.373, blue: 0.341).opacity(0.7),
+                .stroke(Color.fmsLoss.opacity(0.7),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round))
 
             // Neutral zone (yellow) — 30–50%
             GaugeArc(startAngle: .degrees(180 + 0.30 * 180), endAngle: .degrees(360), fraction: (0.50 - 0.30) / 0.70)
-                .stroke(Color(red: 1.0, green: 0.741, blue: 0.180).opacity(0.7),
+                .stroke(Color.fmsWarning.opacity(0.7),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round))
 
             // Greed zone (green) — 50–100%
@@ -208,7 +204,7 @@ struct NewsFeedRightPanel: View {
                 Text("\(value)")
                     .font(.system(size: 26, weight: .heavy).monospacedDigit())
                     .foregroundStyle(Color.fmsPrimary)
-                Text("Greed")
+                Text("newsfeed.panel.sentiment.greed", bundle: lang.bundle)
                     .font(.system(size: 9.5, weight: .bold))
                     .foregroundStyle(Color.fmsPrimary)
                     .textCase(.uppercase)
@@ -218,11 +214,11 @@ struct NewsFeedRightPanel: View {
 
             // Labels
             HStack {
-                Text("Fear")
+                Text("newsfeed.panel.sentiment.fear", bundle: lang.bundle)
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
                 Spacer()
-                Text("Greed")
+                Text("newsfeed.panel.sentiment.greed", bundle: lang.bundle)
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -234,7 +230,7 @@ struct NewsFeedRightPanel: View {
 
     private var calendarSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("Upcoming Events")
+            sectionTitle(String(localized: "newsfeed.panel.upcoming_events", bundle: lang.bundle))
 
             VStack(spacing: 6) {
                 ForEach(events, id: \.name) { event in
@@ -244,9 +240,12 @@ struct NewsFeedRightPanel: View {
 
             // Impact legend
             HStack(spacing: 14) {
-                legendDot(Color(red: 1, green: 0.373, blue: 0.341), label: "High")
-                legendDot(Color(red: 1.0, green: 0.741, blue: 0.180), label: "Medium")
-                legendDot(Color.fmsMuted.opacity(0.5), label: "Low")
+                legendDot(Color.fmsLoss,
+                          label: String(localized: "newsfeed.panel.impact.high",   bundle: lang.bundle))
+                legendDot(Color.fmsWarning,
+                          label: String(localized: "newsfeed.panel.impact.medium", bundle: lang.bundle))
+                legendDot(Color.fmsMuted.opacity(0.5),
+                          label: String(localized: "newsfeed.panel.impact.low",    bundle: lang.bundle))
             }
             .padding(.top, 2)
         }
@@ -288,8 +287,8 @@ struct NewsFeedRightPanel: View {
 
     private func impactDot(_ impact: EconEvent.Impact) -> some View {
         let color: Color = switch impact {
-        case .high:   Color(red: 1, green: 0.373, blue: 0.341)
-        case .medium: Color(red: 1.0, green: 0.741, blue: 0.180)
+        case .high:   Color.fmsLoss
+        case .medium: Color.fmsWarning
         case .low:    Color.fmsMuted.opacity(0.5)
         }
         return Circle()
@@ -311,7 +310,7 @@ struct NewsFeedRightPanel: View {
 
     private var sourcesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("Articles by Source")
+            sectionTitle(String(localized: "newsfeed.panel.articles_by_source", bundle: lang.bundle))
 
             let counts = sourceCounts
             let topCount = counts.map(\.count).max() ?? 1

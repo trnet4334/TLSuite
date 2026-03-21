@@ -5,6 +5,7 @@ public struct NewsFeedView: View {
 
     @State private var service = MarketNewsService()
     @State private var isSpinning = false
+    @Environment(LanguageManager.self) private var lang
 
     public init() {}
 
@@ -41,27 +42,22 @@ public struct NewsFeedView: View {
     private var filterBar: some View {
         HStack(spacing: 6) {
             ForEach(NewsCategory.allCases, id: \.self) { cat in
+                let isSelected = service.selectedCategory == cat
                 Button { service.selectedCategory = cat } label: {
                     Text(cat.rawValue)
-                        .font(.system(size: 12, weight: service.selectedCategory == cat ? .bold : .semibold))
+                        .font(.system(size: 12, weight: isSelected ? .bold : .semibold))
                         .padding(.horizontal, 13)
                         .padding(.vertical, 5)
                         .background(
-                            service.selectedCategory == cat
-                                ? Color.fmsPrimary.opacity(0.14)
-                                : Color.clear,
+                            isSelected ? Color.fmsPrimary.opacity(0.14) : Color.clear,
                             in: Capsule()
                         )
                         .overlay(
                             Capsule().stroke(
-                                service.selectedCategory == cat
-                                    ? Color.fmsPrimary.opacity(0.3)
-                                    : Color.fmsMuted.opacity(0.15)
+                                isSelected ? Color.fmsPrimary.opacity(0.3) : Color.fmsMuted.opacity(0.15)
                             )
                         )
-                        .foregroundStyle(
-                            service.selectedCategory == cat ? Color.fmsPrimary : Color.fmsMuted
-                        )
+                        .foregroundStyle(isSelected ? Color.fmsPrimary : Color.fmsMuted)
                 }
                 .buttonStyle(.plain)
             }
@@ -90,12 +86,16 @@ public struct NewsFeedView: View {
         .padding(.vertical, 12)
     }
 
+    private var displayedArticles: [NewsArticle] {
+        Array(service.filteredArticles.prefix(30))
+    }
+
     // MARK: - Article feed
 
     private var articleFeed: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(spacing: 0) {
-                let articles = service.filteredArticles.prefix(30)
+                let articles = displayedArticles
                 // Featured card — first article
                 if let featured = articles.first {
                     featuredCard(featured)
@@ -107,7 +107,7 @@ public struct NewsFeedView: View {
                 // Section divider
                 if articles.count > 1 {
                     HStack {
-                        Text("Latest Stories")
+                        Text("newsfeed.section.latest_stories", bundle: lang.bundle)
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(Color.fmsMuted)
                             .textCase(.uppercase)
@@ -186,7 +186,7 @@ public struct NewsFeedView: View {
                             tagView(article.category)
                             Spacer()
                             HStack(spacing: 4) {
-                                Text("Read full story")
+                                Text("newsfeed.featured.read_full_story", bundle: lang.bundle)
                                     .font(.system(size: 11, weight: .bold))
                                 Image(systemName: "arrow.up.right")
                                     .font(.system(size: 10))
@@ -264,7 +264,7 @@ public struct NewsFeedView: View {
     private var loadingState: some View {
         VStack(spacing: 10) {
             ProgressView().scaleEffect(0.8)
-            Text("Fetching latest news…")
+            Text("newsfeed.loading", bundle: lang.bundle)
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsMuted)
         }
@@ -276,10 +276,10 @@ public struct NewsFeedView: View {
             Image(systemName: "newspaper")
                 .font(.system(size: 32))
                 .foregroundStyle(Color.fmsMuted.opacity(0.2))
-            Text("No articles available")
+            Text("newsfeed.empty.title", bundle: lang.bundle)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.fmsMuted)
-            Button("Retry") { Task { await service.refresh() } }
+            Button(String(localized: "newsfeed.empty.retry", bundle: lang.bundle)) { Task { await service.refresh() } }
                 .buttonStyle(.plain)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.fmsPrimary)
@@ -299,12 +299,13 @@ public struct NewsFeedView: View {
     }
 
     private func sentimentChip(_ category: NewsCategory) -> some View {
-        let (label, color): (String, Color) = switch category {
-        case .stocks:  ("Stocks", Color(red: 0.231, green: 0.510, blue: 0.965))
-        case .forex:   ("Forex",  Color(red: 0.663, green: 0.329, blue: 1.0))
-        case .crypto:  ("Crypto", Color(red: 1.0,   green: 0.584, blue: 0.0))
-        default:       ("General", Color.fmsPrimary)
+        let label: String = switch category {
+        case .stocks:  String(localized: "newsfeed.category.stocks",  bundle: lang.bundle)
+        case .forex:   String(localized: "newsfeed.category.forex",   bundle: lang.bundle)
+        case .crypto:  String(localized: "newsfeed.category.crypto",  bundle: lang.bundle)
+        default:       String(localized: "newsfeed.category.general", bundle: lang.bundle)
         }
+        let color = category.color
         return Text(label)
             .font(.system(size: 9, weight: .bold))
             .foregroundStyle(color)
@@ -315,11 +316,11 @@ public struct NewsFeedView: View {
 
     private func tagView(_ category: NewsCategory) -> some View {
         let label: String = switch category {
-        case .stocks:  "#Stocks"
-        case .forex:   "#Forex"
-        case .crypto:  "#Crypto"
-        case .general: "#General"
-        case .all:     "#Markets"
+        case .stocks:  String(localized: "newsfeed.tag.stocks",  bundle: lang.bundle)
+        case .forex:   String(localized: "newsfeed.tag.forex",   bundle: lang.bundle)
+        case .crypto:  String(localized: "newsfeed.tag.crypto",  bundle: lang.bundle)
+        case .general: String(localized: "newsfeed.tag.general", bundle: lang.bundle)
+        case .all:     String(localized: "newsfeed.tag.markets", bundle: lang.bundle)
         }
         return Text(label)
             .font(.system(size: 9.5, weight: .bold))
@@ -330,19 +331,14 @@ public struct NewsFeedView: View {
     }
 
     private func categoryColor(_ category: NewsCategory) -> Color {
-        switch category {
-        case .all, .general: return Color.fmsPrimary
-        case .stocks:        return Color(red: 0.231, green: 0.510, blue: 0.965)
-        case .forex:         return Color(red: 0.663, green: 0.329, blue: 1.0)
-        case .crypto:        return Color(red: 1.0,   green: 0.584, blue: 0.0)
-        }
+        category.color
     }
 
     private func timeAgo(_ date: Date) -> String {
         let s = Int(-date.timeIntervalSinceNow)
-        if s < 60    { return "Just now" }
-        if s < 3600  { return "\(s / 60)m ago" }
-        if s < 86400 { return "\(s / 3600)h ago" }
-        return "\(s / 86400)d ago"
+        if s < 60    { return String(localized: "newsfeed.time.just_now", bundle: lang.bundle) }
+        if s < 3600  { return String(format: String(localized: "newsfeed.time.minutes_ago", bundle: lang.bundle), s / 60) }
+        if s < 86400 { return String(format: String(localized: "newsfeed.time.hours_ago",   bundle: lang.bundle), s / 3600) }
+        return String(format: String(localized: "newsfeed.time.days_ago", bundle: lang.bundle), s / 86400)
     }
 }
