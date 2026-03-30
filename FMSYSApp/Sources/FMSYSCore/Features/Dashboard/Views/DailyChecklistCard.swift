@@ -3,6 +3,7 @@ import SwiftUI
 public struct DailyChecklistCard: View {
     @Bindable var viewModel: ChecklistViewModel
     @State private var editingId: UUID?
+    @Environment(LanguageManager.self) private var lang
 
     public init(viewModel: ChecklistViewModel) {
         self.viewModel = viewModel
@@ -14,12 +15,12 @@ public struct DailyChecklistCard: View {
                 Image(systemName: "checklist")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.fmsPrimary)
-                Text("Daily Checklist")
+                Text("dashboard.checklist.title", bundle: lang.bundle)
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
                 Button {
-                    viewModel.add(title: "New item")
+                    viewModel.add(title: String(localized: "dashboard.checklist.new_item_placeholder", bundle: lang.bundle))
                     editingId = viewModel.items.last?.id
                 } label: {
                     Image(systemName: "plus")
@@ -32,7 +33,7 @@ public struct DailyChecklistCard: View {
             }
 
             if viewModel.items.isEmpty {
-                Text("Add your first checklist item")
+                Text("dashboard.checklist.empty_hint", bundle: lang.bundle)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsMuted)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -71,6 +72,7 @@ private struct ChecklistRow: View {
 
     @State private var editText = ""
     @FocusState private var isFocused: Bool
+    @Environment(LanguageManager.self) private var lang
 
     var body: some View {
         HStack(spacing: 10) {
@@ -95,7 +97,7 @@ private struct ChecklistRow: View {
             .buttonStyle(.plain)
 
             if isEditing {
-                TextField("Item title", text: $editText)
+                TextField(String(localized: "dashboard.checklist.item_title_placeholder", bundle: lang.bundle), text: $editText)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsOnSurface)
                     .textFieldStyle(.plain)

@@ -2,6 +2,7 @@
 import SwiftUI
 
 public struct ImportPreviewSheet: View {
+    @Environment(LanguageManager.self) private var lang
 
     let result: CSVImportResult
     let onConfirm: () -> Void
@@ -18,15 +19,15 @@ public struct ImportPreviewSheet: View {
             // Header
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Import Preview")
+                    Text("journal.csv.preview_title", bundle: lang.bundle)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.fmsOnSurface)
-                    Text("Format: \(formatLabel) · \(result.trades.count) trades · \(result.failedRows.count) errors")
+                    Text(String(format: String(localized: "journal.csv.preview_subtitle", bundle: lang.bundle), formatLabel, result.trades.count, result.failedRows.count))
                         .font(.system(size: 11))
                         .foregroundStyle(Color.fmsMuted)
                 }
                 Spacer()
-                Button("Cancel", action: onCancel)
+                Button(String(localized: "common.cancel", bundle: lang.bundle), action: onCancel)
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -37,11 +38,11 @@ public struct ImportPreviewSheet: View {
             // Preview table (first 5 trades)
             VStack(spacing: 0) {
                 HStack {
-                    Text("Symbol").frame(width: 80, alignment: .leading)
-                    Text("Direction").frame(width: 80, alignment: .leading)
-                    Text("Entry").frame(width: 100, alignment: .trailing)
-                    Text("Size").frame(width: 80, alignment: .trailing)
-                    Text("Date").frame(maxWidth: .infinity, alignment: .leading)
+                    Text("journal.csv.col.symbol", bundle: lang.bundle).frame(width: 80, alignment: .leading)
+                    Text("journal.csv.col.direction", bundle: lang.bundle).frame(width: 80, alignment: .leading)
+                    Text("journal.csv.col.entry", bundle: lang.bundle).frame(width: 100, alignment: .trailing)
+                    Text("journal.csv.col.size", bundle: lang.bundle).frame(width: 80, alignment: .trailing)
+                    Text("journal.csv.col.date", bundle: lang.bundle).frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
@@ -72,7 +73,7 @@ public struct ImportPreviewSheet: View {
                 }
 
                 if result.trades.count > 5 {
-                    Text("… and \(result.trades.count - 5) more")
+                    Text(String(format: String(localized: "journal.csv.more_trades", bundle: lang.bundle), result.trades.count - 5))
                         .font(.system(size: 11))
                         .foregroundStyle(Color.fmsMuted)
                         .padding(12)
@@ -84,11 +85,11 @@ public struct ImportPreviewSheet: View {
                 Divider().overlay(Color.fmsBorder)
                 ScrollView {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Rows with errors (\(result.failedRows.count)):")
+                        Text(String(format: String(localized: "journal.csv.rows_with_errors", bundle: lang.bundle), result.failedRows.count))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(Color.fmsLoss)
                         ForEach(result.failedRows.prefix(10), id: \.rowIndex) { row, error in
-                            Text("Row \(row): \(error.localizedDescription)")
+                            Text(String(format: String(localized: "journal.csv.row_error", bundle: lang.bundle), row, error.localizedDescription))
                                 .font(.system(size: 11))
                                 .foregroundStyle(Color.fmsLoss.opacity(0.8))
                         }
@@ -104,7 +105,7 @@ public struct ImportPreviewSheet: View {
             // Footer
             HStack {
                 Spacer()
-                Button("Import \(result.trades.count) Trades") { onConfirm() }
+                Button(String(format: String(localized: "journal.csv.confirm_import", bundle: lang.bundle), result.trades.count)) { onConfirm() }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)

@@ -16,12 +16,13 @@ private struct AllNotificationsView: View {
     @Binding var readIds: Set<UUID>
     @Binding var unreadCount: Int
     @Binding var isPresented: Bool
+    @Environment(LanguageManager.self) private var lang
 
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text("All Notifications")
+                Text("notifications.all_notifications", bundle: lang.bundle)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
@@ -106,6 +107,7 @@ public struct NotificationsPopover: View {
     @Binding var unreadCount: Int
     @State private var readIds: Set<UUID> = []
     @State private var showAll = false
+    @Environment(LanguageManager.self) private var lang
 
     private let items: [NotificationItem] = [
         .init(systemImage: "chart.line.uptrend.xyaxis",
@@ -140,11 +142,11 @@ public struct NotificationsPopover: View {
 
             // Header
             HStack {
-                Text("Notifications")
+                Text("notifications.title", bundle: lang.bundle)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
-                Button("Mark all read") {
+                Button(String(localized: "notifications.mark_all_read", bundle: lang.bundle)) {
                     readIds = Set(items.map(\.id))
                     unreadCount = 0
                 }
@@ -165,7 +167,7 @@ public struct NotificationsPopover: View {
 
             // Footer
             HStack {
-                Button("Read all") {
+                Button(String(localized: "notifications.read_all", bundle: lang.bundle)) {
                     showAll = true
                 }
                 .buttonStyle(.plain)
@@ -187,6 +189,7 @@ public struct NotificationsPopover: View {
                 unreadCount: $unreadCount,
                 isPresented: $showAll
             )
+            .environment(LanguageManager.shared)
         }
     }
 

@@ -4,6 +4,7 @@ import Charts
 
 public struct PortfolioView: View {
     @Bindable var viewModel: PortfolioViewModel
+    @Environment(LanguageManager.self) private var lang
 
     public init(viewModel: PortfolioViewModel) {
         self.viewModel = viewModel
@@ -37,16 +38,33 @@ public struct PortfolioView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 16) {
-            kpiCard(title: viewModel.selectedRange == .all ? "Total P&L" : "P&L · \(viewModel.selectedRange.rawValue)",
-                    value: formatted(viewModel.totalPnL),
-                    valueColor: viewModel.totalPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
-            kpiCard(title: "Daily P/L",
-                    value: formatted(viewModel.dailyPnL),
-                    valueColor: viewModel.dailyPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss)
-            kpiCard(title: "Win Rate · \(viewModel.selectedRange.rawValue)",
-                    value: String(format: "%.0f%%", viewModel.winRate * 100),
-                    subtitle: "\(viewModel.rangedClosedTrades.count) trades",
-                    valueColor: viewModel.winRate >= 0.5 ? Color.fmsPrimary : Color.fmsLoss)
+            kpiCard(
+                title: viewModel.selectedRange == .all
+                    ? String(localized: "portfolio.kpi.total_pnl", bundle: lang.bundle)
+                    : String(
+                        format: String(localized: "portfolio.kpi.pnl_range", bundle: lang.bundle),
+                        viewModel.selectedRange.rawValue
+                      ),
+                value: formatted(viewModel.totalPnL),
+                valueColor: viewModel.totalPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss
+            )
+            kpiCard(
+                title: String(localized: "portfolio.kpi.daily_pnl", bundle: lang.bundle),
+                value: formatted(viewModel.dailyPnL),
+                valueColor: viewModel.dailyPnL >= 0 ? Color.fmsPrimary : Color.fmsLoss
+            )
+            kpiCard(
+                title: String(
+                    format: String(localized: "portfolio.kpi.win_rate_range", bundle: lang.bundle),
+                    viewModel.selectedRange.rawValue
+                ),
+                value: String(format: "%.0f%%", viewModel.winRate * 100),
+                subtitle: String(
+                    format: String(localized: "portfolio.kpi.trade_count", bundle: lang.bundle),
+                    viewModel.rangedClosedTrades.count
+                ),
+                valueColor: viewModel.winRate >= 0.5 ? Color.fmsPrimary : Color.fmsLoss
+            )
         }
     }
 
@@ -86,12 +104,17 @@ public struct PortfolioView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Portfolio Performance")
+                    Text("portfolio.performance.title", bundle: lang.bundle)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.fmsOnSurface)
-                    Text("Cumulative P/L · \(viewModel.selectedRange.label)")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Color.fmsMuted)
+                    Text(
+                        String(
+                            format: String(localized: "portfolio.performance.subtitle", bundle: lang.bundle),
+                            viewModel.selectedRange.label
+                        )
+                    )
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.fmsMuted)
                 }
                 Spacer()
                 rangePicker
@@ -102,7 +125,7 @@ public struct PortfolioView: View {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.system(size: 32))
                         .foregroundStyle(Color.fmsMuted.opacity(0.3))
-                    Text("No closed trades in this period")
+                    Text("portfolio.performance.no_trades", bundle: lang.bundle)
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 }
@@ -181,13 +204,13 @@ public struct PortfolioView: View {
 
     private var positionsHeader: some View {
         HStack {
-            Text("Current Positions")
+            Text("portfolio.positions.title", bundle: lang.bundle)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Color.fmsOnSurface)
                 .textCase(.uppercase)
                 .tracking(0.5)
             Spacer()
-            Button("View All Positions") {}
+            Button(String(localized: "portfolio.positions.view_all", bundle: lang.bundle)) {}
                 .buttonStyle(.plain)
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(Color(red: 0.231, green: 0.510, blue: 0.965))
@@ -199,11 +222,11 @@ public struct PortfolioView: View {
 
     private var columnHeaders: some View {
         HStack {
-            Text("Symbol").frame(maxWidth: .infinity, alignment: .leading)
-            Text("Qty").frame(width: 80, alignment: .trailing)
-            Text("Last Price").frame(width: 100, alignment: .trailing)
-            Text("Market Value").frame(width: 110, alignment: .trailing)
-            Text("Unrealized P/L").frame(width: 120, alignment: .trailing)
+            Text("portfolio.positions.col.symbol",       bundle: lang.bundle).frame(maxWidth: .infinity, alignment: .leading)
+            Text("portfolio.positions.col.qty",          bundle: lang.bundle).frame(width: 80, alignment: .trailing)
+            Text("portfolio.positions.col.last_price",   bundle: lang.bundle).frame(width: 100, alignment: .trailing)
+            Text("portfolio.positions.col.market_value", bundle: lang.bundle).frame(width: 110, alignment: .trailing)
+            Text("portfolio.positions.col.unrealized_pnl", bundle: lang.bundle).frame(width: 120, alignment: .trailing)
         }
         .font(.system(size: 10, weight: .bold))
         .foregroundStyle(Color.fmsMuted)

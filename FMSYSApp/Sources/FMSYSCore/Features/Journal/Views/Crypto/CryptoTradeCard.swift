@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct CryptoTradeCard: View {
+    @Environment(LanguageManager.self) private var lang
     let trade: Trade
     let isSelected: Bool
 
@@ -80,7 +81,7 @@ public struct CryptoTradeCard: View {
         let multiplier = trade.direction == .long ? 1.0 : -1.0
         let pct = ((exit - trade.entryPrice) / trade.entryPrice) * (trade.leverage ?? 1) * multiplier * 100
         let sign = pct >= 0 ? "+" : ""
-        return "\(sign)\(String(format: "%.1f", pct))% ROE"
+        return "\(sign)\(String(format: "%.1f", pct))% \(String(localized: "journal.card.roe", bundle: lang.bundle))"
     }
 
     private var computedPnL: Double {

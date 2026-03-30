@@ -5,6 +5,7 @@ public struct SidebarView: View {
     @Binding var selection: AppScreen
     @Binding var journalCategory: JournalCategory
     @State private var journalExpanded = true
+    @Environment(LanguageManager.self) private var lang
 
     public init(
         selection: Binding<AppScreen>,
@@ -17,9 +18,9 @@ public struct SidebarView: View {
     public var body: some View {
         VStack(spacing: 0) {
             List(selection: $selection) {
-                navItem(.portfolio,   icon: "dollarsign.circle.fill", label: "Portfolio",    shortcut: Character("1"))
+                navItem(.portfolio, icon: "dollarsign.circle.fill", label: String(localized: "nav.portfolio",  bundle: lang.bundle), shortcut: Character("1"))
                 journalSection
-                navItem(.newsFeed,    icon: "newspaper.fill",         label: "News Feed",    shortcut: Character("3"))
+                navItem(.newsFeed,  icon: "newspaper.fill",         label: String(localized: "nav.news_feed",  bundle: lang.bundle), shortcut: Character("3"))
                 // TODO: Dashboard  — future release
                 // TODO: Backtesting — future release
                 // TODO: Strategy Lab — future release
@@ -55,12 +56,12 @@ public struct SidebarView: View {
                         .foregroundStyle(journalCategory == cat && selection == .journal
                             ? Color.fmsPrimary
                             : Color.fmsMuted)
-                        .padding(.leading, 8)
+                        .padding(.leading, 13)
                 }
                 .buttonStyle(.plain)
             }
         } label: {
-            Label("Journal", systemImage: "book.fill")
+            Label(String(localized: "nav.journal", bundle: lang.bundle), systemImage: "book.fill")
                 .labelStyle(SidebarLabelStyle())
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(selection == .journal ? Color.fmsPrimary : Color.fmsOnSurface)

@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct CryptoDetailPanel: View {
+    @Environment(LanguageManager.self) private var lang
     @Bindable var trade: Trade
     let viewModel: TradeViewModel
     let onSave: () -> Void
@@ -30,29 +31,29 @@ public struct CryptoDetailPanel: View {
 
     private var subtitle: String {
         if let lev = trade.leverage, lev > 1 {
-            return "Futures · \(String(format: "%.0f", lev))x Leverage"
+            return "\(String(localized: "journal.detail.crypto.futures", bundle: lang.bundle)) · \(String(format: "%.0f", lev))x \(String(localized: "journal.detail.crypto.leverage", bundle: lang.bundle))"
         }
-        return "Spot"
+        return String(localized: "journal.detail.crypto.spot", bundle: lang.bundle)
     }
 
     private var metricsGrid: some View {
         HStack(spacing: 12) {
-            MetricCard(label: "Entry Price") {
+            MetricCard(label: String(localized: "journal.detail.metric.entry_price",   bundle: lang.bundle)) {
                 TextField("0.00", value: $trade.entryPrice, format: .number)
             }
-            MetricCard(label: "Exit Price") {
+            MetricCard(label: String(localized: "journal.detail.metric.exit_price",    bundle: lang.bundle)) {
                 TextField("0.00", value: Binding(
                     get: { trade.exitPrice ?? 0 },
                     set: { trade.exitPrice = $0 }
                 ), format: .number)
             }
-            MetricCard(label: "Leverage") {
+            MetricCard(label: String(localized: "journal.detail.metric.leverage",      bundle: lang.bundle)) {
                 TextField("1x", value: Binding(
                     get: { trade.leverage ?? 1 },
                     set: { trade.leverage = $0 }
                 ), format: .number)
             }
-            MetricCard(label: "Funding Rate") {
+            MetricCard(label: String(localized: "journal.detail.metric.funding_rate",  bundle: lang.bundle)) {
                 TextField("0.0000%", value: Binding(
                     get: { trade.fundingRate ?? 0 },
                     set: { trade.fundingRate = $0 }
@@ -70,7 +71,7 @@ public struct CryptoDetailPanel: View {
                 .background(Color.fmsPrimary.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("EXECUTING WALLET")
+                Text("journal.detail.crypto.executing_wallet", bundle: lang.bundle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
                     .tracking(0.5)
@@ -89,7 +90,7 @@ public struct CryptoDetailPanel: View {
                     NSPasteboard.general.setString(addr, forType: .string)
                 }
             } label: {
-                Label("Copy", systemImage: "doc.on.doc")
+                Label(String(localized: "journal.detail.crypto.copy", bundle: lang.bundle), systemImage: "doc.on.doc")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.fmsPrimary)
             }

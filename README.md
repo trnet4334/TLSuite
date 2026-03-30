@@ -1,6 +1,6 @@
 # FMSYS Trading Suite Pro
 
-A macOS-native trading journal and strategy management app built with SwiftUI.
+A macOS-native trading journal, strategy management, and market intelligence app built with SwiftUI.
 
 **Platform:** macOS 14+ (Sonoma) · **Language:** Swift 5.9+ · **UI:** SwiftUI · **Storage:** SwiftData
 
@@ -10,18 +10,28 @@ A macOS-native trading journal and strategy management app built with SwiftUI.
 
 | Module | Status |
 |---|---|
-| Auth (Email/Password + MFA + OAuth) | ✅ Complete |
+| Auth (Email/Password + MFA) | ✅ Complete |
 | Trading Journal (4 categories) | ✅ Complete |
+| CSV Import (multi-broker) | ✅ Complete |
 | Backtesting | ✅ Complete |
-| Strategy Lab | 🔲 Stub |
-| Portfolio | 🔲 Stub |
-| Dashboard | 🔲 Stub |
+| Strategy Lab | ✅ Complete |
+| Portfolio | ✅ Complete |
+| Dashboard | ✅ Complete |
+| News Feed + Market Panel | ✅ Complete |
+| Notification Center | ✅ Complete |
+| Settings (Preferences, Security, Account, Subscription, Referral) | ✅ Complete |
+| Localization (English / 繁體中文) | ✅ Complete |
 
 ### Journal Categories
 - **Stocks/ETFs** — direction badge, shares, P&L, entry/exit price & time
 - **Crypto** — leverage, funding rate, wallet address (copy button)
 - **Forex** — pip value, lot size, exposure, session notes
 - **Options** — strike price, expiration, cost basis, Greeks (Δ Γ Θ V)
+
+### Market Panel (live data, no API key required)
+- **Trending Tickers** — SPX, NVDA, BTC, EUR/USD via Yahoo Finance (intraday sparkline + % change)
+- **Market Sentiment** — Fear & Greed Index via Alternative.me
+- **Economic Calendar** — High/Medium impact events via ForexFactory
 
 ---
 
@@ -30,12 +40,12 @@ A macOS-native trading journal and strategy management app built with SwiftUI.
 ```
 FMSYSApp (executable)  →  imports FMSYSCore
 FMSYSCore (library)    →  all business logic, views, services
-FMSYSAppTests          →  tests against FMSYSCore
+FMSYSAppTests          →  214 tests, Swift Testing framework
 ```
 
-**Layer stack:** Views → ViewModels (`@Observable`) → Repositories → SwiftData
+**Layer stack:** Views → ViewModels (`@Observable`) → Services / Repositories → SwiftData
 
-**Offline-First:** writes go to SwiftData immediately (`pendingSync = true`), synced to REST API in the background.
+**Offline-First:** writes go to SwiftData immediately, synced to REST API in the background via `AuthInterceptor`.
 
 ---
 
@@ -45,46 +55,40 @@ FMSYSAppTests          →  tests against FMSYSCore
 FMSYSApp/
 ├── Sources/
 │   ├── FMSYSApp/
-│   │   └── FMSYSApp.swift              # @main entry point
+│   │   └── FMSYSApp.swift                  # @main entry point
 │   └── FMSYSCore/
 │       ├── App/
-│       │   ├── AppState.swift
-│       │   ├── AppScreen.swift
-│       │   ├── MainAppView.swift
-│       │   ├── SidebarView.swift
-│       │   └── Router.swift
+│       │   ├── AppStore.swift              # @Observable app state
+│       │   ├── AppScreen.swift             # navigation enum
+│       │   ├── MainAppView.swift           # root shell + title bar
+│       │   └── SidebarView.swift           # 256px sidebar rail
 │       ├── Core/
-│       │   ├── Models/
-│       │   │   ├── Trade.swift
-│       │   │   ├── JournalCategory.swift
-│       │   │   └── ...
-│       │   ├── Networking/
-│       │   │   ├── APIClient.swift
-│       │   │   ├── AuthInterceptor.swift
-│       │   │   └── DTOs/
-│       │   ├── Repositories/
-│       │   │   ├── TradeRepository.swift
-│       │   │   └── AuthRepository.swift
+│       │   ├── Models/                     # Trade, Strategy, BacktestResult, ...
+│       │   ├── Networking/                 # APIClient, AuthInterceptor, DTOs
+│       │   ├── Repositories/              # TradeRepository, StrategyRepository, ...
 │       │   └── Services/
-│       │       └── AuthService.swift
+│       │       ├── AuthService.swift
+│       │       ├── MarketNewsService.swift  # RSS feeds (Reuters, MarketWatch, ForexLive, CoinTelegraph)
+│       │       └── MarketPanelService.swift # Yahoo Finance, Alternative.me, ForexFactory
 │       ├── Features/
-│       │   ├── Auth/Views/
-│       │   │   ├── LoginView.swift
-│       │   │   └── MFAVerificationView.swift
-│       │   ├── Journal/Views/
-│       │   │   ├── JournalDetailView.swift
-│       │   │   ├── TradeListPanel.swift
-│       │   │   ├── Stocks/
-│       │   │   ├── Crypto/
-│       │   │   ├── Forex/
-│       │   │   └── Options/
-│       │   └── Backtesting/Views/
+│       │   ├── Auth/
+│       │   ├── Dashboard/
+│       │   ├── Journal/
+│       │   │   └── Views/CSV/              # ColumnMappingSheet, ImportPreviewSheet
+│       │   ├── Backtesting/
+│       │   ├── StrategyLab/
+│       │   ├── Portfolio/
+│       │   ├── NewsFeed/
+│       │   └── Settings/
 │       └── Shared/
 │           ├── Components/
-│           ├── Theme/          # Colors, Typography, Spacing
-│           └── Utilities/      # KeychainManager, Validators
+│           │   └── Notifications/          # NotificationCenterView, detail views
+│           ├── Theme/                      # Colors, Typography, Spacing
+│           └── Utilities/
+│               ├── KeychainManager.swift
+│               └── LanguageManager.swift   # runtime language switching
 └── Tests/
-    └── FMSYSAppTests/          # 141 tests, Swift Testing framework
+    └── FMSYSAppTests/                      # 214 tests
 ```
 
 ---
@@ -94,19 +98,23 @@ FMSYSApp/
 **Requirements:** macOS 14+, Xcode 15+, Swift 5.9+
 
 ```bash
-# Clone
 git clone <repo-url>
 cd TLSuite/FMSYSApp
 
-# Build
-swift build
-
-# Run tests
-swift test
-
-# Open in Xcode
-open Package.swift
+swift build       # build
+swift test        # run 214 tests
+open Package.swift  # open in Xcode
 ```
+
+---
+
+## Localization
+
+Supports **English** and **繁體中文** with runtime switching (no restart required).
+
+- String files: `Sources/FMSYSCore/Resources/{en,zh-Hant}.lproj/Localizable.strings`
+- Switch via: Settings → App Preferences → Language
+- All views use `@Environment(LanguageManager.self)` + `lang.bundle`
 
 ---
 
@@ -135,6 +143,7 @@ Font: **Manrope** (weights 300–800)
 | `⌘3` | Backtesting |
 | `⌘4` | Strategy Lab |
 | `⌘5` | Portfolio |
+| `⌘6` | News Feed |
 
 ---
 

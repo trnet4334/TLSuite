@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct StocksTradeCard: View {
+    @Environment(LanguageManager.self) private var lang
     let trade: Trade
     let isSelected: Bool
 
@@ -24,7 +25,7 @@ public struct StocksTradeCard: View {
                     directionBadge
                 }
                 HStack {
-                    Text("$\(trade.entryPrice, specifier: "%.2f") · \(trade.positionSize, specifier: "%.0f") shares")
+                    Text(String(format: "$%.2f · %.0f \(String(localized: "journal.card.shares", bundle: lang.bundle))", trade.entryPrice, trade.positionSize))
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                     Spacer()
@@ -47,7 +48,9 @@ public struct StocksTradeCard: View {
     }
 
     private var directionBadge: some View {
-        Text(trade.direction == .long ? "BUY" : "SELL")
+        Text(trade.direction == .long
+             ? String(localized: "journal.card.buy", bundle: lang.bundle)
+             : String(localized: "journal.card.sell", bundle: lang.bundle))
             .font(.system(size: 10, weight: .bold))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)

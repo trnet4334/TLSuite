@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct OptionsDetailPanel: View {
+    @Environment(LanguageManager.self) private var lang
     @Bindable var trade: Trade
     let viewModel: TradeViewModel
     let onSave: () -> Void
@@ -12,9 +13,11 @@ public struct OptionsDetailPanel: View {
     }
 
     private var contractSubtitle: String {
-        let type = trade.direction == .long ? "Call · Bullish Long" : "Put · Bearish Short"
+        let type = trade.direction == .long
+            ? String(localized: "journal.detail.options.call_bullish", bundle: lang.bundle)
+            : String(localized: "journal.detail.options.put_bearish",  bundle: lang.bundle)
         if let exp = trade.expirationDate {
-            return "\(type) · Exp \(exp.formatted(.dateTime.month().day().year()))"
+            return "\(type) · \(String(localized: "journal.card.options.exp", bundle: lang.bundle)) \(exp.formatted(.dateTime.month().day().year()))"
         }
         return type
     }
@@ -36,13 +39,13 @@ public struct OptionsDetailPanel: View {
 
     private var metricsGrid: some View {
         HStack(spacing: 12) {
-            MetricCard(label: "Strike Price") {
+            MetricCard(label: String(localized: "journal.detail.metric.strike_price", bundle: lang.bundle)) {
                 TextField("0.00", value: Binding(
                     get: { trade.strikePrice ?? 0 },
                     set: { trade.strikePrice = $0 }
                 ), format: .number)
             }
-            MetricCard(label: "Expiration") {
+            MetricCard(label: String(localized: "journal.detail.metric.expiration", bundle: lang.bundle)) {
                 DatePicker("", selection: Binding(
                     get: { trade.expirationDate ?? Date() },
                     set: { trade.expirationDate = $0 }
@@ -50,10 +53,10 @@ public struct OptionsDetailPanel: View {
                 .labelsHidden()
                 .font(.system(size: 13))
             }
-            MetricCard(label: "Quantity") {
+            MetricCard(label: String(localized: "journal.detail.metric.quantity", bundle: lang.bundle)) {
                 TextField("0", value: $trade.positionSize, format: .number)
             }
-            MetricCard(label: "Cost Basis") {
+            MetricCard(label: String(localized: "journal.detail.metric.cost_basis", bundle: lang.bundle)) {
                 TextField("0.00", value: Binding(
                     get: { trade.costBasis ?? 0 },
                     set: { trade.costBasis = $0 }
@@ -64,14 +67,14 @@ public struct OptionsDetailPanel: View {
 
     private var greeksPanel: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("Option Greeks", systemImage: "chart.line.uptrend.xyaxis")
+            Label(String(localized: "journal.detail.options.greeks_title", bundle: lang.bundle), systemImage: "chart.line.uptrend.xyaxis")
                 .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(Color.fmsOnSurface)
             HStack(spacing: 12) {
-                greekCell(label: "Delta", value: trade.greeksDelta)
-                greekCell(label: "Gamma", value: trade.greeksGamma)
-                greekCell(label: "Theta", value: trade.greeksTheta)
-                greekCell(label: "Vega",  value: trade.greeksVega)
+                greekCell(label: String(localized: "journal.detail.options.greek.delta", bundle: lang.bundle), value: trade.greeksDelta)
+                greekCell(label: String(localized: "journal.detail.options.greek.gamma", bundle: lang.bundle), value: trade.greeksGamma)
+                greekCell(label: String(localized: "journal.detail.options.greek.theta", bundle: lang.bundle), value: trade.greeksTheta)
+                greekCell(label: String(localized: "journal.detail.options.greek.vega",  bundle: lang.bundle), value: trade.greeksVega)
             }
             .padding(16)
             .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))

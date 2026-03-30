@@ -3,6 +3,7 @@ import SwiftUI
 import AppKit
 
 public struct TradeListPanel: View {
+    @Environment(LanguageManager.self) private var lang
     let category: JournalCategory
     let trades: [Trade]
     @Binding var selectedTrade: Trade?
@@ -10,7 +11,7 @@ public struct TradeListPanel: View {
     let onNewTrade: () -> Void
     let onImport: ([Trade]) -> Void
 
-    @State private var activeFilter: String = "All"
+    @State private var activeFilter: String = "all"
     @State private var showingMapping      = false
     @State private var showingPreview      = false
     @State private var csvText             = ""
@@ -49,7 +50,7 @@ public struct TradeListPanel: View {
             }
         }
         .background(Color.fmsSurface)
-        .onChange(of: category) { _, _ in activeFilter = "All" }
+        .onChange(of: category) { _, _ in activeFilter = "all" }
         .sheet(isPresented: $showingMapping) {
             ColumnMappingSheet(
                 csvHeaders: csvHeaders,
@@ -65,6 +66,7 @@ public struct TradeListPanel: View {
                 },
                 onCancel: { showingMapping = false }
             )
+            .environment(LanguageManager.shared)
         }
         .sheet(isPresented: $showingPreview) {
             if let result = importResult {
@@ -76,6 +78,7 @@ public struct TradeListPanel: View {
                     },
                     onCancel: { showingPreview = false }
                 )
+                .environment(LanguageManager.shared)
             }
         }
     }
@@ -87,8 +90,8 @@ public struct TradeListPanel: View {
         panel.allowedContentTypes = [.commaSeparatedText, .plainText]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        panel.title = "Import Trades from CSV"
-        panel.prompt = "Import"
+        panel.title = String(localized: "journal.list.import_panel_title", bundle: lang.bundle)
+        panel.prompt = String(localized: "journal.list.import_panel_prompt", bundle: lang.bundle)
 
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
@@ -126,30 +129,42 @@ public struct TradeListPanel: View {
         case .all:
             EmptyView()
         case .stocksETFs:
-            segmentedFilter(options: ["All", "Buy", "Sell"])
+            segmentedFilter(options: [
+                ("all",  String(localized: "journal.filter.all",     bundle: lang.bundle)),
+                ("buy",  String(localized: "journal.filter.buy",     bundle: lang.bundle)),
+                ("sell", String(localized: "journal.filter.sell",    bundle: lang.bundle))
+            ])
         case .crypto:
-            segmentedFilter(options: ["All", "Spot", "Futures"])
+            segmentedFilter(options: [
+                ("all",     String(localized: "journal.filter.all",     bundle: lang.bundle)),
+                ("spot",    String(localized: "journal.filter.spot",    bundle: lang.bundle)),
+                ("futures", String(localized: "journal.filter.futures", bundle: lang.bundle))
+            ])
         case .forex:
             EmptyView()
         case .options:
-            segmentedFilter(options: ["All", "Call", "Put"])
+            segmentedFilter(options: [
+                ("all",  String(localized: "journal.filter.all",  bundle: lang.bundle)),
+                ("call", String(localized: "journal.filter.call", bundle: lang.bundle)),
+                ("put",  String(localized: "journal.filter.put",  bundle: lang.bundle))
+            ])
         }
     }
 
-    private func segmentedFilter(options: [String]) -> some View {
+    private func segmentedFilter(options: [(key: String, label: String)]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
-                ForEach(options, id: \.self) { opt in
-                    Button(opt) { activeFilter = opt }
+                ForEach(options, id: \.key) { opt in
+                    Button(opt.label) { activeFilter = opt.key }
                         .buttonStyle(.plain)
-                        .font(.system(size: 11, weight: activeFilter == opt ? .bold : .regular))
+                        .font(.system(size: 11, weight: activeFilter == opt.key ? .bold : .regular))
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                         .background(
-                            activeFilter == opt ? Color.fmsPrimary.opacity(0.15) : Color.clear,
+                            activeFilter == opt.key ? Color.fmsPrimary.opacity(0.15) : Color.clear,
                             in: Capsule()
                         )
-                        .foregroundStyle(activeFilter == opt ? Color.fmsPrimary : Color.fmsMuted)
+                        .foregroundStyle(activeFilter == opt.key ? Color.fmsPrimary : Color.fmsMuted)
                 }
             }
             .padding(.horizontal, 12)
@@ -158,17 +173,17 @@ public struct TradeListPanel: View {
     }
 
     private var filteredTrades: [Trade] {
-        guard activeFilter != "All" else { return trades }
+        guard activeFilter != "all" else { return trades }
         switch category {
         case .stocksETFs:
-            if activeFilter == "Buy"  { return trades.filter { $0.direction == .long } }
-            if activeFilter == "Sell" { return trades.filter { $0.direction == .short } }
+            if activeFilter == "buy"  { return trades.filter { $0.direction == .long } }
+            if activeFilter == "sell" { return trades.filter { $0.direction == .short } }
         case .crypto:
-            if activeFilter == "Spot"    { return trades.filter { ($0.leverage ?? 1) <= 1 } }
-            if activeFilter == "Futures" { return trades.filter { ($0.leverage ?? 1) > 1 } }
+            if activeFilter == "spot"    { return trades.filter { ($0.leverage ?? 1) <= 1 } }
+            if activeFilter == "futures" { return trades.filter { ($0.leverage ?? 1) > 1 } }
         case .options:
-            if activeFilter == "Call" { return trades.filter { $0.direction == .long } }
-            if activeFilter == "Put"  { return trades.filter { $0.direction == .short } }
+            if activeFilter == "call" { return trades.filter { $0.direction == .long } }
+            if activeFilter == "put"  { return trades.filter { $0.direction == .short } }
         default: break
         }
         return trades
@@ -178,7 +193,9 @@ public struct TradeListPanel: View {
 
     private var listHeader: some View {
         HStack {
-            Text(category == .all ? "All Trades" : category.rawValue)
+            Text(category == .all
+                 ? String(localized: "journal.list.all_trades", bundle: lang.bundle)
+                 : category.rawValue)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
                 .textCase(.uppercase)
@@ -191,7 +208,7 @@ public struct TradeListPanel: View {
                     .foregroundStyle(Color.fmsMuted)
             }
             .buttonStyle(.plain)
-            .help("Import trades from CSV")
+            .help(String(localized: "journal.list.import_help", bundle: lang.bundle))
             .padding(.trailing, 4)
             Button {
                 onNewTrade()
@@ -205,7 +222,10 @@ public struct TradeListPanel: View {
             Button {
                 sortByPnL.toggle()
             } label: {
-                Label(sortByPnL ? "P&L" : "Newest", systemImage: "arrow.up.arrow.down")
+                Label(sortByPnL
+                  ? String(localized: "journal.list.sort_pnl", bundle: lang.bundle)
+                  : String(localized: "journal.list.sort_newest", bundle: lang.bundle),
+                  systemImage: "arrow.up.arrow.down")
                     .font(.system(size: 11))
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -244,14 +264,14 @@ public struct TradeListPanel: View {
             Image(systemName: "square.and.pencil")
                 .font(.system(size: 48))
                 .foregroundStyle(Color.fmsMuted.opacity(0.3))
-            Text("Start Your Trading Journal")
+            Text("journal.list.empty_title", bundle: lang.bundle)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.fmsOnSurface)
-            Text("Record your first trade to begin\ntracking performance.")
+            Text("journal.list.empty_subtitle", bundle: lang.bundle)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.fmsMuted)
                 .multilineTextAlignment(.center)
-            Button("+ Log First Trade") { onNewTrade() }
+            Button(String(localized: "journal.list.log_first_trade", bundle: lang.bundle)) { onNewTrade() }
                 .buttonStyle(.plain)
                 .font(.system(size: 13, weight: .semibold))
                 .padding(.horizontal, 16)

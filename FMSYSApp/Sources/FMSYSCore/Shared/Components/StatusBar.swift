@@ -1,19 +1,21 @@
 import SwiftUI
 
 public struct StatusBar: View {
+    @Environment(LanguageManager.self) private var lang
+
     public init() {}
 
     public var body: some View {
         HStack(spacing: 16) {
-            statusDot(color: Color.fmsPrimary, label: "Engine: Ready")
+            statusDot(color: Color.fmsPrimary, label: String(localized: "statusbar.engine_ready", bundle: lang.bundle))
             divider
-            Text("Latency: 4ms")
+            Text(String(format: String(localized: "statusbar.latency", bundle: lang.bundle), "4ms"))
                 .foregroundStyle(Color.fmsMuted)
             Spacer()
-            Text("Core Version: 2.1.0")
+            Text(String(format: String(localized: "statusbar.core_version", bundle: lang.bundle), "2.1.0"))
                 .foregroundStyle(Color.fmsMuted)
             divider
-            Text("macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
+            Text(String(format: String(localized: "statusbar.macos_version", bundle: lang.bundle), ProcessInfo.processInfo.operatingSystemVersion.majorVersion))
                 .foregroundStyle(Color.fmsMuted)
         }
         .font(.system(size: 11, weight: .medium).monospacedDigit())

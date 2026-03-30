@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct OptionsTradeCard: View {
+    @Environment(LanguageManager.self) private var lang
     let trade: Trade
     let isSelected: Bool
 
@@ -26,7 +27,7 @@ public struct OptionsTradeCard: View {
                 }
                 HStack {
                     if let exp = trade.expirationDate {
-                        Text("Exp: \(exp.formatted(date: .abbreviated, time: .omitted))")
+                        Text("\(String(localized: "journal.card.options.exp", bundle: lang.bundle)): \(exp.formatted(date: .abbreviated, time: .omitted))")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.fmsMuted)
                     }
@@ -34,7 +35,7 @@ public struct OptionsTradeCard: View {
                         TradeSourceBadge(source: src)
                     }
                     Spacer()
-                    Text("Qty: \(trade.positionSize, specifier: "%.0f")")
+                    Text("\(String(localized: "journal.card.options.qty", bundle: lang.bundle)): \(trade.positionSize, specifier: "%.0f")")
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 }

@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct StrategyInspectorPanel: View {
     @Bindable var viewModel: StrategyViewModel
+    @Environment(LanguageManager.self) private var lang
 
     public var body: some View {
         if let strategy = viewModel.selectedStrategy {
@@ -14,7 +15,7 @@ public struct StrategyInspectorPanel: View {
                         viewModel.update(strategy)
                         // TODO: trigger real backtest in future phase
                     } label: {
-                        Text("Run Backtest")
+                        Text("strategy.inspector.run_backtest", bundle: lang.bundle)
                             .font(.system(size: 13, weight: .bold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
@@ -27,9 +28,9 @@ public struct StrategyInspectorPanel: View {
             }
         } else {
             ContentUnavailableView(
-                "No Strategy Selected",
+                String(localized: "strategy.inspector.empty.title", bundle: lang.bundle),
                 systemImage: "flask",
-                description: Text("Select a strategy to inspect its logic and parameters.")
+                description: Text("strategy.inspector.empty.description", bundle: lang.bundle)
             )
         }
     }
@@ -37,10 +38,13 @@ public struct StrategyInspectorPanel: View {
     @ViewBuilder
     private func logicSection(strategy: Strategy) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Strategy Logic", systemImage: "chevron.left.forwardslash.chevron.right")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
-                .textCase(.uppercase)
+            Label(
+                String(localized: "strategy.inspector.logic.title", bundle: lang.bundle),
+                systemImage: "chevron.left.forwardslash.chevron.right"
+            )
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(Color.fmsMuted)
+            .textCase(.uppercase)
 
             TextEditor(text: Binding(
                 get: { strategy.logicCode },
@@ -58,13 +62,16 @@ public struct StrategyInspectorPanel: View {
     @ViewBuilder
     private func parametersSection(strategy: Strategy) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Parameters", systemImage: "slider.horizontal.3")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.fmsMuted)
-                .textCase(.uppercase)
+            Label(
+                String(localized: "strategy.inspector.parameters.title", bundle: lang.bundle),
+                systemImage: "slider.horizontal.3"
+            )
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(Color.fmsMuted)
+            .textCase(.uppercase)
 
             parameterSlider(
-                label: "EMA Fast Period",
+                label: String(localized: "strategy.inspector.parameters.ema_fast", bundle: lang.bundle),
                 value: Binding(
                     get: { Double(strategy.emaFastPeriod) },
                     set: { strategy.emaFastPeriod = Int($0) }
@@ -72,7 +79,7 @@ public struct StrategyInspectorPanel: View {
                 range: 1...50
             )
             parameterSlider(
-                label: "EMA Slow Period",
+                label: String(localized: "strategy.inspector.parameters.ema_slow", bundle: lang.bundle),
                 value: Binding(
                     get: { Double(strategy.emaSlowPeriod) },
                     set: { strategy.emaSlowPeriod = Int($0) }
@@ -86,7 +93,7 @@ public struct StrategyInspectorPanel: View {
                 get: { strategy.riskMgmtEnabled },
                 set: { strategy.riskMgmtEnabled = $0 }
             )) {
-                Text("Risk Management")
+                Text("strategy.inspector.parameters.risk_management", bundle: lang.bundle)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsOnSurface.opacity(0.7))
             }
@@ -96,7 +103,7 @@ public struct StrategyInspectorPanel: View {
                 get: { strategy.trailingStopEnabled },
                 set: { strategy.trailingStopEnabled = $0 }
             )) {
-                Text("Trailing Stop")
+                Text("strategy.inspector.parameters.trailing_stop", bundle: lang.bundle)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsOnSurface.opacity(0.7))
             }

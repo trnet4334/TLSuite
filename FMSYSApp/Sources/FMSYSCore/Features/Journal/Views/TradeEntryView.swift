@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct TradeEntryView: View {
+    @Environment(LanguageManager.self) private var lang
     let initialCategory: JournalCategory
     let viewModel: TradeViewModel
     let onDismiss: () -> Void
@@ -96,10 +97,10 @@ public struct TradeEntryView: View {
                     .frame(width: 36, height: 36)
                     .background(Color.fmsPrimary.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Add New Trade")
+                    Text("journal.entry.title", bundle: lang.bundle)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Color.fmsOnSurface)
-                    Text("Log your execution details")
+                    Text("journal.entry.subtitle", bundle: lang.bundle)
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 }
@@ -124,7 +125,7 @@ public struct TradeEntryView: View {
 
     private var categorySwitcher: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Category")
+            Text("journal.entry.category", bundle: lang.bundle)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.fmsOnSurface)
             HStack(spacing: 2) {
@@ -162,7 +163,7 @@ public struct TradeEntryView: View {
         HStack(spacing: 16) {
             // Asset ticker
             VStack(alignment: .leading, spacing: 6) {
-                fieldLabel("Asset Ticker")
+                fieldLabel(String(localized: "journal.entry.asset_ticker", bundle: lang.bundle))
                 HStack(spacing: 6) {
                     TextField(assetPlaceholder, text: $asset)
                         .textFieldStyle(.plain)
@@ -184,7 +185,7 @@ public struct TradeEntryView: View {
 
             // Direction / Call-Put toggle
             VStack(alignment: .leading, spacing: 6) {
-                fieldLabel("Direction")
+                fieldLabel(String(localized: "journal.entry.direction", bundle: lang.bundle))
                 HStack(spacing: 2) {
                     Button {
                         direction = .long
@@ -192,7 +193,9 @@ public struct TradeEntryView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.up")
                                 .font(.system(size: 10, weight: .bold))
-                            Text(selectedCategory == .options ? "CALL" : "LONG")
+                            Text(selectedCategory == .options
+                                 ? String(localized: "journal.entry.direction.call", bundle: lang.bundle)
+                                 : String(localized: "journal.entry.direction.long", bundle: lang.bundle))
                                 .font(.system(size: 11, weight: .bold))
                         }
                         .frame(maxWidth: .infinity)
@@ -213,7 +216,9 @@ public struct TradeEntryView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.down")
                                 .font(.system(size: 10, weight: .bold))
-                            Text(selectedCategory == .options ? "PUT" : "SHORT")
+                            Text(selectedCategory == .options
+                                 ? String(localized: "journal.entry.direction.put",   bundle: lang.bundle)
+                                 : String(localized: "journal.entry.direction.short", bundle: lang.bundle))
                                 .font(.system(size: 11, weight: .bold))
                         }
                         .frame(maxWidth: .infinity)
@@ -252,7 +257,7 @@ public struct TradeEntryView: View {
                 Image(systemName: "slider.horizontal.3")
                     .font(.system(size: 11))
                     .foregroundStyle(Color.fmsPrimary)
-                Text("EXECUTION DETAILS")
+                Text("journal.entry.execution_details", bundle: lang.bundle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
                     .tracking(0.5)
@@ -272,10 +277,10 @@ public struct TradeEntryView: View {
             columns: [GridItem(.flexible()), GridItem(.flexible())],
             spacing: 14
         ) {
-            entryField(label: "Entry Price", prefix: "$", text: $entryPriceText, placeholder: "0.00")
-            entryField(label: "Exit Price (Optional)", prefix: "$", text: $exitPriceText, placeholder: "0.00")
-            entryField(label: "Quantity (Shares)", text: $positionSizeText, placeholder: "0")
-            entryField(label: "Stop Loss", prefix: "$", text: $stopLossText, placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.entry_price",         bundle: lang.bundle), prefix: "$", text: $entryPriceText, placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.exit_price_optional",  bundle: lang.bundle), prefix: "$", text: $exitPriceText,  placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.quantity_shares",      bundle: lang.bundle), text: $positionSizeText, placeholder: "0")
+            entryField(label: String(localized: "journal.entry.field.stop_loss",            bundle: lang.bundle), prefix: "$", text: $stopLossText,   placeholder: "0.00")
         }
     }
 
@@ -284,12 +289,12 @@ public struct TradeEntryView: View {
             columns: [GridItem(.flexible()), GridItem(.flexible())],
             spacing: 14
         ) {
-            entryField(label: "Entry Price", prefix: "$", text: $entryPriceText, placeholder: "1.0850")
-            entryField(label: "Exit Price", prefix: "$", text: $exitPriceText, placeholder: "1.0920")
-            entryField(label: "Pip Value ($)", text: $pipValueText, placeholder: "10.00")
-            entryField(label: "Lot Size", text: $lotSizeText, placeholder: "1.0")
-            entryField(label: "Exposure", text: $exposureText, placeholder: "150000")
-            entryField(label: "Position Size", text: $positionSizeText, placeholder: "1")
+            entryField(label: String(localized: "journal.entry.field.entry_price",   bundle: lang.bundle), prefix: "$", text: $entryPriceText, placeholder: "1.0850")
+            entryField(label: String(localized: "journal.entry.field.exit_price",    bundle: lang.bundle), prefix: "$", text: $exitPriceText,  placeholder: "1.0920")
+            entryField(label: String(localized: "journal.entry.field.pip_value",     bundle: lang.bundle), text: $pipValueText,   placeholder: "10.00")
+            entryField(label: String(localized: "journal.entry.field.lot_size",      bundle: lang.bundle), text: $lotSizeText,    placeholder: "1.0")
+            entryField(label: String(localized: "journal.entry.field.exposure",      bundle: lang.bundle), text: $exposureText,   placeholder: "150000")
+            entryField(label: String(localized: "journal.entry.field.position_size", bundle: lang.bundle), text: $positionSizeText, placeholder: "1")
         }
     }
 
@@ -298,12 +303,12 @@ public struct TradeEntryView: View {
             columns: [GridItem(.flexible()), GridItem(.flexible())],
             spacing: 14
         ) {
-            entryField(label: "Entry Price", prefix: "$", text: $entryPriceText, placeholder: "0.00")
-            entryField(label: "Exit Price", prefix: "$", text: $exitPriceText, placeholder: "0.00")
-            entryField(label: "Leverage", suffix: "x", text: $leverageText, placeholder: "1")
-            entryField(label: "Funding Rate", suffix: "%", text: $fundingRateText, placeholder: "0.01")
-            entryField(label: "Position Size", text: $positionSizeText, placeholder: "0")
-            entryField(label: "Wallet Address (Optional)", text: $walletText, placeholder: "0x...")
+            entryField(label: String(localized: "journal.entry.field.entry_price",          bundle: lang.bundle), prefix: "$", text: $entryPriceText, placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.exit_price",           bundle: lang.bundle), prefix: "$", text: $exitPriceText,  placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.leverage",             bundle: lang.bundle), suffix: "x", text: $leverageText,   placeholder: "1")
+            entryField(label: String(localized: "journal.entry.field.funding_rate",         bundle: lang.bundle), suffix: "%", text: $fundingRateText, placeholder: "0.01")
+            entryField(label: String(localized: "journal.entry.field.position_size",        bundle: lang.bundle), text: $positionSizeText, placeholder: "0")
+            entryField(label: String(localized: "journal.entry.field.wallet_address",       bundle: lang.bundle), text: $walletText,        placeholder: "0x...")
         }
     }
 
@@ -312,18 +317,18 @@ public struct TradeEntryView: View {
             columns: [GridItem(.flexible()), GridItem(.flexible())],
             spacing: 14
         ) {
-            entryField(label: "Strike Price", prefix: "$", text: $strikeText, placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.strike_price",        bundle: lang.bundle), prefix: "$", text: $strikeText,       placeholder: "0.00")
             expirationField
-            entryField(label: "Quantity (Contracts)", text: $positionSizeText, placeholder: "1")
-            entryField(label: "Cost Basis", prefix: "$", text: $costBasisText, placeholder: "0.00")
-            entryField(label: "Entry Price (Premium)", prefix: "$", text: $entryPriceText, placeholder: "0.00")
-            entryField(label: "Exit Price (Optional)", prefix: "$", text: $exitPriceText, placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.quantity_contracts",  bundle: lang.bundle), text: $positionSizeText,  placeholder: "1")
+            entryField(label: String(localized: "journal.entry.field.cost_basis",          bundle: lang.bundle), prefix: "$", text: $costBasisText,    placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.entry_price_premium", bundle: lang.bundle), prefix: "$", text: $entryPriceText,   placeholder: "0.00")
+            entryField(label: String(localized: "journal.entry.field.exit_price_optional", bundle: lang.bundle), prefix: "$", text: $exitPriceText,    placeholder: "0.00")
         }
     }
 
     private var expirationField: some View {
         VStack(alignment: .leading, spacing: 6) {
-            fieldLabel("Expiration Date")
+            fieldLabel(String(localized: "journal.entry.field.expiration_date", bundle: lang.bundle))
             DatePicker("", selection: $expirationDate, displayedComponents: .date)
                 .labelsHidden()
                 .padding(8)
@@ -340,7 +345,7 @@ public struct TradeEntryView: View {
 
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Notes & Reflection")
+            Text("journal.entry.notes_reflection", bundle: lang.bundle)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.fmsOnSurface)
             TextEditor(text: $notesText)
@@ -362,14 +367,14 @@ public struct TradeEntryView: View {
     private var modalFooter: some View {
         HStack {
             Spacer()
-            Button("Cancel") { onDismiss() }
+            Button(String(localized: "common.cancel", bundle: lang.bundle)) { onDismiss() }
                 .buttonStyle(.plain)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.fmsMuted)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 8))
-            Button("Save Trade") { saveTrade() }
+            Button(String(localized: "journal.entry.save_trade", bundle: lang.bundle)) { saveTrade() }
                 .buttonStyle(.plain)
                 .font(.system(size: 13, weight: .bold))
                 .padding(.horizontal, 20)

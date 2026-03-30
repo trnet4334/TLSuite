@@ -4,6 +4,7 @@ import SwiftUI
 public struct BacktestKPICards: View {
 
     let result: BacktestResult
+    @Environment(LanguageManager.self) private var lang
 
     private let winRateTarget: Double      = 0.6
     private let profitFactorTarget: Double = 2.0
@@ -17,25 +18,32 @@ public struct BacktestKPICards: View {
             kpiCard(
                 systemIcon:    "checkmark.seal.fill",
                 iconColor:     .blue,
-                title:         "Win Rate",
+                title:         String(localized: "backtest.kpi.win_rate", bundle: lang.bundle),
                 value:         String(format: "%.1f%%", result.winRate * 100),
-                subtext:       result.winRate >= winRateTarget ? "Above target (60%)" : "Below target (60%)",
+                subtext:       result.winRate >= winRateTarget
+                    ? String(localized: "backtest.kpi.win_rate.above_target", bundle: lang.bundle)
+                    : String(localized: "backtest.kpi.win_rate.below_target", bundle: lang.bundle),
                 subtextColor:  result.winRate >= winRateTarget ? Color.fmsPrimary : Color.fmsLoss
             )
             kpiCard(
                 systemIcon:    "chart.bar.fill",
                 iconColor:     .orange,
-                title:         "Profit Factor",
+                title:         String(localized: "backtest.kpi.profit_factor", bundle: lang.bundle),
                 value:         String(format: "%.2f", result.profitFactor),
-                subtext:       result.profitFactor >= profitFactorTarget ? "Excellent performance" : "Fair performance",
+                subtext:       result.profitFactor >= profitFactorTarget
+                    ? String(localized: "backtest.kpi.profit_factor.excellent", bundle: lang.bundle)
+                    : String(localized: "backtest.kpi.profit_factor.fair", bundle: lang.bundle),
                 subtextColor:  Color.fmsMuted
             )
             kpiCard(
                 systemIcon:    "arrow.down.right",
                 iconColor:     Color.fmsLoss,
-                title:         "Max Drawdown",
+                title:         String(localized: "backtest.kpi.max_drawdown", bundle: lang.bundle),
                 value:         String(format: "%.2f%%", result.maxDrawdown * 100),
-                subtext:       "Sharpe: \(String(format: "%.2f", result.sharpeRatio))",
+                subtext:       String(
+                    format: String(localized: "backtest.kpi.sharpe", bundle: lang.bundle),
+                    result.sharpeRatio
+                ),
                 subtextColor:  Color.fmsMuted
             )
         }

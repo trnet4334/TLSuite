@@ -6,20 +6,24 @@ public struct AvatarPopover: View {
     public let email: String
     public let role: String
     public let onSignOut: () -> Void
+    public let onShowSettings: (SettingsTab) -> Void
 
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("priceAlertsEnabled") private var priceAlertsEnabled = false
+    @Environment(LanguageManager.self) private var lang
 
     public init(
         displayName: String,
         email: String,
         role: String,
-        onSignOut: @escaping () -> Void
+        onSignOut: @escaping () -> Void,
+        onShowSettings: @escaping (SettingsTab) -> Void = { _ in }
     ) {
         self.displayName = displayName
         self.email = email
         self.role = role
         self.onSignOut = onSignOut
+        self.onShowSettings = onShowSettings
     }
 
     public var body: some View {
@@ -84,10 +88,10 @@ public struct AvatarPopover: View {
 
     private var accountSection: some View {
         VStack(spacing: 0) {
-            menuRow(systemImage: "person", label: "Account Management") {}
-            menuRow(systemImage: "creditcard", label: "Subscription Management") {}
-            menuRow(systemImage: "lock.shield", label: "Security & Privacy") {}
-            menuRow(systemImage: "person.3", label: "Referral Program") {}
+            menuRow(systemImage: "person", label: String(localized: "avatar.account_management", bundle: lang.bundle)) { onShowSettings(.account) }
+            menuRow(systemImage: "creditcard", label: String(localized: "avatar.subscription_management", bundle: lang.bundle)) { onShowSettings(.subscription) }
+            menuRow(systemImage: "lock.shield", label: String(localized: "avatar.security_privacy", bundle: lang.bundle)) { onShowSettings(.security) }
+            menuRow(systemImage: "person.3", label: String(localized: "avatar.referral_program", bundle: lang.bundle)) { onShowSettings(.referral) }
         }
         .padding(.vertical, 4)
     }
@@ -96,10 +100,10 @@ public struct AvatarPopover: View {
 
     private var settingsSection: some View {
         VStack(spacing: 0) {
-            sectionHeader("Settings")
-            toggleRow(systemImage: "moon.fill", label: "Dark Mode", binding: $isDarkMode)
-            toggleRow(systemImage: "bell.fill", label: "Price Alerts", binding: $priceAlertsEnabled)
-            menuRow(systemImage: "gearshape.fill", label: "App Preferences") {}
+            sectionHeader(String(localized: "avatar.settings", bundle: lang.bundle))
+            toggleRow(systemImage: "moon.fill", label: String(localized: "avatar.dark_mode", bundle: lang.bundle), binding: $isDarkMode)
+            toggleRow(systemImage: "bell.fill", label: String(localized: "avatar.price_alerts", bundle: lang.bundle), binding: $priceAlertsEnabled)
+            menuRow(systemImage: "gearshape.fill", label: String(localized: "avatar.app_preferences", bundle: lang.bundle)) { onShowSettings(.preferences) }
         }
         .padding(.vertical, 4)
     }
@@ -112,7 +116,7 @@ public struct AvatarPopover: View {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.fmsLoss)
-                Text("Sign Out")
+                Text("avatar.sign_out", bundle: lang.bundle)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.fmsLoss)
                 Spacer()

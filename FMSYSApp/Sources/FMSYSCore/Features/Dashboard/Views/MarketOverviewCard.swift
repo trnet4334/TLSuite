@@ -3,6 +3,7 @@ import Charts
 
 public struct MarketOverviewCard: View {
     let quotes: [MarketQuote]
+    @Environment(LanguageManager.self) private var lang
 
     public init(quotes: [MarketQuote]) {
         self.quotes = quotes
@@ -14,7 +15,7 @@ public struct MarketOverviewCard: View {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.fmsPrimary)
-                Text("Market Overview")
+                Text("dashboard.market_overview.title", bundle: lang.bundle)
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
             }

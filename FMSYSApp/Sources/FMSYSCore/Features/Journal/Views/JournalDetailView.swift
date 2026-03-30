@@ -2,6 +2,7 @@
 import SwiftUI
 
 public struct JournalDetailView: View {
+    @Environment(LanguageManager.self) private var lang
     let category: JournalCategory
     @Bindable var viewModel: TradeViewModel
 
@@ -59,6 +60,13 @@ public struct JournalDetailView: View {
                 selectedTrade = sortedTrades.first
             }
         }
+        .onChange(of: viewModel.pendingTradeId) { _, pendingId in
+            guard let pendingId else { return }
+            if let match = viewModel.trades.first(where: { $0.id == pendingId }) {
+                selectedTrade = match
+            }
+            viewModel.pendingTradeId = nil
+        }
     }
 
     @ViewBuilder
@@ -86,7 +94,7 @@ public struct JournalDetailView: View {
             Image(systemName: "square.and.pencil")
                 .font(.system(size: 48))
                 .foregroundStyle(Color.fmsMuted.opacity(0.3))
-            Text("Select a trade to view details")
+            Text("journal.detail.select_trade", bundle: lang.bundle)
                 .font(.system(size: 14))
                 .foregroundStyle(Color.fmsMuted)
         }

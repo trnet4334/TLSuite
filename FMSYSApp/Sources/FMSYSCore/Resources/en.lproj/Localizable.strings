@@ -1,0 +1,529 @@
+// MARK: - Navigation
+"nav.dashboard"         = "Dashboard";
+"nav.journal"           = "Journal";
+"nav.backtesting"       = "Backtesting";
+"nav.strategy_lab"      = "Strategy Lab";
+"nav.portfolio"         = "Portfolio";
+"nav.news_feed"         = "News Feed";
+
+// MARK: - Sidebar cards
+"sidebar.total_equity"  = "Total Equity";
+"sidebar.mtd"           = "MTD";
+"sidebar.active_labs"   = "Active Labs";
+"sidebar.running"       = "Running";
+"sidebar.cpu_usage"     = "CPU Usage";
+"sidebar.market_news"   = "Market News";
+"sidebar.live_feed"     = "Live Feed";
+"sidebar.sources_active" = "Sources Active";
+
+// MARK: - Title bar
+"titlebar.search_placeholder" = "Search trades, journals, analytics...";
+
+// MARK: - Avatar / Account
+"avatar.sign_out"               = "Sign Out";
+"avatar.settings"               = "Settings";
+"avatar.dark_mode"              = "Dark Mode";
+"avatar.app_preferences"        = "App Preferences";
+"avatar.security_privacy"       = "Security & Privacy";
+"avatar.account_management"     = "Account Management";
+"avatar.subscription_management" = "Subscription Management";
+"avatar.referral_program"       = "Referral Program";
+"avatar.price_alerts"           = "Price Alerts";
+
+// MARK: - Auth
+"auth.app_name"         = "TRADING SUITE PRO";
+"auth.tagline"          = "Secure Login for Trading Suite Pro";
+"auth.username_label"   = "USERNAME / EMAIL";
+"auth.password_label"   = "PASSWORD";
+"auth.sign_in"          = "SIGN IN";
+"auth.no_account"       = "Don't have an account?";
+"auth.create_account"   = "Create Account";
+"auth.forgot_password"  = "Forgot password?";
+"auth.email_placeholder" = "Enter your email";
+"auth.terms"            = "Terms of Service";
+"auth.privacy_policy"   = "Privacy Policy";
+"auth.contact_support"  = "Contact Support";
+"auth.mfa_title"        = "Verify Identity";
+"auth.mfa_subtitle"     = "Enter the 6-digit code from\nyour authenticator app";
+"auth.mfa_method"       = "Method";
+"auth.mfa_google"       = "Google Authenticator";
+"auth.mfa_resend"       = "Resend Code";
+"auth.mfa_locked"       = "Account Locked";
+
+// MARK: - Settings
+"settings.title"        = "Settings";
+"settings.close"        = "Close";
+"settings.quick_settings" = "Quick Settings";
+
+// MARK: - Settings / Preferences
+"prefs.title"           = "General Settings";
+"prefs.subtitle"        = "Manage your application appearance and core behaviors.";
+"prefs.appearance"      = "Appearance";
+"prefs.theme_system"    = "System";
+"prefs.theme_light"     = "Light";
+"prefs.theme_dark"      = "Dark";
+"prefs.behavior"        = "Application Behavior";
+"prefs.auto_save"       = "Auto-save layouts";
+"prefs.auto_save_sub"   = "Automatically save your workspace configuration";
+"prefs.sound_effects"   = "Sound Effects";
+"prefs.sound_effects_sub" = "Play sounds for order fills and alerts";
+"prefs.language"        = "Language";
+"prefs.language_sub"    = "Select your preferred display language";
+"prefs.refresh_rate"    = "Data Refresh Rate";
+"prefs.realtime"        = "Real-time";
+"prefs.balanced"        = "Balanced";
+"prefs.power_save"      = "Power Save";
+"prefs.reset"           = "Reset Defaults";
+"prefs.save"            = "Save Changes";
+
+// MARK: - Settings / Security
+"security.title"        = "Two-Factor Authentication";
+"security.subtitle"     = "Secure your account with 2FA";
+"security.current_method" = "Current Method: **Google Authenticator**\nBackup codes generated on Oct 12, 2023.";
+"security.login_history" = "Login History";
+"security.login_history_sub" = "Review recent account access attempts.";
+"security.device"       = "Device";
+"security.ip"           = "IP Address";
+"security.location"     = "Location";
+"security.time"         = "Time";
+"security.status"       = "Status";
+"security.api_management" = "API Management";
+"security.api_sub"      = "Manage external application access to your trading data.";
+"security.api_create_key" = "Create New API Key";
+"security.last_used"    = "Last used: 2 hours ago • Permission: Read/Trade";
+"security.revoke_access" = "Revoke Access";
+"security.export_log"   = "Export Log";
+"security.change_password" = "Change Password";
+"security.danger_zone"  = "Danger Zone";
+"security.danger_sub"   = "Irreversible actions regarding your account.";
+"security.freeze_warning" = "This will freeze all trading and access until you contact support.";
+"security.delete_warning" = "Once deleted, your account and trade history cannot be recovered.";
+"security.disable_title" = "Disable 2FA";
+"security.disable_alert_title" = "Disable Two-Factor Authentication?";
+"security.disable_confirm" = "Disable";
+"security.delete_title" = "Delete Account";
+"security.delete_account_btn" = "Delete My Account";
+"security.delete_alert_title" = "Delete Account Permanently?";
+"security.delete_forever_confirm" = "Delete Forever";
+"security.privacy_controls_title" = "Privacy Controls";
+"security.privacy_controls_subtitle" = "Manage how your data is shared and displayed.";
+"security.privacy_public_profile" = "Public Profile";
+"security.privacy_public_profile_sub" = "Allow other traders to view your profile";
+"security.privacy_share_perf" = "Share Performance Stats";
+"security.privacy_share_perf_sub" = "Include your win rate in leaderboards";
+"security.privacy_marketing" = "Marketing Communications";
+"security.privacy_marketing_sub" = "Receive tips, offers, and product updates";
+
+// MARK: - Settings / Account
+"account.preferences"   = "Account Preferences";
+"account.adjust"        = "Adjust how your data is handled and viewed by others.";
+"account.kyc"           = "KYC VERIFIED";
+"account.id"            = "ID: 4829-THM";
+"account.role"          = "Professional Trader • Member since January 2022";
+"account.member_since"  = "Member since";
+"account.personal_info" = "Personal Information";
+"account.field_full_name" = "Full Name";
+"account.field_email"   = "Email";
+"account.field_phone"   = "Phone";
+"account.field_region"  = "Region";
+"account.update_profile" = "Update Profile";
+"account.security_auth" = "Security & Authentication";
+"account.two_factor_title" = "Two-Factor Authentication";
+"account.two_factor_subtitle" = "Add an extra layer of security to your account";
+"account.two_factor_info" = "Google Authenticator is active";
+"account.field_current_password" = "Current Password";
+"account.field_new_password" = "New Password";
+"account.password_placeholder" = "Enter password";
+"account.update_password" = "Update Password";
+"account.export_data"   = "Export My Data";
+"account.deactivate"    = "Deactivate Account";
+"account.deactivate_alert_title" = "Deactivate Account?";
+"account.deactivate_message" = "Your account will be deactivated. You can reactivate it anytime by logging in again.";
+"account.deactivate_confirm" = "Deactivate";
+
+// MARK: - Notifications
+"notif.type.trade_alert" = "Trade Alert";
+"notif.type.security"    = "Security Alert";
+"notif.type.user"        = "User";
+"notif.title"           = "Notification Center";
+"notif.subtitle"        = "Manage your latest alerts and strategy updates.";
+"notif.mark_all_read"   = "Mark all as read";
+"notif.filter_all"      = "All";
+"notif.filter_achieved" = "Achieved";
+"notif.view_details"    = "View Details";
+"notif.achieve"         = "Achieve";
+"notif.dismiss"         = "Dismiss";
+
+// MARK: - Notification detail views
+"notification.price_alert.type"             = "PRICE ALERT";
+"notification.price_alert.current_price"    = "Current Price";
+"notification.price_alert.target_price"     = "Target Price";
+"notification.price_alert.triggered_title"  = "Alert Triggered";
+"notification.price_alert.triggered_body"   = "Your target price has been reached. Consider reviewing your open positions and adjusting your strategy accordingly.";
+"notification.price_alert.volatility_label" = "PRICE VOLATILITY (24H)";
+"notification.price_alert.high_risk"        = "HIGH RISK";
+
+"notification.security_alert.type"          = "SECURITY ALERT";
+"notification.security_alert.device"        = "Device";
+"notification.security_alert.ip_address"    = "IP Address";
+"notification.security_alert.location"      = "Location";
+
+"notification.user.account_update"          = "Account Update";
+"notification.user.account_status"          = "Account Status";
+"notification.user.plan_renewal"            = "Plan Renewal";
+"notification.user.billing_cycle"           = "Billing Cycle";
+"notification.user.renewal_date"            = "Renewal Date";
+
+// MARK: - Notifications popover
+"notifications.title"           = "Notifications";
+"notifications.all_notifications" = "All notifications";
+"notifications.mark_all_read"   = "Mark all as read";
+"notifications.read_all"        = "Read all";
+
+// MARK: - Share popover
+"share.title"           = "Share";
+"share.export_pdf"      = "Export PDF Report";
+"share.email_journal"   = "Email Journal";
+"share.copy_link"       = "Copy Link";
+"share.share_twitter"   = "Share on X";
+
+// MARK: - Status bar
+"statusbar.engine_ready"  = "Engine Ready";
+"statusbar.latency"       = "Latency";
+"statusbar.macos_version" = "macOS";
+"statusbar.core_version"  = "FMSYSCore";
+
+// MARK: - Dashboard
+"dashboard.checklist.title"             = "Daily Checklist";
+"dashboard.checklist.empty_hint"        = "No items yet";
+"dashboard.checklist.new_item_placeholder" = "Add checklist item...";
+"dashboard.checklist.item_title_placeholder" = "Item";
+"dashboard.equity_curve.title"          = "Equity Curve";
+"dashboard.equity_curve.subtitle"       = "Cumulative P&L over time";
+"dashboard.equity_curve.empty"          = "No trades yet in this period";
+"dashboard.market_overview.title"       = "Market Overview";
+"dashboard.psych.title"                 = "PSYCHOLOGICAL ANALYTICS";
+"dashboard.psych.period"                = "Period";
+"dashboard.psych.heatmap_title"         = "Trade Emotion Heatmap";
+"dashboard.psych.legend.profit"         = "Profit";
+"dashboard.psych.legend.neutral"        = "Neutral";
+"dashboard.psych.legend.loss"           = "Loss";
+"dashboard.psych.discipline_score"      = "Discipline Score";
+"dashboard.psych.patience_index"        = "Patience Index";
+"dashboard.news.title"                  = "Market News";
+"dashboard.news.loading"                = "Loading news...";
+"dashboard.news.empty"                  = "No news available";
+"dashboard.news.retry"                  = "Retry";
+"dashboard.news.time_just_now"          = "Just now";
+"dashboard.news.time_minutes_ago"       = "m ago";
+"dashboard.news.time_hours_ago"         = "h ago";
+"dashboard.news.time_days_ago"          = "d ago";
+
+// MARK: - Backtesting
+"backtest.title"                        = "Backtesting";
+"backtest.button.new"                   = "New Backtest";
+"backtest.empty.title"                  = "No Backtest Results";
+"backtest.empty.description"            = "Run a backtest to see results here";
+"backtest.equity_curve.title"           = "Equity Curve";
+"backtest.equity_curve.subtitle"        = "Simulated performance";
+"backtest.equity_curve.no_data"         = "No equity data";
+"backtest.equity_curve.mode.daily"      = "Daily";
+"backtest.equity_curve.mode.trade_by_trade" = "Trade-by-Trade";
+"backtest.chart.axis.equity"            = "Equity";
+"backtest.chart.axis.trade"             = "Trade";
+"backtest.chart.x_label.start"         = "Start";
+"backtest.chart.x_label.end"           = "End";
+"backtest.chart.x_label.trade"         = "Trade";
+"backtest.kpi.win_rate"                 = "Win Rate";
+"backtest.kpi.win_rate.above_target"    = "Above target";
+"backtest.kpi.win_rate.below_target"    = "Below target";
+"backtest.kpi.profit_factor"            = "Profit Factor";
+"backtest.kpi.profit_factor.excellent"  = "Excellent";
+"backtest.kpi.profit_factor.fair"       = "Fair";
+"backtest.kpi.max_drawdown"             = "Max Drawdown";
+"backtest.kpi.sharpe"                   = "Sharpe Ratio";
+"backtest.trade_log.title"              = "Trade Log";
+"backtest.trade_log.empty"              = "No trades";
+"backtest.trade_log.col.date"           = "Date";
+"backtest.trade_log.col.symbol"         = "Symbol";
+"backtest.trade_log.col.type"           = "Type";
+"backtest.trade_log.col.net_profit"     = "Net Profit";
+"backtest.trade_log.col.strategy"       = "Strategy";
+"backtest.trade_log.direction.long"     = "LONG";
+"backtest.trade_log.direction.short"    = "SHORT";
+
+// MARK: - Strategy Lab
+"strategy.title"                        = "Strategy Lab";
+"strategy.subtitle"                     = "Manage and test your trading strategies";
+"strategy.button.new"                   = "New Strategy";
+"strategy.empty.title"                  = "No Strategies";
+"strategy.empty.description"            = "Create your first strategy to get started";
+"strategy.inspector.title"              = "Strategy Details";
+"strategy.inspector.empty.title"        = "Select a Strategy";
+"strategy.inspector.empty.description"  = "Choose a strategy to view its details";
+"strategy.inspector.logic.title"        = "Strategy Logic";
+"strategy.inspector.parameters.title"   = "Parameters";
+"strategy.inspector.parameters.ema_fast" = "EMA Fast";
+"strategy.inspector.parameters.ema_slow" = "EMA Slow";
+"strategy.inspector.parameters.trailing_stop" = "Trailing Stop";
+"strategy.inspector.parameters.risk_management" = "Risk Management";
+"strategy.inspector.run_backtest"       = "Run Backtest";
+
+// MARK: - Portfolio
+"portfolio.kpi.total_pnl"               = "Total P&L";
+"portfolio.kpi.daily_pnl"               = "Daily P&L";
+"portfolio.kpi.win_rate_range"          = "Win Rate";
+"portfolio.kpi.pnl_range"               = "P&L (Range)";
+"portfolio.kpi.trade_count"             = "Trades";
+"portfolio.performance.title"           = "Portfolio Performance";
+"portfolio.performance.subtitle"        = "Closed trade P&L";
+"portfolio.performance.no_trades"       = "No trades in this period";
+"portfolio.positions.title"             = "Open Positions";
+"portfolio.positions.col.symbol"        = "Symbol";
+"portfolio.positions.col.qty"           = "Qty";
+"portfolio.positions.col.last_price"    = "Last Price";
+"portfolio.positions.col.market_value"  = "Market Value";
+"portfolio.positions.col.unrealized_pnl" = "Unrealized P&L";
+"portfolio.positions.view_all"          = "View All";
+"portfolio.inspector.total_assets"      = "Total Assets";
+"portfolio.inspector.allocation.title"  = "Allocation";
+"portfolio.inspector.risk.title"        = "Risk Metrics";
+"portfolio.inspector.risk.open_count"   = "Open Positions";
+"portfolio.inspector.risk.margin_utilization" = "Margin Utilization";
+"portfolio.inspector.risk.position_exposure" = "Largest Position";
+
+// MARK: - Journal
+"journal.nav.title"                     = "Trade Journal";
+"journal.list.all_trades"               = "All Trades";
+"journal.list.empty_title"              = "No Trades";
+"journal.list.empty_subtitle"           = "Start logging your trades";
+"journal.list.no_trades"                = "No trades yet";
+"journal.list.no_trades_hint"           = "Tap + to add your first trade";
+"journal.list.log_first_trade"          = "Log First Trade";
+"journal.list.import_panel_title"       = "Import CSV";
+"journal.list.import_panel_prompt"      = "Drop a CSV file here";
+"journal.list.import_help"              = "Supports most broker formats";
+"journal.list.sort_newest"              = "Newest First";
+"journal.list.sort_pnl"                 = "P&L";
+"journal.filter.all"                    = "All";
+"journal.filter.buy"                    = "Buy";
+"journal.filter.sell"                   = "Sell";
+"journal.filter.call"                   = "Call";
+"journal.filter.put"                    = "Put";
+"journal.filter.spot"                   = "Spot";
+"journal.filter.futures"                = "Futures";
+"journal.detail.select_trade"           = "Select a trade to view details";
+
+// Journal card
+"journal.card.buy"                      = "BUY";
+"journal.card.sell"                     = "SELL";
+"journal.card.shares"                   = "shares";
+"journal.card.roe"                      = "ROE";
+"journal.card.options.qty"              = "qty";
+"journal.card.options.exp"              = "exp";
+"journal.card.forex.last_trade_profit"  = "Last trade profitable";
+"journal.card.forex.last_trade_loss"    = "Last trade at loss";
+"journal.card.forex.no_active_trades"   = "No active trades";
+
+// Journal detail
+"journal.detail.metric.entry_price"     = "Entry Price";
+"journal.detail.metric.exit_price"      = "Exit Price";
+"journal.detail.metric.quantity"        = "Quantity";
+"journal.detail.metric.direction"       = "Direction";
+"journal.detail.metric.direction_long"  = "LONG";
+"journal.detail.metric.direction_short" = "SHORT";
+"journal.detail.metric.leverage"        = "Leverage";
+"journal.detail.metric.exposure"        = "Exposure";
+"journal.detail.metric.cost_basis"      = "Cost Basis";
+"journal.detail.metric.strike_price"    = "Strike Price";
+"journal.detail.metric.expiration"      = "Expiration";
+"journal.detail.metric.funding_rate"    = "Funding Rate";
+"journal.detail.metric.lot_size"        = "Lot Size";
+"journal.detail.metric.pip_value"       = "Pip Value";
+"journal.detail.metric.entry_rate"      = "Entry Rate";
+
+"journal.detail.stocks.subtitle"        = "Equity";
+"journal.detail.crypto.spot"            = "Spot";
+"journal.detail.crypto.futures"         = "Futures";
+"journal.detail.crypto.leverage"        = "Leverage";
+"journal.detail.crypto.executing_wallet" = "Executing Wallet";
+"journal.detail.crypto.copy"            = "Copy";
+"journal.detail.forex.subtitle_prefix"  = "Forex";
+"journal.detail.forex.session.london"   = "London";
+"journal.detail.forex.session.ny"       = "New York";
+"journal.detail.forex.session.asia"     = "Asia";
+"journal.detail.forex.session.off_hours" = "Off Hours";
+"journal.detail.options.call_bullish"   = "Call — Bullish";
+"journal.detail.options.put_bearish"    = "Put — Bearish";
+"journal.detail.options.greeks_title"   = "Greeks";
+"journal.detail.options.greek.delta"    = "Delta";
+"journal.detail.options.greek.gamma"    = "Gamma";
+"journal.detail.options.greek.theta"    = "Theta";
+"journal.detail.options.greek.vega"     = "Vega";
+
+// Journal entry form
+"journal.entry.title"                   = "New Trade";
+"journal.entry.subtitle"                = "Log a new trade";
+"journal.entry.asset_ticker"            = "Asset / Ticker";
+"journal.entry.category"                = "Category";
+"journal.entry.direction"               = "Direction";
+"journal.entry.direction.long"          = "Long";
+"journal.entry.direction.short"         = "Short";
+"journal.entry.direction.call"          = "Call";
+"journal.entry.direction.put"           = "Put";
+"journal.entry.execution_details"       = "Execution Details";
+"journal.entry.field.entry_price"       = "Entry Price";
+"journal.entry.field.exit_price"        = "Exit Price";
+"journal.entry.field.exit_price_optional" = "Exit Price (optional)";
+"journal.entry.field.quantity_shares"   = "Quantity (shares)";
+"journal.entry.field.quantity_contracts" = "Quantity (contracts)";
+"journal.entry.field.position_size"     = "Position Size";
+"journal.entry.field.stop_loss"         = "Stop Loss";
+"journal.entry.field.cost_basis"        = "Cost Basis";
+"journal.entry.field.leverage"          = "Leverage";
+"journal.entry.field.exposure"          = "Exposure";
+"journal.entry.field.entry_price_premium" = "Entry Price (Premium)";
+"journal.entry.field.strike_price"      = "Strike Price";
+"journal.entry.field.expiration_date"   = "Expiration Date";
+"journal.entry.field.funding_rate"      = "Funding Rate";
+"journal.entry.field.lot_size"          = "Lot Size";
+"journal.entry.field.pip_value"         = "Pip Value";
+"journal.entry.field.wallet_address"    = "Wallet Address";
+"journal.entry.notes_reflection"        = "Notes & Reflection";
+"journal.entry.save_trade"              = "Save Trade";
+
+// Journal close trade
+"journal.close_trade.title"             = "Close Trade";
+"journal.close_trade.exit_price"        = "Exit Price";
+"journal.close_trade.exit_time"         = "Exit Time";
+"journal.close_trade.entry_price"       = "Entry Price";
+"journal.close_trade.estimated_pl"      = "Estimated P&L";
+"journal.close_trade.confirm_button"    = "Confirm Close";
+
+// Journal attachments
+"journal.attachments.title"             = "Attachments";
+"journal.attachments.drop_hint"         = "Drop images here";
+"journal.attachments.add_help"          = "Add screenshots or charts";
+
+// Journal CSV import
+"journal.csv.map_columns_title"         = "Map Columns";
+"journal.csv.col_header_csv"            = "CSV Column";
+"journal.csv.col_header_maps_to"        = "Maps To";
+"journal.csv.col_header_sample"         = "Sample";
+"journal.csv.skip_option"               = "Skip";
+"journal.csv.col.date"                  = "Date";
+"journal.csv.col.symbol"                = "Symbol";
+"journal.csv.col.direction"             = "Direction";
+"journal.csv.col.entry"                 = "Entry Price";
+"journal.csv.col.size"                  = "Size";
+"journal.csv.all_fields_mapped"         = "All required fields mapped";
+"journal.csv.missing_fields"            = "Missing required fields";
+"journal.csv.confirm_import"            = "Import";
+"journal.csv.import_button"             = "Import CSV";
+"journal.csv.preview_title"             = "Import Preview";
+"journal.csv.preview_subtitle"          = "Review trades before importing";
+"journal.csv.rows_with_errors"          = "Rows with errors";
+"journal.csv.row_error"                 = "Error";
+"journal.csv.more_trades"               = "more trades";
+
+// MARK: - News Feed
+"newsfeed.loading"                      = "Loading news...";
+"newsfeed.empty.title"                  = "No Articles";
+"newsfeed.empty.retry"                  = "Try Again";
+"newsfeed.section.latest_stories"       = "Latest Stories";
+"newsfeed.featured.read_full_story"     = "Read Full Story";
+"newsfeed.category.general"             = "General";
+"newsfeed.category.stocks"              = "Stocks";
+"newsfeed.category.crypto"              = "Crypto";
+"newsfeed.category.forex"               = "Forex";
+"newsfeed.tag.general"                  = "General";
+"newsfeed.tag.markets"                  = "Markets";
+"newsfeed.tag.stocks"                   = "Stocks";
+"newsfeed.tag.crypto"                   = "Crypto";
+"newsfeed.tag.forex"                    = "Forex";
+"newsfeed.panel.market_sentiment"       = "Market Sentiment";
+"newsfeed.panel.sentiment.fear"         = "Fear";
+"newsfeed.panel.sentiment.greed"        = "Greed";
+"newsfeed.panel.sentiment.description"  = "Fear & Greed Index";
+"newsfeed.panel.trending_tickers"       = "Trending Tickers";
+"newsfeed.panel.upcoming_events"        = "Upcoming Events";
+"newsfeed.panel.articles_by_source"     = "By Source";
+"newsfeed.panel.impact.high"            = "High";
+"newsfeed.panel.impact.medium"          = "Medium";
+"newsfeed.panel.impact.low"             = "Low";
+"newsfeed.time.just_now"                = "Just now";
+"newsfeed.time.minutes_ago"             = "m ago";
+"newsfeed.time.hours_ago"               = "h ago";
+"newsfeed.time.days_ago"                = "d ago";
+
+// MARK: - Subscription Management
+"subscription.title"                    = "Subscription Management";
+"subscription.current_plan_label"       = "Current Plan";
+"subscription.status_active"            = "Active";
+"subscription.renewal_info"             = "Renews on";
+"subscription.payment_method"           = "Payment Method";
+"subscription.visa_ending"              = "Visa ending";
+"subscription.visa_expires"             = "Expires";
+"subscription.update_payment"           = "Update Payment";
+"subscription.compare_plans"            = "Compare Plans";
+"subscription.badge_recommended"        = "RECOMMENDED";
+"subscription.plan_basic_name"          = "Basic";
+"subscription.plan_basic_subtitle"      = "For individual traders";
+"subscription.plan_pro_name"            = "Pro";
+"subscription.plan_pro_subtitle"        = "For serious traders";
+"subscription.period_monthly"           = "/mo";
+"subscription.pro_plan_annual"          = "Annual billing";
+"subscription.feature_basic_indicators" = "Basic indicators";
+"subscription.feature_100_indicators"   = "100+ indicators";
+"subscription.feature_watchlists_3"     = "3 watchlists";
+"subscription.feature_unlimited_watchlists" = "Unlimited watchlists";
+"subscription.feature_realtime_quotes"  = "Real-time quotes";
+"subscription.feature_multi_chart"      = "Multi-chart layout";
+"subscription.feature_level2_data"      = "Level 2 data";
+"subscription.feature_api_access"       = "API access";
+"subscription.feature_full_api"         = "Full API access";
+"subscription.cta_current_plan"         = "Current Plan";
+"subscription.cta_manage_subscription"  = "Manage Subscription";
+"subscription.switch_monthly"           = "Switch to Monthly";
+"subscription.billing_history"          = "Billing History";
+"subscription.view_all"                 = "View All";
+"subscription.manage_billing"           = "Manage Billing";
+"subscription.support_prompt"           = "Need help with your subscription?";
+"subscription.contact_support"          = "Contact Support";
+"subscription.help_center"              = "Help Center";
+
+// MARK: - Referral Program
+"referral.hero_eyebrow"                 = "REFER & EARN";
+"referral.hero_headline"                = "Get 1 month free for every referral";
+"referral.hero_body"                    = "Share your unique link and earn rewards when friends join Trading Suite Pro.";
+"referral.stat_total"                   = "Total Referrals";
+"referral.stat_rewards"                 = "Rewards Earned";
+"referral.stat_rewards_sub"             = "in free months";
+"referral.stat_pending"                 = "Pending";
+"referral.your_link_title"              = "Your Referral Link";
+"referral.your_link_subtitle"           = "Share this link to earn rewards";
+"referral.invite_cta"                   = "Invite Friends";
+"referral.quick_share"                  = "Quick Share";
+"referral.program_rewards"              = "Program Rewards";
+"referral.recent_title"                 = "Recent Referrals";
+"referral.col_user"                     = "User";
+"referral.col_date"                     = "Date";
+"referral.col_status"                   = "Status";
+"referral.col_reward"                   = "Reward";
+"referral.view_all"                     = "View All Referrals";
+
+// MARK: - Common actions
+"common.save"           = "Save";
+"common.cancel"         = "Cancel";
+"common.close"          = "Close";
+"common.dismiss"        = "Dismiss";
+"common.done"           = "Done";
+"common.view_details"   = "View Details";
+"common.view_trade"     = "View Trade";
+"common.view_source"    = "View Source";
+"common.view_settings"  = "View Settings";
+"common.view_account"   = "View Account";
+"common.mark_achieved"  = "Mark Achieved";
+"common.achieved"       = "Achieved";
+"common.archived"       = "Archived";
+"common.archive"        = "Archive";

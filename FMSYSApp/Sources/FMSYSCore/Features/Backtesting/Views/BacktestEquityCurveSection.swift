@@ -7,6 +7,7 @@ public struct BacktestEquityCurveSection: View {
     let result: BacktestResult
 
     @State private var viewMode: ViewMode = .tradeByTrade
+    @Environment(LanguageManager.self) private var lang
 
     // Fix 5 (LOW): Named constant for daily stride
     private let dailySampleStride = 5
@@ -18,9 +19,9 @@ public struct BacktestEquityCurveSection: View {
     // MARK: View modes
 
     // Fix 4 (LOW): Mark ViewMode as private
-    private enum ViewMode: String, CaseIterable {
-        case daily        = "Daily"
-        case tradeByTrade = "Trade-by-Trade"
+    private enum ViewMode: CaseIterable {
+        case daily
+        case tradeByTrade
     }
 
     // MARK: Body
@@ -51,12 +52,17 @@ public struct BacktestEquityCurveSection: View {
     private var headerRow: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Equity Curve")
+                Text("backtest.equity_curve.title", bundle: lang.bundle)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
-                Text("Cumulative Net Profit over \(result.totalTrades) trades")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.fmsMuted)
+                Text(
+                    String(
+                        format: String(localized: "backtest.equity_curve.subtitle", bundle: lang.bundle),
+                        result.totalTrades
+                    )
+                )
+                .font(.system(size: 11))
+                .foregroundStyle(Color.fmsMuted)
             }
             Spacer()
             modePicker
@@ -66,7 +72,7 @@ public struct BacktestEquityCurveSection: View {
     private var modePicker: some View {
         HStack(spacing: 2) {
             ForEach(ViewMode.allCases, id: \.self) { mode in
-                Button(mode.rawValue) {
+                Button(modeLabel(mode)) {
                     viewMode = mode
                 }
                 .font(.system(size: 10, weight: .bold))
@@ -88,13 +94,20 @@ public struct BacktestEquityCurveSection: View {
         .background(Color.fmsMuted.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
     }
 
+    private func modeLabel(_ mode: ViewMode) -> String {
+        switch mode {
+        case .daily:        return String(localized: "backtest.equity_curve.mode.daily", bundle: lang.bundle)
+        case .tradeByTrade: return String(localized: "backtest.equity_curve.mode.trade_by_trade", bundle: lang.bundle)
+        }
+    }
+
     @ViewBuilder
     private func chartArea(points: [BacktestEquityPoint], lastTradeNumber: Int) -> some View {
         if points.isEmpty {
             Color.fmsMuted.opacity(0.1)
                 .frame(height: 200)
                 .overlay(
-                    Text("No equity data")
+                    Text("backtest.equity_curve.no_data", bundle: lang.bundle)
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsMuted)
                 )
@@ -102,8 +115,8 @@ public struct BacktestEquityCurveSection: View {
         } else {
             Chart(points, id: \.tradeNumber) { pt in
                 AreaMark(
-                    x: .value("Trade", pt.tradeNumber),
-                    y: .value("Equity", pt.equity)
+                    x: .value(String(localized: "backtest.chart.axis.trade", bundle: lang.bundle), pt.tradeNumber),
+                    y: .value(String(localized: "backtest.chart.axis.equity", bundle: lang.bundle), pt.equity)
                 )
                 .foregroundStyle(
                     LinearGradient(
@@ -114,8 +127,8 @@ public struct BacktestEquityCurveSection: View {
                 )
 
                 LineMark(
-                    x: .value("Trade", pt.tradeNumber),
-                    y: .value("Equity", pt.equity)
+                    x: .value(String(localized: "backtest.chart.axis.trade", bundle: lang.bundle), pt.tradeNumber),
+                    y: .value(String(localized: "backtest.chart.axis.equity", bundle: lang.bundle), pt.equity)
                 )
                 .foregroundStyle(Color.fmsPrimary)
                 .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -169,8 +182,11 @@ public struct BacktestEquityCurveSection: View {
 
     // Fix 3 (MEDIUM): lastTradeNumber passed in; no re-decode of equityCurve
     private func xLabel(for tradeNumber: Int, lastTradeNumber: Int) -> String {
-        if tradeNumber <= 1               { return "Start" }
-        if tradeNumber >= lastTradeNumber { return "End" }
-        return "Trade \(tradeNumber)"
+        if tradeNumber <= 1               { return String(localized: "backtest.chart.x_label.start", bundle: lang.bundle) }
+        if tradeNumber >= lastTradeNumber { return String(localized: "backtest.chart.x_label.end", bundle: lang.bundle) }
+        return String(
+            format: String(localized: "backtest.chart.x_label.trade", bundle: lang.bundle),
+            tradeNumber
+        )
     }
 }

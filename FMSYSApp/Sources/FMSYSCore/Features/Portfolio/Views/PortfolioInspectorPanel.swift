@@ -31,15 +31,24 @@ struct AllocationDonutView: View {
             .frame(width: 160, height: 160)
 
             VStack(spacing: 2) {
-                Text("Total Assets")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(Color.fmsMuted)
-                    .textCase(.uppercase)
-                Text("$142k")
-                    .font(.system(size: 17, weight: .heavy))
-                    .foregroundStyle(Color.fmsOnSurface)
+                DonutCenterLabel()
             }
         }
+    }
+}
+
+// Separate subview so it can hold its own @Environment
+private struct DonutCenterLabel: View {
+    @Environment(LanguageManager.self) private var lang
+
+    var body: some View {
+        Text("portfolio.inspector.total_assets", bundle: lang.bundle)
+            .font(.system(size: 9, weight: .bold))
+            .foregroundStyle(Color.fmsMuted)
+            .textCase(.uppercase)
+        Text("$142k")
+            .font(.system(size: 17, weight: .heavy))
+            .foregroundStyle(Color.fmsOnSurface)
     }
 }
 
@@ -47,6 +56,7 @@ struct AllocationDonutView: View {
 
 public struct PortfolioInspectorPanel: View {
     let viewModel: PortfolioViewModel
+    @Environment(LanguageManager.self) private var lang
 
     public var body: some View {
         ScrollView(.vertical) {
@@ -61,7 +71,7 @@ public struct PortfolioInspectorPanel: View {
 
     private var allocationSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Asset Allocation")
+            Text("portfolio.inspector.allocation.title", bundle: lang.bundle)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
                 .textCase(.uppercase)
@@ -94,20 +104,23 @@ public struct PortfolioInspectorPanel: View {
 
     private var riskSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Risk Exposure")
+            Text("portfolio.inspector.risk.title", bundle: lang.bundle)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
                 .textCase(.uppercase)
                 .tracking(1)
 
             riskBar(
-                label: "Position Exposure",
+                label: String(localized: "portfolio.inspector.risk.position_exposure", bundle: lang.bundle),
                 fillFraction: min(1.0, Double(viewModel.openTrades.count) / 10.0),
-                displayValue: "\(viewModel.openTrades.count) open",
+                displayValue: String(
+                    format: String(localized: "portfolio.inspector.risk.open_count", bundle: lang.bundle),
+                    viewModel.openTrades.count
+                ),
                 color: Color(red: 0.231, green: 0.510, blue: 0.965)
             )
             riskBar(
-                label: "Margin Utilization",
+                label: String(localized: "portfolio.inspector.risk.margin_utilization", bundle: lang.bundle),
                 fillFraction: viewModel.marginUtilization,
                 displayValue: String(format: "%.0f%%", viewModel.marginUtilization * 100),
                 color: Color.fmsPrimary

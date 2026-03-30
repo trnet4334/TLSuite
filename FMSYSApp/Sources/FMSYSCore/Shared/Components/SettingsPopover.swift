@@ -4,6 +4,7 @@ import SwiftUI
 public struct SettingsPopover: View {
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("priceAlertsEnabled") private var priceAlertsEnabled = false
+    @Environment(LanguageManager.self) private var lang
 
     public init() {}
 
@@ -15,21 +16,21 @@ public struct SettingsPopover: View {
                 .frame(width: 32, height: 4)
                 .padding(.top, 10)
 
-            Text("Quick Settings")
+            Text("settings.quick_settings", bundle: lang.bundle)
                 .font(.system(size: 15, weight: .bold))
                 .foregroundStyle(Color.fmsOnSurface)
                 .padding(.top, 8)
                 .padding(.bottom, 8)
 
             VStack(spacing: 2) {
-                toggleRow(systemImage: "moon.fill", label: "Dark Mode", binding: $isDarkMode)
-                toggleRow(systemImage: "bell.fill", label: "Price Alerts", binding: $priceAlertsEnabled)
+                toggleRow(systemImage: "moon.fill", label: String(localized: "avatar.dark_mode", bundle: lang.bundle), binding: $isDarkMode)
+                toggleRow(systemImage: "bell.fill", label: String(localized: "avatar.price_alerts", bundle: lang.bundle), binding: $priceAlertsEnabled)
 
                 Divider()
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
 
-                navigateRow(systemImage: "gearshape.fill", label: "App Preferences")
+                navigateRow(systemImage: "gearshape.fill", label: String(localized: "avatar.app_preferences", bundle: lang.bundle))
             }
             .padding(.horizontal, 8)
             .padding(.bottom, 12)

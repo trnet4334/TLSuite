@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct PsychAnalyticsSection: View {
     let analytics: PsychAnalytics
+    @Environment(LanguageManager.self) private var lang
 
     private let emotionColumns = EmotionTag.allCases.map { $0.displayName }
 
@@ -15,12 +16,12 @@ public struct PsychAnalyticsSection: View {
                 Image(systemName: "brain.head.profile")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.fmsPrimary)
-                Text("PSYCHOLOGICAL ANALYTICS")
+                Text("dashboard.psych.title", bundle: lang.bundle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                     .kerning(0.5)
                 Spacer()
-                Text("LAST 30 SESSIONS")
+                Text("dashboard.psych.period", bundle: lang.bundle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Color.fmsMuted)
                     .kerning(0.5)
@@ -29,14 +30,14 @@ public struct PsychAnalyticsSection: View {
             GeometryReader { geo in
                 HStack(alignment: .top, spacing: 24) {
                     VStack(spacing: 12) {
-                        ScoreBar(label: "Discipline Score", value: analytics.disciplineScore, color: Color.fmsPrimary)
-                        ScoreBar(label: "Patience Index", value: analytics.patienceIndex, color: Color(red: 0.345, green: 0.651, blue: 1.0))
+                        ScoreBar(label: String(localized: "dashboard.psych.discipline_score", bundle: lang.bundle), value: analytics.disciplineScore, color: Color.fmsPrimary)
+                        ScoreBar(label: String(localized: "dashboard.psych.patience_index", bundle: lang.bundle), value: analytics.patienceIndex, color: Color(red: 0.345, green: 0.651, blue: 1.0))
                     }
                     .frame(width: (geo.size.width - 24) / 3)
 
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("Emotion vs. P/L Heatmap")
+                            Text("dashboard.psych.heatmap_title", bundle: lang.bundle)
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(Color.fmsMuted)
                             Spacer()
@@ -55,9 +56,9 @@ public struct PsychAnalyticsSection: View {
 
     private var legend: some View {
         HStack(spacing: 8) {
-            legendSwatch(color: Color.fmsLoss, label: "Loss")
-            legendSwatch(color: Color.fmsMuted.opacity(0.5), label: "Neutral")
-            legendSwatch(color: Color.fmsPrimary, label: "Profit")
+            legendSwatch(color: Color.fmsLoss, label: String(localized: "dashboard.psych.legend.loss", bundle: lang.bundle))
+            legendSwatch(color: Color.fmsMuted.opacity(0.5), label: String(localized: "dashboard.psych.legend.neutral", bundle: lang.bundle))
+            legendSwatch(color: Color.fmsPrimary, label: String(localized: "dashboard.psych.legend.profit", bundle: lang.bundle))
         }
     }
 

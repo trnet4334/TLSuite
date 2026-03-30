@@ -4,6 +4,7 @@ import SwiftUI
 public struct NewsFeedView: View {
 
     @State private var service = MarketNewsService()
+    @State private var panelService = MarketPanelService()
     @State private var isSpinning = false
     @Environment(LanguageManager.self) private var lang
 
@@ -13,10 +14,11 @@ public struct NewsFeedView: View {
         HStack(spacing: 0) {
             feedColumn
             Divider()
-            NewsFeedRightPanel(articles: service.articles)
+            NewsFeedRightPanel(articles: service.articles, panelService: panelService)
         }
         .background(Color.fmsBackground)
         .task { await service.refresh() }
+        .task { await panelService.refresh() }
     }
 
     // MARK: - Left feed column
@@ -70,7 +72,9 @@ public struct NewsFeedView: View {
                     withAnimation(.linear(duration: 0.6).repeatCount(1, autoreverses: false)) {
                         isSpinning = true
                     }
-                    await service.refresh()
+                    async let n: () = service.refresh()
+                    async let p: () = panelService.refresh()
+                    _ = await (n, p)
                     isSpinning = false
                 }
             } label: {

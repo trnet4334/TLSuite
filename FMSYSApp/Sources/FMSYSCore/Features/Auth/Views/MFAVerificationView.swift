@@ -3,6 +3,7 @@ import SwiftUI
 public struct MFAVerificationView: View {
     @State private var viewModel: MFAViewModel
     @State private var code = ""
+    @Environment(LanguageManager.self) private var lang
 
     let onAuthenticated: () -> Void
 
@@ -20,31 +21,6 @@ public struct MFAVerificationView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             VStack(spacing: 0) {
-                // Window chrome row
-                HStack {
-                    HStack(spacing: 6) {
-                        Circle().fill(Color.fmsLoss).frame(width: 12, height: 12)
-                        Circle().fill(Color.fmsWarning).frame(width: 12, height: 12)
-                        Circle().fill(Color.fmsPrimary).frame(width: 12, height: 12)
-                    }
-                    Spacer()
-                    Text("FMSYS")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Color.fmsOnSurface)
-                    Spacer()
-                    HStack(spacing: 6) {
-                        Circle().fill(Color.clear).frame(width: 12, height: 12)
-                        Circle().fill(Color.clear).frame(width: 12, height: 12)
-                        Circle().fill(Color.clear).frame(width: 12, height: 12)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 14)
-                .background(Color.fmsSurface.opacity(0.6))
-                .overlay(alignment: .bottom) {
-                    Rectangle().frame(height: 0.5).foregroundStyle(Color.fmsMuted.opacity(0.2))
-                }
-
                 // Content
                 VStack(spacing: 28) {
                     // Shield icon
@@ -60,10 +36,10 @@ public struct MFAVerificationView: View {
 
                     // Title
                     VStack(spacing: 8) {
-                        Text("Verify Identity")
+                        Text("auth.mfa_title", bundle: lang.bundle)
                             .font(.system(size: 24, weight: .heavy))
                             .foregroundStyle(Color.fmsOnSurface)
-                        Text("Enter the 6-digit code from\nyour authenticator app")
+                        Text("auth.mfa_subtitle", bundle: lang.bundle)
                             .font(.system(size: 14))
                             .foregroundStyle(Color.fmsMuted)
                             .multilineTextAlignment(.center)
@@ -76,9 +52,12 @@ public struct MFAVerificationView: View {
 
                     // Locked state or Verify button
                     if viewModel.isLocked {
-                        Label("Account locked. Too many attempts.", systemImage: "lock.fill")
-                            .font(.footnote)
-                            .foregroundStyle(Color.fmsLoss)
+                        Label(
+                            String(localized: "auth.mfa_locked", bundle: lang.bundle),
+                            systemImage: "lock.fill"
+                        )
+                        .font(.footnote)
+                        .foregroundStyle(Color.fmsLoss)
                     } else {
                         VStack(spacing: 16) {
                             Button {
@@ -88,7 +67,7 @@ public struct MFAVerificationView: View {
                                     if viewModel.isLoading {
                                         ProgressView().tint(Color.fmsBackground)
                                     } else {
-                                        Text("Verify Identity")
+                                        Text("auth.mfa_title", bundle: lang.bundle)
                                             .font(.system(size: 14, weight: .bold))
                                     }
                                 }
@@ -101,7 +80,7 @@ public struct MFAVerificationView: View {
                             .buttonStyle(.plain)
                             .disabled(viewModel.isLoading || code.count < 6)
 
-                            Button("Resend code") {}
+                            Button(String(localized: "auth.mfa_resend", bundle: lang.bundle)) {}
                                 .font(.system(size: 13))
                                 .foregroundStyle(Color.fmsPrimary)
                                 .buttonStyle(.plain)
@@ -113,8 +92,10 @@ public struct MFAVerificationView: View {
                         Image(systemName: "iphone")
                             .font(.system(size: 13))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Method").font(.system(size: 10)).foregroundStyle(Color.fmsMuted)
-                            Text("Google Authenticator").font(.system(size: 12, weight: .semibold))
+                            Text("auth.mfa_method", bundle: lang.bundle)
+                                .font(.system(size: 10)).foregroundStyle(Color.fmsMuted)
+                            Text("auth.mfa_google", bundle: lang.bundle)
+                                .font(.system(size: 12, weight: .semibold))
                         }
                     }
                     .foregroundStyle(Color.fmsOnSurface)

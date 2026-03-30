@@ -12,6 +12,7 @@ public struct BacktestTradeLogTable: View {
     }
 
     let result: BacktestResult
+    @Environment(LanguageManager.self) private var lang
 
     public init(result: BacktestResult) {
         self.result = result
@@ -45,7 +46,7 @@ public struct BacktestTradeLogTable: View {
 
     private var tableHeader: some View {
         HStack {
-            Text("Detailed Test Results")
+            Text("backtest.trade_log.title", bundle: lang.bundle)
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(Color.fmsMuted)
                 .tracking(0.8)
@@ -63,11 +64,11 @@ public struct BacktestTradeLogTable: View {
 
     private var columnHeaderRow: some View {
         HStack(spacing: 0) {
-            colHeader("Date",       width: ColumnWidth.date)
-            colHeader("Symbol",     width: ColumnWidth.symbol)
-            colHeader("Strategy",   width: ColumnWidth.strategy)
-            colHeader("Type",       width: ColumnWidth.type)
-            colHeader("Net Profit", width: ColumnWidth.profit)
+            colHeader(String(localized: "backtest.trade_log.col.date",       bundle: lang.bundle), width: ColumnWidth.date)
+            colHeader(String(localized: "backtest.trade_log.col.symbol",     bundle: lang.bundle), width: ColumnWidth.symbol)
+            colHeader(String(localized: "backtest.trade_log.col.strategy",   bundle: lang.bundle), width: ColumnWidth.strategy)
+            colHeader(String(localized: "backtest.trade_log.col.type",       bundle: lang.bundle), width: ColumnWidth.type)
+            colHeader(String(localized: "backtest.trade_log.col.net_profit", bundle: lang.bundle), width: ColumnWidth.profit)
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -80,7 +81,7 @@ public struct BacktestTradeLogTable: View {
     @ViewBuilder
     private func tableBody(trades: [BacktestTradeEntry]) -> some View {
         if trades.isEmpty {
-            Text("No trades in log")
+            Text("backtest.trade_log.empty", bundle: lang.bundle)
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsMuted)
                 .frame(maxWidth: .infinity)
@@ -113,7 +114,9 @@ public struct BacktestTradeLogTable: View {
                 .foregroundStyle(Color.fmsOnSurface)
                 .frame(width: ColumnWidth.strategy, alignment: .leading)
 
-            Text(entry.direction == .long ? "Long" : "Short")
+            Text(entry.direction == .long
+                    ? String(localized: "backtest.trade_log.direction.long",  bundle: lang.bundle)
+                    : String(localized: "backtest.trade_log.direction.short", bundle: lang.bundle))
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(entry.direction == .long ? Color.fmsPrimary : Color.fmsLoss)
                 .frame(width: ColumnWidth.type, alignment: .leading)
@@ -139,7 +142,9 @@ public struct BacktestTradeLogTable: View {
     }
 
     private func rowAccessibilityLabel(_ entry: BacktestTradeEntry) -> String {
-        let direction = entry.direction == .long ? "Long" : "Short"
+        let direction = entry.direction == .long
+            ? String(localized: "backtest.trade_log.direction.long",  bundle: lang.bundle)
+            : String(localized: "backtest.trade_log.direction.short", bundle: lang.bundle)
         let profit = entry.netProfit >= 0
             ? String(format: "+$%.2f", entry.netProfit)
             : String(format: "-$%.2f", abs(entry.netProfit))

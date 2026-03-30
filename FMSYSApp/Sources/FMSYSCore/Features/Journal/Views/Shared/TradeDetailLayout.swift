@@ -181,6 +181,7 @@ public struct TradeDetailLayout<Metrics: View>: View {
                 },
                 onCancel: { showingCloseTrade = false }
             )
+            .environment(LanguageManager.shared)
         }
     }
 

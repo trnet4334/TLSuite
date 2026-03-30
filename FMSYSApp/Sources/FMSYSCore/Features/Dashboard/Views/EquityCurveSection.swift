@@ -4,6 +4,7 @@ import Charts
 public struct EquityCurveSection: View {
     @Binding var selectedRange: DashboardRange
     let curve: [EquityPoint]
+    @Environment(LanguageManager.self) private var lang
 
     public init(selectedRange: Binding<DashboardRange>, curve: [EquityPoint]) {
         self._selectedRange = selectedRange
@@ -14,10 +15,10 @@ public struct EquityCurveSection: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Equity Curve")
+                    Text("dashboard.equity_curve.title", bundle: lang.bundle)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.fmsOnSurface)
-                    Text("Compound performance vs. benchmark")
+                    Text("dashboard.equity_curve.subtitle", bundle: lang.bundle)
                         .font(.system(size: 11))
                         .foregroundStyle(Color.fmsMuted)
                 }
@@ -99,7 +100,7 @@ public struct EquityCurveSection: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color.fmsBackground.opacity(0.5))
                 .frame(height: 180)
-            Text("No closed trades in this period.")
+            Text("dashboard.equity_curve.empty", bundle: lang.bundle)
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsMuted)
         }

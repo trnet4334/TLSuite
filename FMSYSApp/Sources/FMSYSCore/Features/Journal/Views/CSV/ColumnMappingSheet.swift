@@ -4,6 +4,7 @@ import SwiftUI
 /// Shown when broker format cannot be auto-detected.
 /// User maps CSV column names to Trade field names.
 public struct ColumnMappingSheet: View {
+    @Environment(LanguageManager.self) private var lang
 
     let csvHeaders: [String]
     let preview: [[String]]   // first 3 rows of raw values, parallel to csvHeaders
@@ -33,11 +34,11 @@ public struct ColumnMappingSheet: View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text("Map CSV Columns")
+                Text("journal.csv.map_columns_title", bundle: lang.bundle)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
-                Button("Cancel", action: onCancel)
+                Button(String(localized: "common.cancel", bundle: lang.bundle), action: onCancel)
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -50,11 +51,11 @@ public struct ColumnMappingSheet: View {
                 VStack(spacing: 0) {
                     // Column header row
                     HStack {
-                        Text("CSV Column")
+                        Text("journal.csv.col_header_csv", bundle: lang.bundle)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Sample Values")
+                        Text("journal.csv.col_header_sample", bundle: lang.bundle)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Maps To")
+                        Text("journal.csv.col_header_maps_to", bundle: lang.bundle)
                             .frame(width: 180, alignment: .leading)
                     }
                     .font(.system(size: 11, weight: .bold))
@@ -86,7 +87,7 @@ public struct ColumnMappingSheet: View {
             HStack {
                 missingRequiredLabel
                 Spacer()
-                Button("Import") { onConfirm(mapping) }
+                Button(String(localized: "journal.csv.import_button", bundle: lang.bundle)) { onConfirm(mapping) }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
@@ -116,11 +117,11 @@ public struct ColumnMappingSheet: View {
     private var missingRequiredLabel: some View {
         let missing = Self.requiredFields.filter { !Set(mapping.values).contains($0) }
         if missing.isEmpty {
-            Text("All required fields mapped")
+            Text("journal.csv.all_fields_mapped", bundle: lang.bundle)
                 .font(.system(size: 11))
                 .foregroundStyle(Color.fmsPrimary)
         } else {
-            Text("Missing: \(missing.joined(separator: ", "))")
+            Text(String(format: String(localized: "journal.csv.missing_fields", bundle: lang.bundle), missing.joined(separator: ", ")))
                 .font(.system(size: 11))
                 .foregroundStyle(Color.fmsLoss)
         }
@@ -128,6 +129,7 @@ public struct ColumnMappingSheet: View {
 }
 
 private struct MappingRow: View {
+    @Environment(LanguageManager.self) private var lang
     let csvHeader: String
     let sampleValues: String
     let targetFields: [String]
@@ -145,7 +147,7 @@ private struct MappingRow: View {
                 .foregroundStyle(Color.fmsMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Picker("", selection: $selectedTarget) {
-                Text("— skip —").tag("")
+                Text("journal.csv.skip_option", bundle: lang.bundle).tag("")
                 ForEach(targetFields, id: \.self) { field in
                     HStack {
                         Text(field)

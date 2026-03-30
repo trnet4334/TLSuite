@@ -1,7 +1,9 @@
 // Sources/FMSYSCore/Shared/Components/Notifications/NotificationCenterView.swift
 import SwiftUI
 
+
 public struct NotificationCenterView: View {
+    @Environment(LanguageManager.self) private var lang
     @Binding var unreadCount: Int
     let onDismiss: () -> Void
     let onViewTrade: ((UUID?) -> Void)?
@@ -21,11 +23,11 @@ public struct NotificationCenterView: View {
         case type(NotificationType)
         case achieved
 
-        var label: String {
+        func label(bundle: Bundle) -> String {
             switch self {
-            case .all:           return "All"
-            case .type(let t):   return t.rawValue
-            case .achieved:      return "Achieved"
+            case .all:           return String(localized: "notif.filter_all",      bundle: bundle)
+            case .type(let t):   return t.localizedName(bundle: bundle)
+            case .achieved:      return String(localized: "notif.filter_achieved", bundle: bundle)
             }
         }
     }
@@ -68,6 +70,7 @@ public struct NotificationCenterView: View {
         .background(Color.fmsSurface)
         .sheet(item: $selectedNotification) { notification in
             detailView(for: notification)
+                .environment(LanguageManager.shared)
         }
     }
 
@@ -76,10 +79,10 @@ public struct NotificationCenterView: View {
     private var header: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Notification Center")
+                Text("notif.title", bundle: lang.bundle)
                     .font(.system(size: 20, weight: .heavy))
                     .foregroundStyle(Color.fmsOnSurface)
-                Text("Manage your latest alerts and strategy updates.")
+                Text("notif.subtitle", bundle: lang.bundle)
                     .font(.system(size: 11))
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -121,7 +124,7 @@ public struct NotificationCenterView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle")
                         .font(.system(size: 12))
-                    Text("Mark all as read")
+                    Text("notif.mark_all_read", bundle: lang.bundle)
                         .font(.system(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(Color.fmsPrimary)
@@ -166,7 +169,7 @@ public struct NotificationCenterView: View {
         return Button {
             activeFilter = tab
         } label: {
-            Text(tab.label)
+            Text(tab.label(bundle: lang.bundle))
                 .font(.system(size: 12, weight: isSelected ? .bold : .semibold))
                 .foregroundStyle(
                     isSelected
@@ -267,7 +270,7 @@ public struct NotificationCenterView: View {
                     .lineLimit(2)
 
                 HStack(spacing: 8) {
-                    Button("View Details") {
+                    Button(String(localized: "notif.view_details", bundle: lang.bundle)) {
                         markRead(notification)
                         selectedNotification = notification
                     }
@@ -279,7 +282,7 @@ public struct NotificationCenterView: View {
                     .foregroundStyle(Color.fmsSurface)
 
                     if !notification.isAchieved {
-                        Button("Achieve") {
+                        Button(String(localized: "notif.achieve", bundle: lang.bundle)) {
                             achieve(notification)
                         }
                         .buttonStyle(.plain)
@@ -290,7 +293,7 @@ public struct NotificationCenterView: View {
                         .foregroundStyle(Color.fmsPrimary)
                     }
 
-                    Button("Dismiss") {
+                    Button(String(localized: "notif.dismiss", bundle: lang.bundle)) {
                         remove(notification)
                     }
                     .buttonStyle(.plain)

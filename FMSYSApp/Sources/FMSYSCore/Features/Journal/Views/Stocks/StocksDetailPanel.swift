@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct StocksDetailPanel: View {
+    @Environment(LanguageManager.self) private var lang
     @Bindable var trade: Trade
     let viewModel: TradeViewModel
     let onSave: () -> Void
@@ -14,7 +15,7 @@ public struct StocksDetailPanel: View {
     public var body: some View {
         TradeDetailLayout(
             trade: trade,
-            subtitle: "Stocks & ETFs",
+            subtitle: String(localized: "journal.detail.stocks.subtitle", bundle: lang.bundle),
             viewModel: viewModel,
             onDiscard: {},
             onSave: onSave
@@ -25,20 +26,22 @@ public struct StocksDetailPanel: View {
 
     private var metricsGrid: some View {
         HStack(spacing: 12) {
-            MetricCard(label: "Entry Price") {
+            MetricCard(label: String(localized: "journal.detail.metric.entry_price", bundle: lang.bundle)) {
                 TextField("0.00", value: $trade.entryPrice, format: .number)
             }
-            MetricCard(label: "Exit Price") {
+            MetricCard(label: String(localized: "journal.detail.metric.exit_price", bundle: lang.bundle)) {
                 TextField("0.00", value: Binding(
                     get: { trade.exitPrice ?? 0 },
                     set: { trade.exitPrice = $0 }
                 ), format: .number)
             }
-            MetricCard(label: "Quantity") {
+            MetricCard(label: String(localized: "journal.detail.metric.quantity", bundle: lang.bundle)) {
                 TextField("0", value: $trade.positionSize, format: .number)
             }
-            MetricCard(label: "Direction") {
-                Text(trade.direction == .long ? "Long" : "Short")
+            MetricCard(label: String(localized: "journal.detail.metric.direction", bundle: lang.bundle)) {
+                Text(trade.direction == .long
+                     ? String(localized: "journal.detail.metric.direction_long",  bundle: lang.bundle)
+                     : String(localized: "journal.detail.metric.direction_short", bundle: lang.bundle))
                     .foregroundStyle(trade.direction == .long ? Color.fmsPrimary : Color.fmsLoss)
             }
         }

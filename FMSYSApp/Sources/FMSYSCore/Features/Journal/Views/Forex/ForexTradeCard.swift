@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct ForexTradeCard: View {
+    @Environment(LanguageManager.self) private var lang
     let trade: Trade
     let isSelected: Bool
 
@@ -70,9 +71,13 @@ public struct ForexTradeCard: View {
 
     private var lastTradeNote: String {
         let pnl = computedPnL
-        if trade.exitPrice == nil { return "No active trades" }
-        if pnl >= 0 { return "Last trade: Profit $\(String(format: "%.2f", pnl))" }
-        return "Last trade: Loss -$\(String(format: "%.2f", abs(pnl)))"
+        if trade.exitPrice == nil {
+            return String(localized: "journal.card.forex.no_active_trades", bundle: lang.bundle)
+        }
+        if pnl >= 0 {
+            return String(format: String(localized: "journal.card.forex.last_trade_profit", bundle: lang.bundle), pnl)
+        }
+        return String(format: String(localized: "journal.card.forex.last_trade_loss", bundle: lang.bundle), abs(pnl))
     }
 
     private var computedPnL: Double {

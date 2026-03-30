@@ -21,6 +21,14 @@ public enum NotificationType: String, CaseIterable {
         case .user:       return "person.circle.fill"
         }
     }
+
+    public func localizedName(bundle: Bundle) -> String {
+        switch self {
+        case .priceAlert: return String(localized: "notif.type.trade_alert", bundle: bundle)
+        case .security:   return String(localized: "notif.type.security",    bundle: bundle)
+        case .user:       return String(localized: "notif.type.user",        bundle: bundle)
+        }
+    }
 }
 
 public struct AppNotification: Identifiable {

@@ -28,6 +28,7 @@ public struct MainAppView: View {
             appShell
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .environment(store)
+                .environment(LanguageManager.shared)
                 .sheet(isPresented: $showSettings) {
                     SettingsView(
                         initialTab: settingsInitialTab,
@@ -35,6 +36,7 @@ public struct MainAppView: View {
                         email: store.userEmail,
                         onDismiss: { showSettings = false }
                     )
+                    .environment(LanguageManager.shared)
                 }
                 .sheet(isPresented: $showNotificationCenter) {
                     NotificationCenterView(
@@ -61,6 +63,7 @@ public struct MainAppView: View {
                             showSettings = true
                         }
                     )
+                    .environment(LanguageManager.shared)
                 }
         } else {
             authFlow
@@ -174,6 +177,7 @@ public struct MainAppView: View {
                             showSettings = true
                         }
                     )
+                    .environment(LanguageManager.shared)
                 }
                 .padding(.leading, 4)
             }
@@ -205,6 +209,7 @@ public struct MainAppView: View {
         .buttonStyle(.plain)
         .popover(isPresented: isPresented, arrowEdge: .top) {
             popoverContent()
+                .environment(LanguageManager.shared)
         }
     }
 
@@ -260,5 +265,6 @@ public struct MainAppView: View {
                 }
             }
         }
+        .environment(LanguageManager.shared)
     }
 }

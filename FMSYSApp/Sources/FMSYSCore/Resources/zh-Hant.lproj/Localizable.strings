@@ -1,0 +1,529 @@
+// MARK: - 導覽列
+"nav.dashboard"         = "總覽";
+"nav.journal"           = "交易日誌";
+"nav.backtesting"       = "回測";
+"nav.strategy_lab"      = "策略實驗室";
+"nav.portfolio"         = "投資組合";
+"nav.news_feed"         = "市場資訊";
+
+// MARK: - 側邊欄卡片
+"sidebar.total_equity"  = "總資產";
+"sidebar.mtd"           = "本月";
+"sidebar.active_labs"   = "運行中的策略";
+"sidebar.running"       = "執行中";
+"sidebar.cpu_usage"     = "CPU 使用率";
+"sidebar.market_news"   = "市場新聞";
+"sidebar.live_feed"     = "即時資訊";
+"sidebar.sources_active" = "資料來源";
+
+// MARK: - 標題列
+"titlebar.search_placeholder" = "搜尋交易、日誌、分析...";
+
+// MARK: - 頭像 / 帳戶
+"avatar.sign_out"               = "登出";
+"avatar.settings"               = "設定";
+"avatar.dark_mode"              = "深色模式";
+"avatar.app_preferences"        = "應用程式偏好設定";
+"avatar.security_privacy"       = "安全性與隱私";
+"avatar.account_management"     = "帳號管理";
+"avatar.subscription_management" = "訂閱管理";
+"avatar.referral_program"       = "推薦計畫";
+"avatar.price_alerts"           = "價格警示";
+
+// MARK: - 驗證
+"auth.app_name"         = "TRADING SUITE PRO";
+"auth.tagline"          = "Trading Suite Pro 安全登入";
+"auth.username_label"   = "帳號 / 電子郵件";
+"auth.password_label"   = "密碼";
+"auth.sign_in"          = "登入";
+"auth.no_account"       = "還沒有帳號？";
+"auth.create_account"   = "建立帳號";
+"auth.forgot_password"  = "忘記密碼？";
+"auth.email_placeholder" = "輸入電子郵件";
+"auth.terms"            = "服務條款";
+"auth.privacy_policy"   = "隱私政策";
+"auth.contact_support"  = "聯絡客服";
+"auth.mfa_title"        = "身份驗證";
+"auth.mfa_subtitle"     = "請輸入驗證器 App 上\n顯示的 6 位數驗證碼";
+"auth.mfa_method"       = "驗證方式";
+"auth.mfa_google"       = "Google 驗證器";
+"auth.mfa_resend"       = "重新傳送驗證碼";
+"auth.mfa_locked"       = "帳號已鎖定";
+
+// MARK: - 設定
+"settings.title"        = "設定";
+"settings.close"        = "關閉";
+"settings.quick_settings" = "快速設定";
+
+// MARK: - 設定 / 偏好設定
+"prefs.title"           = "一般設定";
+"prefs.subtitle"        = "管理應用程式外觀與核心行為。";
+"prefs.appearance"      = "外觀";
+"prefs.theme_system"    = "跟隨系統";
+"prefs.theme_light"     = "淺色";
+"prefs.theme_dark"      = "深色";
+"prefs.behavior"        = "應用程式行為";
+"prefs.auto_save"       = "自動儲存版面配置";
+"prefs.auto_save_sub"   = "自動儲存您的工作區設定";
+"prefs.sound_effects"   = "音效";
+"prefs.sound_effects_sub" = "訂單成交與警示時播放音效";
+"prefs.language"        = "語言";
+"prefs.language_sub"    = "選擇偏好的顯示語言";
+"prefs.refresh_rate"    = "資料更新頻率";
+"prefs.realtime"        = "即時";
+"prefs.balanced"        = "平衡";
+"prefs.power_save"      = "省電";
+"prefs.reset"           = "恢復預設值";
+"prefs.save"            = "儲存變更";
+
+// MARK: - 設定 / 安全性
+"security.title"        = "雙重驗證";
+"security.subtitle"     = "使用 2FA 保護您的帳號";
+"security.current_method" = "目前方式：**Google 驗證器**\n備用驗證碼產生於 2023 年 10 月 12 日。";
+"security.login_history" = "登入紀錄";
+"security.login_history_sub" = "查看近期帳號存取記錄。";
+"security.device"       = "裝置";
+"security.ip"           = "IP 位址";
+"security.location"     = "位置";
+"security.time"         = "時間";
+"security.status"       = "狀態";
+"security.api_management" = "API 管理";
+"security.api_sub"      = "管理外部應用程式對您交易資料的存取。";
+"security.api_create_key" = "建立新 API 金鑰";
+"security.last_used"    = "上次使用：2 小時前 • 權限：讀取 / 交易";
+"security.revoke_access" = "撤銷存取";
+"security.export_log"   = "匯出記錄";
+"security.change_password" = "更改密碼";
+"security.danger_zone"  = "危險操作";
+"security.danger_sub"   = "帳號相關的不可逆操作。";
+"security.freeze_warning" = "此操作將凍結所有交易與存取，直到您聯絡客服為止。";
+"security.delete_warning" = "帳號及交易記錄一經刪除將無法復原。";
+"security.disable_title" = "停用 2FA";
+"security.disable_alert_title" = "停用雙重驗證？";
+"security.disable_confirm" = "停用";
+"security.delete_title" = "刪除帳號";
+"security.delete_account_btn" = "刪除我的帳號";
+"security.delete_alert_title" = "永久刪除帳號？";
+"security.delete_forever_confirm" = "永久刪除";
+"security.privacy_controls_title" = "隱私控制";
+"security.privacy_controls_subtitle" = "管理您的資料分享與顯示方式。";
+"security.privacy_public_profile" = "公開個人資料";
+"security.privacy_public_profile_sub" = "允許其他交易者查看您的個人資料";
+"security.privacy_share_perf" = "分享績效統計";
+"security.privacy_share_perf_sub" = "在排行榜上顯示您的勝率";
+"security.privacy_marketing" = "行銷通訊";
+"security.privacy_marketing_sub" = "接收技巧、優惠和產品更新";
+
+// MARK: - 設定 / 帳號
+"account.preferences"   = "帳號偏好設定";
+"account.adjust"        = "調整資料的處理與顯示方式。";
+"account.kyc"           = "KYC 已驗證";
+"account.id"            = "ID：4829-THM";
+"account.role"          = "專業交易員 • 成員自 2022 年 1 月";
+"account.member_since"  = "加入時間";
+"account.personal_info" = "個人資料";
+"account.field_full_name" = "全名";
+"account.field_email"   = "電子郵件";
+"account.field_phone"   = "電話";
+"account.field_region"  = "地區";
+"account.update_profile" = "更新個人資料";
+"account.security_auth" = "安全性與驗證";
+"account.two_factor_title" = "雙重驗證";
+"account.two_factor_subtitle" = "為您的帳號新增額外的安全防護";
+"account.two_factor_info" = "Google 驗證器已啟用";
+"account.field_current_password" = "目前密碼";
+"account.field_new_password" = "新密碼";
+"account.password_placeholder" = "輸入密碼";
+"account.update_password" = "更新密碼";
+"account.export_data"   = "匯出我的資料";
+"account.deactivate"    = "停用帳號";
+"account.deactivate_alert_title" = "停用帳號？";
+"account.deactivate_message" = "您的帳號將被停用。您可以隨時重新登入來恢復帳號。";
+"account.deactivate_confirm" = "停用";
+
+// MARK: - 通知
+"notif.type.trade_alert" = "交易警示";
+"notif.type.security"    = "安全警示";
+"notif.type.user"        = "用戶";
+"notif.title"           = "通知中心";
+"notif.subtitle"        = "管理您的最新警示與策略更新。";
+"notif.mark_all_read"   = "全部標為已讀";
+"notif.filter_all"      = "全部";
+"notif.filter_achieved" = "已完成";
+"notif.view_details"    = "查看詳情";
+"notif.achieve"         = "標為完成";
+"notif.dismiss"         = "忽略";
+
+// MARK: - 通知詳情
+"notification.price_alert.type"             = "價格警示";
+"notification.price_alert.current_price"    = "目前價格";
+"notification.price_alert.target_price"     = "目標價格";
+"notification.price_alert.triggered_title"  = "警示已觸發";
+"notification.price_alert.triggered_body"   = "您的目標價格已達到。請考慮檢視您的持倉並相應調整策略。";
+"notification.price_alert.volatility_label" = "價格波動（24H）";
+"notification.price_alert.high_risk"        = "高風險";
+
+"notification.security_alert.type"          = "安全警示";
+"notification.security_alert.device"        = "裝置";
+"notification.security_alert.ip_address"    = "IP 位址";
+"notification.security_alert.location"      = "位置";
+
+"notification.user.account_update"          = "帳號更新";
+"notification.user.account_status"          = "帳號狀態";
+"notification.user.plan_renewal"            = "方案續費";
+"notification.user.billing_cycle"           = "計費週期";
+"notification.user.renewal_date"            = "續費日期";
+
+// MARK: - 通知彈出視窗
+"notifications.title"           = "通知";
+"notifications.all_notifications" = "所有通知";
+"notifications.mark_all_read"   = "全部標為已讀";
+"notifications.read_all"        = "全部已讀";
+
+// MARK: - 分享彈出視窗
+"share.title"           = "分享";
+"share.export_pdf"      = "匯出 PDF 報告";
+"share.email_journal"   = "以電子郵件傳送日誌";
+"share.copy_link"       = "複製連結";
+"share.share_twitter"   = "在 X 上分享";
+
+// MARK: - 狀態列
+"statusbar.engine_ready"  = "引擎就緒";
+"statusbar.latency"       = "延遲";
+"statusbar.macos_version" = "macOS";
+"statusbar.core_version"  = "FMSYSCore";
+
+// MARK: - 總覽
+"dashboard.checklist.title"             = "每日清單";
+"dashboard.checklist.empty_hint"        = "尚無項目";
+"dashboard.checklist.new_item_placeholder" = "新增清單項目...";
+"dashboard.checklist.item_title_placeholder" = "項目";
+"dashboard.equity_curve.title"          = "資產曲線";
+"dashboard.equity_curve.subtitle"       = "累計損益隨時間變化";
+"dashboard.equity_curve.empty"          = "此時段尚無交易";
+"dashboard.market_overview.title"       = "市場概覽";
+"dashboard.psych.title"                 = "心理分析";
+"dashboard.psych.period"                = "時段";
+"dashboard.psych.heatmap_title"         = "交易情緒熱圖";
+"dashboard.psych.legend.profit"         = "獲利";
+"dashboard.psych.legend.neutral"        = "中性";
+"dashboard.psych.legend.loss"           = "虧損";
+"dashboard.psych.discipline_score"      = "紀律分數";
+"dashboard.psych.patience_index"        = "耐心指數";
+"dashboard.news.title"                  = "市場新聞";
+"dashboard.news.loading"                = "載入新聞中...";
+"dashboard.news.empty"                  = "目前沒有新聞";
+"dashboard.news.retry"                  = "重試";
+"dashboard.news.time_just_now"          = "剛剛";
+"dashboard.news.time_minutes_ago"       = "分鐘前";
+"dashboard.news.time_hours_ago"         = "小時前";
+"dashboard.news.time_days_ago"          = "天前";
+
+// MARK: - 回測
+"backtest.title"                        = "回測";
+"backtest.button.new"                   = "新增回測";
+"backtest.empty.title"                  = "沒有回測結果";
+"backtest.empty.description"            = "執行回測以在此查看結果";
+"backtest.equity_curve.title"           = "資產曲線";
+"backtest.equity_curve.subtitle"        = "模擬績效";
+"backtest.equity_curve.no_data"         = "沒有資產資料";
+"backtest.equity_curve.mode.daily"      = "每日";
+"backtest.equity_curve.mode.trade_by_trade" = "逐筆交易";
+"backtest.chart.axis.equity"            = "資產";
+"backtest.chart.axis.trade"             = "交易";
+"backtest.chart.x_label.start"         = "開始";
+"backtest.chart.x_label.end"           = "結束";
+"backtest.chart.x_label.trade"         = "交易";
+"backtest.kpi.win_rate"                 = "勝率";
+"backtest.kpi.win_rate.above_target"    = "高於目標";
+"backtest.kpi.win_rate.below_target"    = "低於目標";
+"backtest.kpi.profit_factor"            = "獲利因子";
+"backtest.kpi.profit_factor.excellent"  = "優秀";
+"backtest.kpi.profit_factor.fair"       = "尚可";
+"backtest.kpi.max_drawdown"             = "最大回撤";
+"backtest.kpi.sharpe"                   = "夏普比率";
+"backtest.trade_log.title"              = "交易記錄";
+"backtest.trade_log.empty"              = "沒有交易";
+"backtest.trade_log.col.date"           = "日期";
+"backtest.trade_log.col.symbol"         = "標的";
+"backtest.trade_log.col.type"           = "類型";
+"backtest.trade_log.col.net_profit"     = "淨損益";
+"backtest.trade_log.col.strategy"       = "策略";
+"backtest.trade_log.direction.long"     = "做多";
+"backtest.trade_log.direction.short"    = "做空";
+
+// MARK: - 策略實驗室
+"strategy.title"                        = "策略實驗室";
+"strategy.subtitle"                     = "管理並測試您的交易策略";
+"strategy.button.new"                   = "新增策略";
+"strategy.empty.title"                  = "沒有策略";
+"strategy.empty.description"            = "建立您的第一個策略以開始使用";
+"strategy.inspector.title"              = "策略詳情";
+"strategy.inspector.empty.title"        = "選擇策略";
+"strategy.inspector.empty.description"  = "選擇一個策略以查看其詳情";
+"strategy.inspector.logic.title"        = "策略邏輯";
+"strategy.inspector.parameters.title"   = "參數";
+"strategy.inspector.parameters.ema_fast" = "快速 EMA";
+"strategy.inspector.parameters.ema_slow" = "慢速 EMA";
+"strategy.inspector.parameters.trailing_stop" = "移動停損";
+"strategy.inspector.parameters.risk_management" = "風險管理";
+"strategy.inspector.run_backtest"       = "執行回測";
+
+// MARK: - 投資組合
+"portfolio.kpi.total_pnl"               = "總損益";
+"portfolio.kpi.daily_pnl"               = "今日損益";
+"portfolio.kpi.win_rate_range"          = "勝率";
+"portfolio.kpi.pnl_range"               = "損益（時段）";
+"portfolio.kpi.trade_count"             = "交易次數";
+"portfolio.performance.title"           = "投資組合績效";
+"portfolio.performance.subtitle"        = "已平倉損益";
+"portfolio.performance.no_trades"       = "此時段沒有交易";
+"portfolio.positions.title"             = "持倉";
+"portfolio.positions.col.symbol"        = "標的";
+"portfolio.positions.col.qty"           = "數量";
+"portfolio.positions.col.last_price"    = "最新價格";
+"portfolio.positions.col.market_value"  = "市值";
+"portfolio.positions.col.unrealized_pnl" = "未實現損益";
+"portfolio.positions.view_all"          = "查看全部";
+"portfolio.inspector.total_assets"      = "總資產";
+"portfolio.inspector.allocation.title"  = "配置";
+"portfolio.inspector.risk.title"        = "風險指標";
+"portfolio.inspector.risk.open_count"   = "持倉數量";
+"portfolio.inspector.risk.margin_utilization" = "保證金使用率";
+"portfolio.inspector.risk.position_exposure" = "最大持倉";
+
+// MARK: - 交易日誌
+"journal.nav.title"                     = "交易日誌";
+"journal.list.all_trades"               = "所有交易";
+"journal.list.empty_title"              = "沒有交易";
+"journal.list.empty_subtitle"           = "開始記錄您的交易";
+"journal.list.no_trades"                = "尚無交易";
+"journal.list.no_trades_hint"           = "點擊 + 新增第一筆交易";
+"journal.list.log_first_trade"          = "記錄第一筆交易";
+"journal.list.import_panel_title"       = "匯入 CSV";
+"journal.list.import_panel_prompt"      = "將 CSV 檔案拖曳至此";
+"journal.list.import_help"              = "支援多數券商格式";
+"journal.list.sort_newest"              = "最新優先";
+"journal.list.sort_pnl"                 = "損益";
+"journal.filter.all"                    = "全部";
+"journal.filter.buy"                    = "買入";
+"journal.filter.sell"                   = "賣出";
+"journal.filter.call"                   = "買權";
+"journal.filter.put"                    = "賣權";
+"journal.filter.spot"                   = "現貨";
+"journal.filter.futures"                = "期貨";
+"journal.detail.select_trade"           = "選擇交易以查看詳情";
+
+// 交易卡片
+"journal.card.buy"                      = "買入";
+"journal.card.sell"                     = "賣出";
+"journal.card.shares"                   = "股";
+"journal.card.roe"                      = "股東權益報酬率";
+"journal.card.options.qty"              = "數量";
+"journal.card.options.exp"              = "到期";
+"journal.card.forex.last_trade_profit"  = "上筆交易獲利";
+"journal.card.forex.last_trade_loss"    = "上筆交易虧損";
+"journal.card.forex.no_active_trades"   = "沒有進行中的交易";
+
+// 交易詳情
+"journal.detail.metric.entry_price"     = "進場價格";
+"journal.detail.metric.exit_price"      = "出場價格";
+"journal.detail.metric.quantity"        = "數量";
+"journal.detail.metric.direction"       = "方向";
+"journal.detail.metric.direction_long"  = "做多";
+"journal.detail.metric.direction_short" = "做空";
+"journal.detail.metric.leverage"        = "槓桿";
+"journal.detail.metric.exposure"        = "曝險";
+"journal.detail.metric.cost_basis"      = "成本基礎";
+"journal.detail.metric.strike_price"    = "履約價格";
+"journal.detail.metric.expiration"      = "到期日";
+"journal.detail.metric.funding_rate"    = "資金費率";
+"journal.detail.metric.lot_size"        = "手數";
+"journal.detail.metric.pip_value"       = "點值";
+"journal.detail.metric.entry_rate"      = "進場匯率";
+
+"journal.detail.stocks.subtitle"        = "股票";
+"journal.detail.crypto.spot"            = "現貨";
+"journal.detail.crypto.futures"         = "期貨";
+"journal.detail.crypto.leverage"        = "槓桿";
+"journal.detail.crypto.executing_wallet" = "執行錢包";
+"journal.detail.crypto.copy"            = "複製";
+"journal.detail.forex.subtitle_prefix"  = "外匯";
+"journal.detail.forex.session.london"   = "倫敦盤";
+"journal.detail.forex.session.ny"       = "紐約盤";
+"journal.detail.forex.session.asia"     = "亞洲盤";
+"journal.detail.forex.session.off_hours" = "非交易時段";
+"journal.detail.options.call_bullish"   = "買權 — 看漲";
+"journal.detail.options.put_bearish"    = "賣權 — 看跌";
+"journal.detail.options.greeks_title"   = "希臘字母";
+"journal.detail.options.greek.delta"    = "Delta";
+"journal.detail.options.greek.gamma"    = "Gamma";
+"journal.detail.options.greek.theta"    = "Theta";
+"journal.detail.options.greek.vega"     = "Vega";
+
+// 交易記錄表單
+"journal.entry.title"                   = "新增交易";
+"journal.entry.subtitle"                = "記錄一筆新交易";
+"journal.entry.asset_ticker"            = "資產 / 代碼";
+"journal.entry.category"                = "類別";
+"journal.entry.direction"               = "方向";
+"journal.entry.direction.long"          = "做多";
+"journal.entry.direction.short"         = "做空";
+"journal.entry.direction.call"          = "買權";
+"journal.entry.direction.put"           = "賣權";
+"journal.entry.execution_details"       = "執行詳情";
+"journal.entry.field.entry_price"       = "進場價格";
+"journal.entry.field.exit_price"        = "出場價格";
+"journal.entry.field.exit_price_optional" = "出場價格（選填）";
+"journal.entry.field.quantity_shares"   = "數量（股）";
+"journal.entry.field.quantity_contracts" = "數量（合約）";
+"journal.entry.field.position_size"     = "倉位大小";
+"journal.entry.field.stop_loss"         = "停損";
+"journal.entry.field.cost_basis"        = "成本基礎";
+"journal.entry.field.leverage"          = "槓桿";
+"journal.entry.field.exposure"          = "曝險";
+"journal.entry.field.entry_price_premium" = "進場價格（期權金）";
+"journal.entry.field.strike_price"      = "履約價格";
+"journal.entry.field.expiration_date"   = "到期日";
+"journal.entry.field.funding_rate"      = "資金費率";
+"journal.entry.field.lot_size"          = "手數";
+"journal.entry.field.pip_value"         = "點值";
+"journal.entry.field.wallet_address"    = "錢包地址";
+"journal.entry.notes_reflection"        = "備註與反思";
+"journal.entry.save_trade"              = "儲存交易";
+
+// 平倉
+"journal.close_trade.title"             = "平倉";
+"journal.close_trade.exit_price"        = "出場價格";
+"journal.close_trade.exit_time"         = "出場時間";
+"journal.close_trade.entry_price"       = "進場價格";
+"journal.close_trade.estimated_pl"      = "預估損益";
+"journal.close_trade.confirm_button"    = "確認平倉";
+
+// 附件
+"journal.attachments.title"             = "附件";
+"journal.attachments.drop_hint"         = "將圖片拖曳至此";
+"journal.attachments.add_help"          = "新增截圖或圖表";
+
+// CSV 匯入
+"journal.csv.map_columns_title"         = "欄位對應";
+"journal.csv.col_header_csv"            = "CSV 欄位";
+"journal.csv.col_header_maps_to"        = "對應至";
+"journal.csv.col_header_sample"         = "範例";
+"journal.csv.skip_option"               = "略過";
+"journal.csv.col.date"                  = "日期";
+"journal.csv.col.symbol"                = "標的";
+"journal.csv.col.direction"             = "方向";
+"journal.csv.col.entry"                 = "進場價格";
+"journal.csv.col.size"                  = "大小";
+"journal.csv.all_fields_mapped"         = "所有必填欄位已對應";
+"journal.csv.missing_fields"            = "缺少必填欄位";
+"journal.csv.confirm_import"            = "匯入";
+"journal.csv.import_button"             = "匯入 CSV";
+"journal.csv.preview_title"             = "匯入預覽";
+"journal.csv.preview_subtitle"          = "匯入前請確認交易資料";
+"journal.csv.rows_with_errors"          = "含錯誤的列";
+"journal.csv.row_error"                 = "錯誤";
+"journal.csv.more_trades"               = "筆交易";
+
+// MARK: - 市場資訊
+"newsfeed.loading"                      = "載入新聞中...";
+"newsfeed.empty.title"                  = "沒有文章";
+"newsfeed.empty.retry"                  = "重試";
+"newsfeed.section.latest_stories"       = "最新報導";
+"newsfeed.featured.read_full_story"     = "閱讀全文";
+"newsfeed.category.general"             = "綜合";
+"newsfeed.category.stocks"              = "股票";
+"newsfeed.category.crypto"              = "加密貨幣";
+"newsfeed.category.forex"               = "外匯";
+"newsfeed.tag.general"                  = "綜合";
+"newsfeed.tag.markets"                  = "市場";
+"newsfeed.tag.stocks"                   = "股票";
+"newsfeed.tag.crypto"                   = "加密貨幣";
+"newsfeed.tag.forex"                    = "外匯";
+"newsfeed.panel.market_sentiment"       = "市場情緒";
+"newsfeed.panel.sentiment.fear"         = "恐懼";
+"newsfeed.panel.sentiment.greed"        = "貪婪";
+"newsfeed.panel.sentiment.description"  = "恐懼與貪婪指數";
+"newsfeed.panel.trending_tickers"       = "熱門標的";
+"newsfeed.panel.upcoming_events"        = "即將到來的事件";
+"newsfeed.panel.articles_by_source"     = "依來源";
+"newsfeed.panel.impact.high"            = "高";
+"newsfeed.panel.impact.medium"          = "中";
+"newsfeed.panel.impact.low"             = "低";
+"newsfeed.time.just_now"                = "剛剛";
+"newsfeed.time.minutes_ago"             = "分鐘前";
+"newsfeed.time.hours_ago"               = "小時前";
+"newsfeed.time.days_ago"                = "天前";
+
+// MARK: - 訂閱管理
+"subscription.title"                    = "訂閱管理";
+"subscription.current_plan_label"       = "目前方案";
+"subscription.status_active"            = "啟用中";
+"subscription.renewal_info"             = "續費日期";
+"subscription.payment_method"           = "付款方式";
+"subscription.visa_ending"              = "Visa 末四碼";
+"subscription.visa_expires"             = "到期日";
+"subscription.update_payment"           = "更新付款方式";
+"subscription.compare_plans"            = "比較方案";
+"subscription.badge_recommended"        = "推薦";
+"subscription.plan_basic_name"          = "基本";
+"subscription.plan_basic_subtitle"      = "適合個人交易者";
+"subscription.plan_pro_name"            = "專業";
+"subscription.plan_pro_subtitle"        = "適合認真的交易者";
+"subscription.period_monthly"           = "/月";
+"subscription.pro_plan_annual"          = "年付方案";
+"subscription.feature_basic_indicators" = "基本指標";
+"subscription.feature_100_indicators"   = "100+ 種指標";
+"subscription.feature_watchlists_3"     = "3 個自選清單";
+"subscription.feature_unlimited_watchlists" = "無限自選清單";
+"subscription.feature_realtime_quotes"  = "即時報價";
+"subscription.feature_multi_chart"      = "多圖表版面";
+"subscription.feature_level2_data"      = "Level 2 資料";
+"subscription.feature_api_access"       = "API 存取";
+"subscription.feature_full_api"         = "完整 API 存取";
+"subscription.cta_current_plan"         = "目前方案";
+"subscription.cta_manage_subscription"  = "管理訂閱";
+"subscription.switch_monthly"           = "切換為月付";
+"subscription.billing_history"          = "帳單記錄";
+"subscription.view_all"                 = "查看全部";
+"subscription.manage_billing"           = "管理帳單";
+"subscription.support_prompt"           = "需要訂閱相關協助？";
+"subscription.contact_support"          = "聯絡客服";
+"subscription.help_center"              = "說明中心";
+
+// MARK: - 推薦計畫
+"referral.hero_eyebrow"                 = "推薦賺好禮";
+"referral.hero_headline"                = "每推薦一人可獲得一個月免費";
+"referral.hero_body"                    = "分享您的專屬連結，當朋友加入 Trading Suite Pro 時即可獲得獎勵。";
+"referral.stat_total"                   = "推薦總數";
+"referral.stat_rewards"                 = "已獲得獎勵";
+"referral.stat_rewards_sub"             = "免費月數";
+"referral.stat_pending"                 = "待確認";
+"referral.your_link_title"              = "您的推薦連結";
+"referral.your_link_subtitle"           = "分享此連結以獲得獎勵";
+"referral.invite_cta"                   = "邀請朋友";
+"referral.quick_share"                  = "快速分享";
+"referral.program_rewards"              = "計畫獎勵";
+"referral.recent_title"                 = "近期推薦";
+"referral.col_user"                     = "用戶";
+"referral.col_date"                     = "日期";
+"referral.col_status"                   = "狀態";
+"referral.col_reward"                   = "獎勵";
+"referral.view_all"                     = "查看所有推薦";
+
+// MARK: - 常用操作
+"common.save"           = "儲存";
+"common.cancel"         = "取消";
+"common.close"          = "關閉";
+"common.dismiss"        = "忽略";
+"common.done"           = "完成";
+"common.view_details"   = "查看詳情";
+"common.view_trade"     = "查看交易";
+"common.view_source"    = "查看來源";
+"common.view_settings"  = "查看設定";
+"common.view_account"   = "查看帳號";
+"common.mark_achieved"  = "標為完成";
+"common.achieved"       = "已完成";
+"common.archived"       = "已歸檔";
+"common.archive"        = "歸檔";

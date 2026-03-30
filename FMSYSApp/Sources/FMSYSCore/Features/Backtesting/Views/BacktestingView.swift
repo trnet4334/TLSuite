@@ -5,6 +5,7 @@ import SwiftData
 public struct BacktestingView: View {
 
     @Bindable var viewModel: BacktestViewModel
+    @Environment(LanguageManager.self) private var lang
 
     public init(viewModel: BacktestViewModel) {
         self.viewModel = viewModel
@@ -34,7 +35,7 @@ public struct BacktestingView: View {
     private var headerRow: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Backtesting Analysis")
+                Text("backtest.title", bundle: lang.bundle)
                     .font(.system(size: 20, weight: .heavy))
                     .foregroundStyle(Color.fmsOnSurface)
                 if let result = viewModel.selectedResult {
@@ -56,7 +57,7 @@ public struct BacktestingView: View {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 14))
                     .accessibilityHidden(true)
-                Text("New Backtest")
+                Text("backtest.button.new", bundle: lang.bundle)
                     .font(.system(size: 13, weight: .semibold))
             }
             .foregroundStyle(Color.black)
@@ -72,9 +73,9 @@ public struct BacktestingView: View {
 
     private var emptyState: some View {
         ContentUnavailableView(
-            "No Backtests Yet",
+            String(localized: "backtest.empty.title", bundle: lang.bundle),
             systemImage: "arrow.clockwise.circle",
-            description: Text("Run a backtest from the Strategy Lab to see results here.")
+            description: Text("backtest.empty.description", bundle: lang.bundle)
         )
     }
 }

@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct TradeListView: View {
+    @Environment(LanguageManager.self) private var lang
     @State private var viewModel: TradeViewModel
     @State private var showingEntry = false
     @State private var showingDashboard = false
@@ -17,7 +18,7 @@ public struct TradeListView: View {
                 tradeList
             }
         }
-        .navigationTitle("Journal")
+        .navigationTitle(String(localized: "journal.nav.title", bundle: lang.bundle))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -42,10 +43,12 @@ public struct TradeListView: View {
                 viewModel: viewModel,
                 onDismiss: { showingEntry = false }
             )
+            .environment(LanguageManager.shared)
         }
         .sheet(isPresented: $showingDashboard) {
             DashboardView(viewModel: DashboardViewModel(trades: viewModel.trades))
                 .frame(minWidth: 480, minHeight: 560)
+                .environment(LanguageManager.shared)
         }
         .onAppear { viewModel.loadTrades() }
     }
@@ -55,10 +58,10 @@ public struct TradeListView: View {
             Image(systemName: "tray")
                 .font(.system(size: 48))
                 .foregroundStyle(Color.fmsMuted)
-            Text("No trades yet")
+            Text("journal.list.no_trades", bundle: lang.bundle)
                 .font(.title3.bold())
                 .foregroundStyle(Color.fmsOnSurface)
-            Text("Tap + to log your first trade.")
+            Text("journal.list.no_trades_hint", bundle: lang.bundle)
                 .font(.subheadline)
                 .foregroundStyle(Color.fmsMuted)
         }

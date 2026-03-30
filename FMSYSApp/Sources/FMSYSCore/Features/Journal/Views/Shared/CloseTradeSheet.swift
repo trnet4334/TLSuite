@@ -2,6 +2,7 @@
 import SwiftUI
 
 public struct CloseTradeSheet: View {
+    @Environment(LanguageManager.self) private var lang
 
     let trade: Trade
     let onConfirm: (Double, Date) -> Void
@@ -44,7 +45,7 @@ public struct CloseTradeSheet: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("Close Position")
+                Text("journal.close_trade.title", bundle: lang.bundle)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.fmsOnSurface)
                 HStack(spacing: 6) {
@@ -55,7 +56,7 @@ public struct CloseTradeSheet: View {
                 }
             }
             Spacer()
-            Button("Cancel", action: onCancel)
+            Button(String(localized: "common.cancel", bundle: lang.bundle), action: onCancel)
                 .buttonStyle(.plain)
                 .font(.system(size: 12))
                 .foregroundStyle(Color.fmsMuted)
@@ -80,14 +81,14 @@ public struct CloseTradeSheet: View {
     private var content: some View {
         VStack(spacing: 16) {
             // Entry price (read-only)
-            row(label: "Entry Price") {
+            row(label: String(localized: "journal.close_trade.entry_price", bundle: lang.bundle)) {
                 Text(String(format: "$%.4g", trade.entryPrice))
                     .font(.system(size: 14, weight: .semibold).monospacedDigit())
                     .foregroundStyle(Color.fmsOnSurface)
             }
 
             // Exit price (input)
-            row(label: "Exit Price") {
+            row(label: String(localized: "journal.close_trade.exit_price", bundle: lang.bundle)) {
                 TextField("0.00", text: $exitPriceText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 14, weight: .semibold).monospacedDigit())
@@ -103,7 +104,7 @@ public struct CloseTradeSheet: View {
             }
 
             // Exit time
-            row(label: "Exit Time") {
+            row(label: String(localized: "journal.close_trade.exit_time", bundle: lang.bundle)) {
                 DatePicker("", selection: $exitAt, displayedComponents: [.date, .hourAndMinute])
                     .labelsHidden()
                     .font(.system(size: 12))
@@ -132,7 +133,7 @@ public struct CloseTradeSheet: View {
         let color = positive ? Color.fmsPrimary : Color.fmsLoss
         return HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Estimated P/L")
+                Text("journal.close_trade.estimated_pl", bundle: lang.bundle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(color.opacity(0.7))
                     .textCase(.uppercase)
@@ -166,7 +167,7 @@ public struct CloseTradeSheet: View {
                 guard let price = exitPrice else { return }
                 onConfirm(price, exitAt)
             } label: {
-                Text("Close Position")
+                Text("journal.close_trade.confirm_button", bundle: lang.bundle)
                     .font(.system(size: 13, weight: .semibold))
                     .padding(.horizontal, 20)
                     .padding(.vertical, 8)

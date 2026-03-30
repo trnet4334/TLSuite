@@ -5,6 +5,7 @@ public struct OTPFieldView: View {
     @Binding var code: String
     let onComplete: (String) -> Void
 
+    @FocusState private var isFocused: Bool
     private let length = 6
 
     public init(code: Binding<String>, onComplete: @escaping (String) -> Void = { _ in }) {
@@ -18,26 +19,29 @@ public struct OTPFieldView: View {
                 digitBox(at: index)
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture { isFocused = true }
         .overlay {
-            // Hidden text field captures input
             TextField("", text: $code)
+                .focused($isFocused)
                 .opacity(0.01)
+                .allowsHitTesting(false)
                 .onChange(of: code) { _, new in
                     let filtered = String(new.filter { $0.isNumber }.prefix(length))
                     if filtered != new { code = filtered }
                     if filtered.count == length { onComplete(filtered) }
                 }
         }
+        .onAppear { isFocused = true }
     }
 
     private func digitBox(at index: Int) -> some View {
         let digits = Array(code)
         let char: String = index < digits.count ? String(digits[index]) : ""
-        let isActive = index == code.count
 
         return ZStack {
             RoundedRectangle(cornerRadius: 8)
-                .stroke(isActive ? Color.fmsPrimary : Color.fmsMuted.opacity(0.4), lineWidth: isActive ? 2 : 1)
+                .stroke(Color.fmsMuted.opacity(0.4), lineWidth: 1)
                 .frame(width: 44, height: 52)
                 .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 8))
             Text(char)

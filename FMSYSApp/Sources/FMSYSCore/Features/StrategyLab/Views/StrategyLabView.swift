@@ -4,6 +4,7 @@ import SwiftData
 
 public struct StrategyLabView: View {
     @Bindable var viewModel: StrategyViewModel
+    @Environment(LanguageManager.self) private var lang
 
     public init(viewModel: StrategyViewModel) {
         self.viewModel = viewModel
@@ -46,10 +47,10 @@ public struct StrategyLabView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Strategy Lab")
+                Text("strategy.title", bundle: lang.bundle)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
-                Text("Develop, test, and optimize algorithmic models")
+                Text("strategy.subtitle", bundle: lang.bundle)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.fmsMuted)
             }
@@ -57,7 +58,7 @@ public struct StrategyLabView: View {
             Button {
                 viewModel.add()
             } label: {
-                Label("New Strategy", systemImage: "plus")
+                Label(String(localized: "strategy.button.new", bundle: lang.bundle), systemImage: "plus")
                     .font(.system(size: 13, weight: .bold))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 7)
@@ -72,7 +73,7 @@ public struct StrategyLabView: View {
     private var inspectorPanel: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Inspector")
+                Text("strategy.inspector.title", bundle: lang.bundle)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
@@ -94,14 +95,14 @@ public struct StrategyLabView: View {
             Image(systemName: "flask.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(Color.fmsMuted.opacity(0.4))
-            Text("Create Your First Strategy")
+            Text("strategy.empty.title", bundle: lang.bundle)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.fmsOnSurface)
-            Text("Build, test, and optimize your algorithmic trading strategies.")
+            Text("strategy.empty.description", bundle: lang.bundle)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.fmsMuted)
                 .multilineTextAlignment(.center)
-            Button("New Strategy") { viewModel.add() }
+            Button(String(localized: "strategy.button.new", bundle: lang.bundle)) { viewModel.add() }
                 .buttonStyle(.borderedProminent)
                 .tint(Color.fmsPrimary)
             Spacer()

@@ -13,6 +13,8 @@ public final class TradeViewModel {
 
     /// Called after any trade mutation (create/update/delete). Used by AppStore to keep TradingDataService in sync.
     public var onTradesChanged: (() -> Void)?
+    /// Set from outside (e.g. notification deep-link) to auto-select a trade when the journal opens.
+    public var pendingTradeId: UUID? = nil
 
     private let repository: TradeRepository
     private let userId: String

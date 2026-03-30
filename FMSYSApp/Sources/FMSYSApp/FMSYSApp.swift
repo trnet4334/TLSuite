@@ -22,16 +22,7 @@ struct FMSYSApp: App {
         }
     }()
 
-    private let authService: AuthService = {
-        guard let baseURL = URL(string: "https://api.fmsys.io/v1") else {
-            fatalError("Invalid base URL: configuration error")
-        }
-        return AuthService(
-            client: APIClient(),
-            keychain: KeychainManager(),
-            baseURL: baseURL
-        )
-    }()
+    private let authService: LocalAuthService = LocalAuthService()
 
     init() {
         NSApplication.shared.setActivationPolicy(.regular)
@@ -40,13 +31,7 @@ struct FMSYSApp: App {
     var body: some Scene {
         WindowGroup {
             MainAppView(
-                store: {
-                    let store = AppStore(modelContainer: modelContainer)
-                    #if DEBUG
-                    store.markAuthenticated()
-                    #endif
-                    return store
-                }(),
+                store: AppStore(modelContainer: modelContainer),
                 authService: authService
             )
             .frame(minWidth: 1000, minHeight: 640)

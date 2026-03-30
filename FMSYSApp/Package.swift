@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "FMSYSApp",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "FMSYSApp", targets: ["FMSYSApp"]),
@@ -16,7 +17,8 @@ let package = Package(
         ),
         .target(
             name: "FMSYSCore",
-            path: "Sources/FMSYSCore"
+            path: "Sources/FMSYSCore",
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "FMSYSAppTests",

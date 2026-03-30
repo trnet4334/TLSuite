@@ -3,6 +3,7 @@ import SwiftUI
 import AppKit
 
 public struct AttachmentsSection: View {
+    @Environment(LanguageManager.self) private var lang
     let attachments: [JournalAttachment]
     let onAdd: () -> Void
     let onDelete: (JournalAttachment) -> Void
@@ -24,7 +25,7 @@ public struct AttachmentsSection: View {
         VStack(alignment: .leading, spacing: 10) {
             // Section header
             HStack {
-                Label("Attachments", systemImage: "photo.on.rectangle")
+                Label(String(localized: "journal.attachments.title", bundle: lang.bundle), systemImage: "photo.on.rectangle")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
@@ -36,7 +37,7 @@ public struct AttachmentsSection: View {
                         .foregroundStyle(Color.fmsPrimary)
                 }
                 .buttonStyle(.plain)
-                .help("Add image attachment")
+                .help(String(localized: "journal.attachments.add_help", bundle: lang.bundle))
             }
 
             if attachments.isEmpty {
@@ -45,7 +46,7 @@ public struct AttachmentsSection: View {
                     Image(systemName: "plus.viewfinder")
                         .font(.system(size: 28))
                         .foregroundStyle(Color.fmsMuted)
-                    Text("Drop images here or click + to add")
+                    Text("journal.attachments.drop_hint", bundle: lang.bundle)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.fmsMuted)
                 }
@@ -92,6 +93,7 @@ public struct AttachmentsSection: View {
                 FullImageView(image: image, fileName: attachment.originalFileName) {
                     showingFullImage = false
                 }
+                .environment(LanguageManager.shared)
             }
         }
     }
@@ -132,6 +134,7 @@ public struct AttachmentsSection: View {
 // MARK: - Full image lightbox
 
 private struct FullImageView: View {
+    @Environment(LanguageManager.self) private var lang
     let image: NSImage
     let fileName: String
     let onDismiss: () -> Void
@@ -143,7 +146,7 @@ private struct FullImageView: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.fmsOnSurface)
                 Spacer()
-                Button("Close", action: onDismiss)
+                Button(String(localized: "common.close", bundle: lang.bundle), action: onDismiss)
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.fmsMuted)
             }

@@ -4,6 +4,7 @@ public struct LoginView: View {
     @State private var viewModel: AuthViewModel
     @State private var email = ""
     @State private var password = ""
+    @Environment(LanguageManager.self) private var lang
 
     let onAuthenticated: () -> Void
     let onMFARequired: (String, String) -> Void
@@ -67,8 +68,6 @@ public struct LoginView: View {
     private var card: some View {
         VStack(spacing: 24) {
             cardHeader
-            oauthButtons
-            divider
             formSection
             footerLinks
         }
@@ -77,7 +76,7 @@ public struct LoginView: View {
 
     private var cardHeader: some View {
         VStack(spacing: 6) {
-            Text("TRADING SUITE PRO")
+            Text("auth.app_name", bundle: lang.bundle)
                 .font(.system(size: 10, weight: .bold))
                 .kerning(2)
                 .foregroundStyle(Color.fmsMuted)
@@ -86,55 +85,10 @@ public struct LoginView: View {
                 .font(.system(size: 42, weight: .heavy))
                 .foregroundStyle(Color.fmsOnSurface)
 
-            Text("Secure Login for Trading Suite Pro")
+            Text("auth.tagline", bundle: lang.bundle)
                 .font(.system(size: 14))
                 .foregroundStyle(Color.fmsMuted)
                 .multilineTextAlignment(.center)
-        }
-    }
-
-    private var oauthButtons: some View {
-        VStack(spacing: 10) {
-            Button {
-                // OAuth — coming soon
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "globe")
-                        .font(.system(size: 16, weight: .medium))
-                    Text("Continue with Google")
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2), lineWidth: 1))
-                .foregroundStyle(Color.black)
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                // Passkey — coming soon
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "key.fill")
-                        .font(.system(size: 16, weight: .medium))
-                    Text("Continue with Apple Passkey")
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Color.fmsSurface, in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var divider: some View {
-        HStack(spacing: 12) {
-            Rectangle().frame(height: 0.5).foregroundStyle(Color.fmsMuted.opacity(0.4))
-            Text("OR").font(.system(size: 11, weight: .semibold)).foregroundStyle(Color.fmsMuted)
-            Rectangle().frame(height: 0.5).foregroundStyle(Color.fmsMuted.opacity(0.4))
         }
     }
 
@@ -142,7 +96,7 @@ public struct LoginView: View {
         VStack(spacing: 12) {
             // Email
             VStack(alignment: .leading, spacing: 6) {
-                Text("USERNAME / EMAIL")
+                Text("auth.username_label", bundle: lang.bundle)
                     .font(.system(size: 11, weight: .bold))
                     .kerning(0.5)
                     .foregroundStyle(Color.fmsMuted)
@@ -150,23 +104,25 @@ public struct LoginView: View {
                     Image(systemName: "at")
                         .foregroundStyle(Color.fmsMuted)
                         .frame(width: 16)
-                    TextField("name@company.com", text: $email)
-                        .foregroundStyle(Color.fmsOnSurface)
+                    TextField(
+                        String(localized: "auth.email_placeholder", bundle: lang.bundle),
+                        text: $email
+                    )
+                    .foregroundStyle(Color.fmsOnSurface)
                 }
                 .padding(12)
                 .background(Color.fmsBackground, in: RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.fmsMuted.opacity(0.2), lineWidth: 1))
             }
 
             // Password
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("PASSWORD")
+                    Text("auth.password_label", bundle: lang.bundle)
                         .font(.system(size: 11, weight: .bold))
                         .kerning(0.5)
                         .foregroundStyle(Color.fmsMuted)
                     Spacer()
-                    Button("Forgot?") {}
+                    Button(String(localized: "auth.forgot_password", bundle: lang.bundle)) {}
                         .font(.system(size: 12))
                         .foregroundStyle(Color.fmsPrimary)
                         .buttonStyle(.plain)
@@ -180,7 +136,6 @@ public struct LoginView: View {
                 }
                 .padding(12)
                 .background(Color.fmsBackground, in: RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.fmsMuted.opacity(0.2), lineWidth: 1))
             }
 
             // Sign In button
@@ -191,7 +146,7 @@ public struct LoginView: View {
                     if viewModel.isLoading {
                         ProgressView().tint(Color.fmsBackground)
                     } else {
-                        Text("SIGN IN")
+                        Text("auth.sign_in", bundle: lang.bundle)
                             .font(.system(size: 14, weight: .bold))
                             .kerning(1)
                     }
@@ -211,18 +166,18 @@ public struct LoginView: View {
     private var footerLinks: some View {
         VStack(spacing: 12) {
             HStack(spacing: 4) {
-                Text("Don't have an account?")
+                Text("auth.no_account", bundle: lang.bundle)
                     .foregroundStyle(Color.fmsMuted)
-                Button("Create an account") {}
+                Button(String(localized: "auth.create_account", bundle: lang.bundle)) {}
                     .foregroundStyle(Color.fmsPrimary)
                     .buttonStyle(.plain)
             }
             .font(.system(size: 13))
 
             HStack(spacing: 16) {
-                Button("Privacy Policy") {}.buttonStyle(.plain)
-                Button("Terms") {}.buttonStyle(.plain)
-                Button("Contact Support") {}.buttonStyle(.plain)
+                Button(String(localized: "auth.privacy_policy", bundle: lang.bundle)) {}.buttonStyle(.plain)
+                Button(String(localized: "auth.terms", bundle: lang.bundle)) {}.buttonStyle(.plain)
+                Button(String(localized: "auth.contact_support", bundle: lang.bundle)) {}.buttonStyle(.plain)
             }
             .font(.system(size: 11))
             .foregroundStyle(Color.fmsMuted)

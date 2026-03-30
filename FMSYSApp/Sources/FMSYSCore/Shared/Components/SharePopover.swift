@@ -3,6 +3,8 @@ import SwiftUI
 import AppKit
 
 public struct SharePopover: View {
+    @Environment(LanguageManager.self) private var lang
+
     public init() {}
 
     public var body: some View {
@@ -13,25 +15,25 @@ public struct SharePopover: View {
                 .frame(width: 32, height: 4)
                 .padding(.top, 10)
 
-            Text("Share Options")
+            Text("share.title", bundle: lang.bundle)
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(Color.fmsOnSurface)
                 .padding(.top, 6)
                 .padding(.bottom, 8)
 
             VStack(spacing: 2) {
-                shareRow(systemImage: "link", label: "Copy Link") {
+                shareRow(systemImage: "link", label: String(localized: "share.copy_link", bundle: lang.bundle)) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString("https://fmsys.pro/journal", forType: .string)
                 }
-                shareRow(systemImage: "envelope", label: "Email Journal") {}
-                shareRow(systemImage: "doc.richtext", label: "Export as PDF") {}
+                shareRow(systemImage: "envelope", label: String(localized: "share.email_journal", bundle: lang.bundle)) {}
+                shareRow(systemImage: "doc.richtext", label: String(localized: "share.export_pdf", bundle: lang.bundle)) {}
 
                 Divider()
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
 
-                shareRow(systemImage: "square.and.arrow.up", label: "Share to Twitter/X") {}
+                shareRow(systemImage: "square.and.arrow.up", label: String(localized: "share.share_twitter", bundle: lang.bundle)) {}
             }
             .padding(.horizontal, 8)
             .padding(.bottom, 10)
